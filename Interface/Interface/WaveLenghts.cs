@@ -21,6 +21,13 @@ namespace Interface
         {
 
         }
+
+        public void Clear()
+        {
+            Emited = 0;
+            Reflected = Efficiency = 0;
+            XCoord = Magnification = FWHM = Double.NaN;
+        }
     }
     public class WaveLenghts
     {
@@ -37,6 +44,9 @@ namespace Interface
 
         public Wave[] GetWaveInRagne(SystemConfig.WaveLimits limits)
         {
+            for (int i = 0; i < m_Waves.Count; ++i)
+                m_Waves[i].Clear();
+
             return m_Waves.Where(x => (limits.min.lambda * 0.95 < x.lambda && x.lambda < limits.max.lambda * 1.05)).ToArray();
         }
         public void Add (DataBaseWavelength dwave)

@@ -64,6 +64,28 @@ namespace Interface
         #endregion
 
         private String parFileName = "par/Order_0.par";
+
+        private class OutStreamWriter : System.IO.TextWriter
+        {
+            public override Encoding Encoding { get { return Encoding.UTF8; } }
+
+            public event EventHandler<string> OnConsoleOut;
+            public override void Write(string str)
+            {
+                OnConsoleOut?.Invoke(this, str);
+                base.Write(str);
+            }
+            public override void WriteLine(string str)
+            {
+                OnConsoleOut?.Invoke(this, str + "\n");
+                base.WriteLine(str);
+            }
+            public override void Write(char str)
+            {
+                OnConsoleOut?.Invoke(this, ""+str);
+                base.Write(str);
+            }
+        }
         public Computation(ref SystemConfig sysConf, Wave[] waveSet)
         {
             InitializeComponent();
@@ -157,9 +179,16 @@ namespace Interface
                 }));
             };
 
+            XRayTraceOutput.Text = "Here some log info";
+
             await Task<int>.Factory.StartNew(() =>   RayTracing(1, parFileName, rpc, WaveTraced));
 
             return false;
+        }
+
+        private void P_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => XRayTraceOutput.Text += e.Data.ToString()));
         }
 
         private void WaveTraced(WaveTraceResult waveInfo)
@@ -189,6 +218,11 @@ namespace Interface
         {
             var expander = sender as Expander;
             this.Height -= expander.Height * 0.8;
+        }
+
+        private void Terminate_Click(object sender, RoutedEventArgs e)
+        {
+            terminate();
         }
     }
 }

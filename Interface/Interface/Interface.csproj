@@ -99,6 +99,7 @@
       <DependentUpon>Computation.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConfigPlotter.cs" />
+    <Compile Include="CrystalPlot.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="SystemConfig.cs" />
     <Compile Include="WaveLenghts.cs" />

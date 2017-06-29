@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections;
 using Newtonsoft.Json;
+using Microsoft.Win32;
 
 namespace Interface
 {
@@ -33,6 +34,7 @@ namespace Interface
         private WavePlotter m_WavePlot;
         private SystemConfig m_SysConf;
         private ConfigPlotter m_ConfPlot;
+        private CrystalPlot m_CrystalPlot;
 
         private UIList m_UIS;
         public MainWindow()
@@ -50,6 +52,8 @@ namespace Interface
 
             m_WavePlot = new WavePlotter(WavePlotCanvas);
             m_ConfPlot = new ConfigPlotter(ConfigurationPlot);
+
+            m_CrystalPlot = new Interface.CrystalPlot(CrystalPlotViev);
 
             m_UIS = new UIList()
             {
@@ -215,7 +219,19 @@ namespace Interface
         {
             string jsonConf = Newtonsoft.Json.JsonConvert.SerializeObject(m_SysConf);
 
-            System.IO.StreamWriter sw = new System.IO.StreamWriter("../../json.json");
+            var debugPath = "../../json.json";
+
+            string configFilePath = debugPath;
+
+            var saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "Config files (*.xconf)|*.xconf|All file (*.*)|*.*";
+
+            if (saveDialog.ShowDialog() == false)
+                return;
+
+            configFilePath = saveDialog.FileName;
+
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(configFilePath);
             sw.WriteLine(jsonConf);
 
             jsonConf = Newtonsoft.Json.JsonConvert.SerializeObject(m_WavesDataBase);
@@ -229,12 +245,25 @@ namespace Interface
 
         private void LoadConfig_Click(object sender, RoutedEventArgs e)
         {
-            System.IO.StreamReader sw = new System.IO.StreamReader("../../json.json");
+            var debugPath = "../../json.json";
+
+            string configFilePath = debugPath;
+
+            var openDialog = new OpenFileDialog();
+            openDialog.Filter = "Config files (*.xconf)|*.xconf|All file (*.*)|*.*";
+
+            if (openDialog.ShowDialog() == false)
+                return;
+
+            configFilePath = openDialog.FileName;
+
+            System.IO.StreamReader sw = new System.IO.StreamReader(configFilePath);
             var jsonConf = sw.ReadLine();
             m_SysConf = JsonConvert.DeserializeObject<SystemConfig>(jsonConf);
 
             jsonConf = sw.ReadLine();
-            m_WavesDataBase = JsonConvert.DeserializeObject<WaveLengthLoader>(jsonConf);
+            var waveBase = JsonConvert.DeserializeObject<WaveLengthLoader>(jsonConf);
+            m_WavesDataBase = new WaveLengthLoader(waveBase);
 
             jsonConf = sw.ReadLine();
             m_SelectedWaves = JsonConvert.DeserializeObject<WaveLenghts>(jsonConf);
@@ -270,7 +299,17 @@ namespace Interface
 
             c.Close();
 
+            PerformAnalis();
+
             this.IsEnabled = true;
+        }
+
+        private async void PerformAnalis()
+        {
+            string crystalFileName = "results/Order_0.dump";
+            await Task.Factory.StartNew( () => m_CrystalPlot.ReadCrystalPlane(crystalFileName));
+
+            m_CrystalPlot.PlotMirror(m_SysConf.crystalW, m_SysConf.crystalH);
         }
 
         private void OnWaveProcessed(object sender, Wave e)

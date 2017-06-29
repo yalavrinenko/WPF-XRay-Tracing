@@ -36,10 +36,22 @@ namespace Interface
     {
         private List<DataBaseWavelength> m_WaveDatabase;
         private string m_DBName;
+
+        public string DataBasePath { get { return m_DBName; } set { m_DBName = value; } }
         public WaveLengthLoader(string DBFile)
         {
             m_DBName = DBFile;
             ReadDatabase();
+        }
+
+        public WaveLengthLoader(WaveLengthLoader loader)
+        {
+            m_DBName = loader.m_DBName;
+            ReadDatabase();
+        }
+
+        public WaveLengthLoader()
+        {
         }
 
         public List<DataBaseWavelength> Search(string pattern)

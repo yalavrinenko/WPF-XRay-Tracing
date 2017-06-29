@@ -393,6 +393,8 @@
 
                     <TabItem>
                         <TabItem.Header>Crystal plane</TabItem.Header>
+                        <oxy:PlotView Name="CrystalPlotViev">
+                        </oxy:PlotView>
                     </TabItem>
 
                     <TabItem Height="25" VerticalAlignment="Bottom">

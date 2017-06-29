@@ -19,6 +19,21 @@ namespace Interface
                     */
     public class WavePlotter {
 
+        private static class ColorMap
+        {
+            static string[] colors = {"0,0,0",
+            "0,0,255", "165,42,42", "210,205,30", "46,139,87",
+            "144,238,144", "255,0,255", "60,179,113", "0,0,128",
+            "0,255,255", "184,134,11", "0,128,0", "75,0,130",
+            "255,69,0", "152,251,152", "128,0,128", "65,105,225",
+            "160,82,45", "216,191,216", "255,127,80",};
+
+            public static string GetColor(int index)
+            {
+                return colors[index % colors.Length];
+            }
+        }
+
         private Plot m_Model;
         private SystemConfig.WaveLimits m_Limits;
         private LinearBarSeries m_WaveLimitBar;
@@ -71,7 +86,7 @@ namespace Interface
         {
             m_Model.Series.Clear();
             m_Model.InvalidatePlot(true);
-
+            
             if (waves.Count != 0)
             {
                 var minW = waves.Min(x => x.lambda) * 0.95;
@@ -85,14 +100,18 @@ namespace Interface
             {
                 SetWaveLimits(m_Limits);
             }
-         
+
+            var index = 0;
             foreach (var groupedWave in waves.GroupBy(x => x.Order))
             {
                 var waveSeries = new LinearBarSeries()
                 {
                     BarWidth = 0.0001,
-                    StrokeThickness = 2
+                    StrokeThickness = 2,
+                    StrokeColor = OxyColor.Parse(ColorMap.GetColor(index)).ToColor()
                 };
+
+                ++index;
 
                 waveSeries.ItemsSource = groupedWave.Select(x =>
                {
