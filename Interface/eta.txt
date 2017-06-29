@@ -1,0 +1,113 @@
+[INPUT]
+Crystal type = Sphere
+Crystal 2d = 8.512 [A]
+Crystal radius R = 150 [mm]
+Crystal W x H = 46 X 12 [mm]
+Source size W x H= 0.1 X 0.1 [mm]
+Detector size W x H= 500 X 400 [mm]
+Central wavelength = 6.0598 [A]
+Source distance = 7829.48 [mm]
+Main reflection order m = 1
+Source solid angle = 0.00010844 [sr]
+
+
+[OUTPUT]
+Bragg Angle = 45.3907 [deg]
+Incident Angle = 44.6093 [deg]
+FRO angle = 89.2185 [deg]
+Detector angle = 44.6093 [deg]
+Detector to crystal = 106.787 [mm]
+Detector to center = 75.0001 [mm]
+
+
+[RESULTS]
+Reflection limits for 1 order
+Min wavelength = 5.08478	Position = -20.8133
+Max wavelength = 6.89352	Position = 13.0705
+Reference line = Al He He7; 6.0598
+Dispersion curve:  λ = 0.000667709X**2 + -0.0582421X + 6.06023
+***************************************************************
+Name	Wavelength	Emitted	Reflected	Efficiency	XCoords	Magnification	FWHM	Order	Line Width
+Al He He9	6.0134	300000	186	5.28044e-08	-0.835565	0.0118	0.015975	1	
+Al He He7	6.0598	500000	316	5.38264e-08	0.001636	0.01314	0.013957	1	
+Al He Ly7	5.49285	900000	501	4.74104e-08	-11.1488	0.01417	0.014772	1	
+Al He Ly6	5.5345	700000	405	4.9276e-08	-10.2381	0.01398	0.013479	1	
+
+
+Dispercion curves for the following reference lines
+For L_ref = 5.5345:	 λ = 0.000667709X**2 + -0.0445677X + 5.53386
+For L_ref = 5.08478:	Unable to construct curve
+For L_ref = 6.89352:	Unable to construct curve
+For L_ref = 6.0598:	 λ = 0.000667709X**2 + -0.0582421X + 6.06023
+For L_ref = 5.49285:	 λ = 0.000667709X**2 + -0.0433515X + 5.49382
+For L_ref = 6.0134:	 λ = 0.000667709X**2 + -0.0571241X + 6.01194
+
+[REFL. FUNCTION IN 1 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 2 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 3 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 4 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 5 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 6 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 7 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 8 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 9 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]
+
+[REFL. FUNCTION IN 10 ORDER]
+Crystal 2d = 8.512 [A]
+REFL. File Name = C:\Users\cheshire\Desktop\GIT\XRay-tracing\Interface\Interface\Input\quartz100.curve
+REFL. HW = 0.22 [deg]
+REFL. Step = 0.001
+REFL. Size = 441 [points]

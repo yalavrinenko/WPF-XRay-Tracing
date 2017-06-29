@@ -1,0 +1,33 @@
+﻿<Window x:Class="Interface.Computation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Interface"
+        mc:Ignorable="d"
+        WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterScreen"
+        Width="600" Height="250"
+        Title="Computation" FontSize="16">
+    <Grid Margin="5,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="3*"/>
+        </Grid.RowDefinitions>
+        <Label Panel.ZIndex="1" Name="WaveProgressLabel" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,4,0,5">Computation</Label>
+        <ProgressBar Name="WaveProgress" Grid.Row="0" Margin="0,10"/>
+
+        <Label Panel.ZIndex="1" Grid.Row="1" Name="RaysProgresLabel" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,4,0,5">Computation</Label>
+        <ProgressBar Name="RaysProgres"   Grid.Row="1" Margin="0,10"/>
+        <Button Width="562" Grid.Row="2" Content="Cancel" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,6,10,10"/>
+        <Expander Collapsed="Expander_Collapsed" Expanded="Expander_Expanded"  Grid.Row="3" Header="Show tracing output" HorizontalAlignment="Left" Height="185" VerticalAlignment="Top" Width="582">
+            <Grid Background="Black">
+                <TextBox IsEnabled="False" Name="XRayTraceOutput" Background="Black" Foreground="White" FontSize="12">
+                    Some log text
+                </TextBox>
+            </Grid>
+        </Expander>
+    </Grid>
+</Window>

@@ -1,0 +1,411 @@
+﻿<Window x:Class="Interface.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Interface"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        WindowStartupLocation="Manual"
+        mc:Ignorable="d"
+        Title="XRayTracing" Height="1010" Width="1500" FontSize="14">
+    <Window.DataContext>
+        <local:SystemConfig/>
+    </Window.DataContext>
+    <Grid DockPanel.Dock="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="310*"/>
+            <ColumnDefinition Width="450*"/>
+            <ColumnDefinition Width="750*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Menu>
+            <MenuItem Header="Save">
+                <MenuItem Header="Save results"></MenuItem>
+                <MenuItem Header="Save images"></MenuItem>
+                <MenuItem Header="Save config" Click="SaveConfig_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Load">
+                <MenuItem Header="Load config" Name="LoadConfig" Click="LoadConfig_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <Border Grid.Row="1" Grid.Column="0" Margin="5,5,0,5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"></RowDefinition>
+                    <RowDefinition Height="5"></RowDefinition>
+                    <RowDefinition Height="375*"></RowDefinition>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="299*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Height="70">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="5*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Wave base" d:LayoutOverrides="Width, LeftMargin, RightMargin, TopMargin, BottomMargin" HorizontalContentAlignment="Center"/>
+                    <Label FontSize="13" Content="Search Wavelengths" Grid.Row="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" HorizontalContentAlignment="Center"/>
+                    <local:OpenFileButton Loaded="WaveDataBaseSelection_Loaded" 
+                                          SelectedFileName="../../trans-db.txt"
+                                          Extension="Wave base (*.txt)|*.txt|All files (*.*)|*.*" 
+                                          x:Name="WaveDataBaseSelection" FileSelect="WaveDataBaseSelection_FileSelect" Height="32" Grid.Column="1" 
+                                          d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" 
+                                          VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBox TextWrapping="NoWrap" TextChanged="WaveSearch_TextChanged" x:Name="WaveSearch" Grid.Column="1" Grid.Row="1" Text="" d:LayoutOverrides="LeftMargin, RightMargin" VerticalContentAlignment="Center"/>
+                </Grid>
+                <Separator Grid.Row="1"></Separator>
+                <StackPanel Grid.Row="3" Orientation="Vertical">
+                    <Separator></Separator>
+                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center">Output Log</Label>
+                    <Separator></Separator>
+                </StackPanel>
+                <ScrollViewer Grid.Row="4" Grid.RowSpan="3">
+                    <TextBox x:Name="ConfigurationOuput" TextWrapping="Wrap">
+
+                    </TextBox>
+                </ScrollViewer>
+                <DataGrid IsReadOnly="True" x:Name="WavesDatabaseList" Margin="0,-2,0,5" Grid.Row="2"
+                          ScrollViewer.CanContentScroll="True" 
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto" AutoGenerateColumns="False" MouseDoubleClick="WavesDatabaseList_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Path=name}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="λ [A]" Binding="{Binding Path=lambda}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="dλ [mA]" Binding="{Binding Path=dlambda}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="I" Binding="{Binding Path=intensity}"></DataGridTextColumn>
+                    </DataGrid.Columns></DataGrid>
+
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="1" Margin="2,6,0,5">
+            <StackPanel Orientation="Vertical">
+                <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18">Crystal</Label>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition Width="350*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Content="Crystal file" HorizontalContentAlignment="Center"></Label>
+                    <local:OpenFileButton x:Name="CrystalConfigFile" FileSelect="CrystalConfigFile_FileSelect" Extension="Crystal config (*.cryst) |*.cryst|All files (*.*)|*.*" Grid.Column="1"/>
+
+                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">2d</Label>
+                    <TextBox Text="{Binding Path=Crystal2d, Mode=OneWay, BindsDirectlyToSource=True}" IsEnabled="False" Height="30" Grid.Column="1" Grid.Row="1" TextWrapping="NoWrap" VerticalContentAlignment="Center"></TextBox>
+
+                    <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="R, [mm]"/>
+                    <TextBox SourceUpdated="ConfValue_SourceUpdated" Text="{Binding Path=crystalR, NotifyOnSourceUpdated=True}" Height="30" Grid.Column="1" Grid.Row="2" TextWrapping="NoWrap" VerticalContentAlignment="Center"/>
+
+                    <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Crystal MxS [mm]"/>
+                    <Grid Grid.Column="1" Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Text="{Binding crystalW, NotifyOnSourceUpdated=True}" Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Text="{Binding crystalH, NotifyOnSourceUpdated=True}" Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width"/>
+                    </Grid>
+
+                    <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Type"/>
+                    <ComboBox Grid.Column="1" Grid.Row="4" SelectedIndex="0" Text="{Binding CrystType}">
+                        <ComboBoxItem>Sphere</ComboBoxItem>
+                        <ComboBoxItem>Cylinder</ComboBoxItem>
+                    </ComboBox>
+                </Grid>
+                <Separator></Separator>
+                <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Object"/>
+                <Grid IsEnabled="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition Width="350*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Content="Object file" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"></Label>
+                    <local:OpenFileButton Grid.Column="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+
+                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Distance/offset" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                    <Grid Grid.Column="1" Grid.Row="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="0.1"/>
+                        <TextBox Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="0.1"/>
+                    </Grid>
+
+                    <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Object pixel size" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+
+                </Grid>
+
+                <Separator></Separator>
+                <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Source"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition Width="350*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Source size MxS [mm]"/>
+                    <Grid Grid.Column="1" Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="{Binding SrcSizeW, NotifyOnSourceUpdated=True}"/>
+                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="{Binding SrcSizeH, NotifyOnSourceUpdated=True}"/>
+                    </Grid>
+
+                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Central λ [A]"/>
+                    <TextBox Name="CentralWaveLenght" SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="1" Grid.Row="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding centralWave, NotifyOnSourceUpdated=True}"/>
+
+                    <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Source Distance [mm]"/>
+                    <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="1" Grid.Row="2" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding SrcDist, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}"/>
+
+                </Grid>
+
+                <Separator Height="20"></Separator>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button Height="32" Margin="5,0,15,0" Width="100" Name="FSSR1_Scheme" Click="FSSR1_Scheme_Click">FSSR-1</Button>
+                    <Button Height="32" Margin="15,0" Width="150" Name="UpdateConfig" Click="UpdateConfig_Click">Update system</Button>
+                    <Button Height="32" Margin="15,0,5,0" Width="100" Click="Button_Click">Trace</Button>
+                </StackPanel>
+                <Separator Height="20"></Separator>
+                <Label  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="Wavelength limits"></Label>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="222*"/>
+                        <ColumnDefinition Width="222*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Grid.ColumnSpan="2">
+                        <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MinWaveStr, StringFormat={}{0:0.00000}}"></Label>
+                        <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MaxWaveStr, StringFormat={}{0:0.00000}}"></Label>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Grid.ColumnSpan="2">
+                        <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MinWavePosStr, StringFormat={}{0:0.00000}}"></Label>
+                        <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MaxWavePosStr, StringFormat={}{0:0.00000}}"></Label>
+                    </StackPanel>
+                </Grid>
+
+
+
+                <Separator Height="20"></Separator>
+
+                <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Simulation"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition Width="350*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Main order"/>
+                    <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="1" Grid.Row="0" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding mainOrder, NotifyOnSourceUpdated=True}"/>
+
+                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Additional orders"/>
+                    <TextBox Name="AdditionalOrdersList" Height="30" Grid.Column="1" Grid.Row="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text=""/>
+
+                    <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Refer. λ"/>
+                    <TextBox Height="30" Grid.Column="1" Grid.Row="2" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding ZeroWaveStr}"/>
+
+                    <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Scat. angle [dec]"/>
+                    <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding BraggA, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}"/>
+
+                    <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Rays / For iter"/>
+                    <Grid Grid.Column="1" Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="{Binding RayCount, NotifyOnSourceUpdated=True}"/>
+                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="{Binding RayByIter, NotifyOnSourceUpdated=True}"/>
+                    </Grid>
+
+                </Grid>
+
+                <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Detector limits"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"></ColumnDefinition>
+                        <ColumnDefinition Width="350*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Xmin/Xmax"/>
+                    <Grid Grid.Column="1" Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="0"/>
+                        <TextBox Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="0"/>
+                    </Grid>
+
+                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Ymin/Ymax"/>
+                    <Grid Grid.Column="1" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="0"/>
+                        <TextBox Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="0"/>
+                    </Grid>
+
+                    <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Pixel size"/>
+                    <TextBox Height="30" Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="0.025"/>
+
+                </Grid>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="2" Margin="2,6,5,5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="300*"/>
+                    <RowDefinition Height="700*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="270*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                        <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="AddNewLine" Click="AddNewLine_Click">Add new line</Button>
+                        <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteLine" Click="DeleteLine_Click">Delete line</Button>
+                        <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="GenerateAdditionalLine" Click="GenerateAdditionalLine_Click">Add additional orders</Button>
+                        <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5">Delete additional lines</Button>
+                        <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteAll" Click="DeleteAll_Click">Clear all lines</Button>
+                        <CheckBox Margin="0,5">Display All</CheckBox>
+                    </StackPanel>
+
+                    <DataGrid x:Name="SelectedWavesList" Margin="5,-2,0,5" Grid.Column="1"
+                          ScrollViewer.CanContentScroll="True" 
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                              AutoGenerateColumns="False" SelectedCellsChanged="SelectedWaves_onWaveAdd" MouseDoubleClick="SelectedWavesList_MouseDoubleClick">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="ZeroWave">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                        <RadioButton GroupName="ZeroWave" IsChecked="{Binding Path=isZeroWave, NotifyOnSourceUpdated=True,
+                                            UpdateSourceTrigger=LostFocus,
+                                            Mode=TwoWay}" Click="RadioButton_Click"></RadioButton>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTextColumn Header="Name" Binding="{Binding Path=name}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="λ [A]" Binding="{Binding Path=lambda}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="dλ [mA]" Binding="{Binding Path=dlambda}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="I" Binding="{Binding Path=intensity}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Order" Binding="{Binding Path=Order}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Emited [n]" Binding="{Binding Path=Emited}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Reflected [n]" Binding="{Binding Path=Reflected}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Efficiency [n]" Binding="{Binding Path=Efficiency}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="X Coord [mm]" Binding="{Binding Path=XCoord}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Mag" Binding="{Binding Path=Magnification}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="FWHM [A]" Binding="{Binding Path=FWHM}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+
+                <TabControl Grid.Row="1">
+                    <TabItem>
+                        <TabItem.Header>Selected lines</TabItem.Header>
+                        <Grid>
+                        <oxy:Plot Name="WavePlotCanvas">
+                            <oxy:Plot.Axes >
+                                <oxy:LinearAxis Position="Bottom" Key="WaveKey" Title="Wavelength"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Left" Minimum="0" Key="WaveIntensity" Title="Intensity"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Right" Minimum="0" Key="WaveReflectivity" Title="Reflectivity"></oxy:LinearAxis>
+                            </oxy:Plot.Axes>
+                        </oxy:Plot>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <TabItem.Header>Detector plane</TabItem.Header>
+                    </TabItem>
+
+                    <TabItem>
+                        <TabItem.Header>Observed spectrum</TabItem.Header>
+                    </TabItem>
+
+                    <TabItem>
+                        <TabItem.Header>Crystal plane</TabItem.Header>
+                    </TabItem>
+
+                    <TabItem Height="25" VerticalAlignment="Bottom">
+                        <TabItem.Header>Configuration</TabItem.Header>
+                        <oxy:Plot Name="ConfigurationPlot">
+                            <oxy:Plot.Axes >
+                                <oxy:LinearAxis Position="Bottom"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Left"></oxy:LinearAxis>
+                            </oxy:Plot.Axes>
+                        </oxy:Plot>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
