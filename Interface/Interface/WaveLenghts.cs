@@ -17,6 +17,7 @@ namespace Interface
         public double Magnification { get; set; } = Double.NaN;
         public double FWHM { get; set; } = Double.NaN;
 
+        public Detector.DispersionCurve Curve { get; set; } = null;
         public Wave(DataBaseWavelength w): base(w)
         {
 
@@ -27,6 +28,7 @@ namespace Interface
             Emited = 0;
             Reflected = Efficiency = 0;
             XCoord = Magnification = FWHM = Double.NaN;
+            Curve = null;
         }
     }
     public class WaveLenghts
@@ -73,9 +75,31 @@ namespace Interface
                 onWaveChange?.Invoke(this, new EventArgs());
             }
         }
+
+        public void AddFeatures(Detector.LineFeatures feature, Wave wave)
+        {
+            int index = m_Waves.FindIndex(x => x.lambda == wave.lambda && x.intensity == wave.intensity);
+            if (index != -1)
+            {
+                m_Waves[index].FWHM = feature.FWHM;
+                m_Waves[index].XCoord = feature.XCoord;
+                m_Waves[index].Magnification = feature.Size;
+                m_Waves[index].Curve = feature.Curve;
+
+                onWaveChange?.Invoke(this, new EventArgs());
+            }
+        }
+
+        public Wave GetZeroWave()
+        {
+            return m_Waves.Find(w => w.isZeroWave == true);
+        }
+
         public void GenerateAdditionalWaves(List<int> orders, SystemConfig self)
         {
             var max_crystal_2d = self.CrystalProps.crystal2d.Max();
+
+            List<Tuple<DataBaseWavelength, int>> waveToAdd = new List<Tuple<DataBaseWavelength, int>>();
 
             foreach (int order in orders.Where(x => x != 0 ))
             {
@@ -93,12 +117,24 @@ namespace Interface
 
                         if (m_Waves.Find(x => x.name == newLine.name) == null && newLine.lambda <= max_crystal_2d)
                         {
-                            this.Add(newLine, order);
+                            waveToAdd.Add(new Tuple<DataBaseWavelength, int>(newLine, order));
                         }
                     }
                 }
             }
+
+            foreach (var newLine in waveToAdd)
+            {
+                this.Add(newLine.Item1, newLine.Item2);
+            }
         }
+        
+        public void RemoveAdditionalWaves()
+        {
+            m_Waves.RemoveAll(x => x.name.Contains("_order_"));
+            onWaveChange?.Invoke(this, new EventArgs());
+        }
+
         public void Del(Wave dwave)
         {
             m_Waves.Remove(dwave);

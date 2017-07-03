@@ -22,6 +22,8 @@ namespace Interface
             public double color;
         }
 
+        public List<ScatterPoint> Points { get { return m_Points; } }
+
         double minColor;
         double maxColor;
 
@@ -48,7 +50,7 @@ namespace Interface
                     color= double.Parse(coords[3]),
                 };
 
-                m_Points.Add(new ScatterPoint(cp.x, cp.z, 5, cp.color));
+                m_Points.Add(new ScatterPoint(cp.x, cp.z, 4, cp.color));
                 if (cp.color < minColor)
                     minColor = cp.color;
                 if (cp.color > maxColor)
@@ -60,14 +62,17 @@ namespace Interface
         {
             var model = new PlotModel();
 
-            OxyPlot.Series.ScatterSeries sser = new OxyPlot.Series.ScatterSeries();
+            OxyPlot.Series.ScatterSeries sser = new OxyPlot.Series.ScatterSeries()
+            {
+                MarkerType = MarkerType.Circle,
+            };
             
             sser.ItemsSource = m_Points;
 
             model.Series.Add(sser);
-            model.Axes.Add(new OxyPlot.Axes.LinearAxis { Position = AxisPosition.Bottom, Maximum = w / 2.0, Minimum = -w / 2.0 });
-            model.Axes.Add(new OxyPlot.Axes.LinearAxis { Position = AxisPosition.Left, Maximum = h / 2.0, Minimum = -h / 2.0 });
-            model.Axes.Add(new OxyPlot.Axes.LinearColorAxis { Position = AxisPosition.Right, Palette = OxyPalettes.Jet(200) });
+            model.Axes.Add(new OxyPlot.Axes.LinearAxis { Position = AxisPosition.Bottom, Maximum = w / 2.0, Minimum = -w / 2.0, Title="x, [mm]" });
+            model.Axes.Add(new OxyPlot.Axes.LinearAxis { Position = AxisPosition.Left, Maximum = h / 2.0, Minimum = -h / 2.0, Title="y, [mm]" });
+            model.Axes.Add(new OxyPlot.Axes.LinearColorAxis { Position = AxisPosition.Right, Palette = OxyPalettes.Rainbow(200) });
 
             m_Canvas.Model = model;
             m_Canvas.InvalidatePlot(true);

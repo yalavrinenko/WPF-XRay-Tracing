@@ -61,8 +61,8 @@ namespace Interface
 
             if (FullRange == false)
             {
-                m_Model.Axes[0].Minimum = m_Limits.min.lambda * 0.75;
-                m_Model.Axes[0].Maximum = m_Limits.max.lambda * 1.25;
+                m_Model.Axes[0].Minimum = m_Limits.min.lambda * 0.95;
+                m_Model.Axes[0].Maximum = m_Limits.max.lambda * 1.05;
             }
             else
             {

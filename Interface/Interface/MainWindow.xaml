@@ -7,15 +7,15 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         WindowStartupLocation="Manual"
         mc:Ignorable="d"
-        Title="XRayTracing" Height="1010" Width="1500" FontSize="14">
+        Title="XRayTracing" Height="1050" Width="1550" FontSize="14">
     <Window.DataContext>
         <local:SystemConfig/>
     </Window.DataContext>
     <Grid DockPanel.Dock="Top">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="310*"/>
+            <ColumnDefinition Width="400*"/>
             <ColumnDefinition Width="450*"/>
-            <ColumnDefinition Width="750*"/>
+            <ColumnDefinition Width="700*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"></RowDefinition>
@@ -24,8 +24,8 @@
 
         <Menu>
             <MenuItem Header="Save">
-                <MenuItem Header="Save results"></MenuItem>
-                <MenuItem Header="Save images"></MenuItem>
+                <MenuItem Header="Save results" Name="SaveResuts" Click="SaveResuts_Click"></MenuItem>
+                <MenuItem Header="Save images" Name="SaveImages" Click="SaveImages_Click"></MenuItem>
                 <MenuItem Header="Save config" Click="SaveConfig_Click"></MenuItem>
             </MenuItem>
             <MenuItem Header="Load">
@@ -198,8 +198,12 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Button Height="32" Margin="5,0,15,0" Width="100" Name="FSSR1_Scheme" Click="FSSR1_Scheme_Click">FSSR-1</Button>
                     <Button Height="32" Margin="15,0" Width="150" Name="UpdateConfig" Click="UpdateConfig_Click">Update system</Button>
-                    <Button Height="32" Margin="15,0,5,0" Width="100" Click="Button_Click">Trace</Button>
+                    <Button Height="32" Margin="15,0,5,0" Width="100" Name="Trace"  Click="Trace_Click">Trace</Button>
                 </StackPanel>
+                <Grid Margin="0,5">
+                    <Label FontSize="10" Content="" Name="CalculationProgressLabel" Panel.ZIndex="1" HorizontalContentAlignment="Center" Foreground="#FF0A1583"></Label>
+                    <ProgressBar Name="CalculationProgressBar" Maximum="7" Value="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"></ProgressBar>
+                </Grid>
                 <Separator Height="20"></Separator>
                 <Label  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="Wavelength limits"></Label>
                 <Grid>
@@ -280,8 +284,10 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="0"/>
-                        <TextBox Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="0"/>
+                        <TextBox Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0"
+                                 Name ="XMin" DataContext="m_Detector"  Text="{Binding Path=MinDetectorPositionMer, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}" SourceUpdated="DetectorChange_SourceUpdated"></TextBox>
+                        <TextBox Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" 
+                                 Name ="XMax" DataContext="m_Detector"  Text="{Binding Path=MaxDetectorPositionMer, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}" SourceUpdated="DetectorChange_SourceUpdated"/>
                     </Grid>
 
                     <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Ymin/Ymax"/>
@@ -290,12 +296,15 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Height="30" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="0"/>
-                        <TextBox Height="30" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="0"/>
+                        <TextBox Height="30" Grid.Column="0" Name ="YMin" DataContext="m_Detector"  
+                                 Text="{Binding Path=MinDetectorPositionSag, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}" SourceUpdated="DetectorChange_SourceUpdated" TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0"/>
+                        <TextBox Height="30" Grid.Column="1" Name ="YMax" DataContext="m_Detector"  
+                                 Text="{Binding Path=MaxDetectorPositionSag, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}" SourceUpdated="DetectorChange_SourceUpdated" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width"/>
                     </Grid>
 
                     <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Pixel size"/>
-                    <TextBox Height="30" Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="0.025"/>
+                    <TextBox Name="PixelSize"  Height="30" Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" 
+                             Text="{Binding Path=PixelSize, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}" SourceUpdated="DetectorChange_SourceUpdated"/>
 
                 </Grid>
 
@@ -331,9 +340,9 @@
                         <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="AddNewLine" Click="AddNewLine_Click">Add new line</Button>
                         <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteLine" Click="DeleteLine_Click">Delete line</Button>
                         <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="GenerateAdditionalLine" Click="GenerateAdditionalLine_Click">Add additional orders</Button>
-                        <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5">Delete additional lines</Button>
+                        <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteAdditionalLine" Click="DeleteAdditionalLine_Click">Delete additional lines</Button>
                         <Button Height="30" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteAll" Click="DeleteAll_Click">Clear all lines</Button>
-                        <CheckBox Margin="0,5">Display All</CheckBox>
+                        <CheckBox Margin="0,5" Click="CheckBox_Checked" IsChecked="True">Display All</CheckBox>
                     </StackPanel>
 
                     <DataGrid x:Name="SelectedWavesList" Margin="5,-2,0,5" Grid.Column="1"
@@ -348,23 +357,23 @@
                                         <Grid>
                                         <RadioButton GroupName="ZeroWave" IsChecked="{Binding Path=isZeroWave, NotifyOnSourceUpdated=True,
                                             UpdateSourceTrigger=LostFocus,
-                                            Mode=TwoWay}" Click="RadioButton_Click"></RadioButton>
+                                            Mode=TwoWay}" Click="RadioButton_Click" Checked="RadioButton_Checked" Unchecked="RadioButton_Unchecked"></RadioButton>
                                         </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
                             <DataGridTextColumn Header="Name" Binding="{Binding Path=name}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="λ [A]" Binding="{Binding Path=lambda}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="dλ [mA]" Binding="{Binding Path=dlambda}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="λ [A]" Binding="{Binding Path=lambda, StringFormat={}{0:0.00000}}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="dλ [mA]" Binding="{Binding Path=dlambda, StringFormat={}{0:0.00000}}"></DataGridTextColumn>
                             <DataGridTextColumn Header="I" Binding="{Binding Path=intensity}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Order" Binding="{Binding Path=Order}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Emited [n]" Binding="{Binding Path=Emited}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Reflected [n]" Binding="{Binding Path=Reflected}"></DataGridTextColumn>
                             <DataGridTextColumn Header="Efficiency [n]" Binding="{Binding Path=Efficiency}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="X Coord [mm]" Binding="{Binding Path=XCoord}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Mag" Binding="{Binding Path=Magnification}"></DataGridTextColumn>
-                            <DataGridTextColumn Header="FWHM [A]" Binding="{Binding Path=FWHM}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="X Coord [mm]" Binding="{Binding Path=XCoord, StringFormat={}{0:0.00000}}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Mag" Binding="{Binding Path=Magnification, StringFormat={}{0:0.00000}}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="FWHM [mm]" Binding="{Binding Path=FWHM, StringFormat={}{0:0.00000}}"></DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -375,7 +384,7 @@
                         <Grid>
                         <oxy:Plot Name="WavePlotCanvas">
                             <oxy:Plot.Axes >
-                                <oxy:LinearAxis Position="Bottom" Key="WaveKey" Title="Wavelength"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Bottom" Key="WaveKey" Title="Wavelength, [Å]"></oxy:LinearAxis>
                                 <oxy:LinearAxis Position="Left" Minimum="0" Key="WaveIntensity" Title="Intensity"></oxy:LinearAxis>
                                 <oxy:LinearAxis Position="Right" Minimum="0" Key="WaveReflectivity" Title="Reflectivity"></oxy:LinearAxis>
                             </oxy:Plot.Axes>
@@ -385,10 +394,19 @@
 
                     <TabItem>
                         <TabItem.Header>Detector plane</TabItem.Header>
+                        <oxy:PlotView Name="DetectorPlotCanvas">
+                        </oxy:PlotView>
                     </TabItem>
 
                     <TabItem>
                         <TabItem.Header>Observed spectrum</TabItem.Header>
+                        <oxy:Plot Name="ObservedSpectrumCanvas">
+                            <oxy:Plot.Axes >
+                                <oxy:LinearAxis Position="Bottom" Key="XPosition" Title="x, [mm]"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Left" Key="Counts" Title="Intensity"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Top" Key="WaveLength" Title="Wavelength, [Å]"></oxy:LinearAxis>
+                            </oxy:Plot.Axes>
+                        </oxy:Plot>
                     </TabItem>
 
                     <TabItem>
@@ -401,8 +419,8 @@
                         <TabItem.Header>Configuration</TabItem.Header>
                         <oxy:Plot Name="ConfigurationPlot">
                             <oxy:Plot.Axes >
-                                <oxy:LinearAxis Position="Bottom"></oxy:LinearAxis>
-                                <oxy:LinearAxis Position="Left"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Bottom" Title="x, [mm]"></oxy:LinearAxis>
+                                <oxy:LinearAxis Position="Left" Title="y, [mm]"></oxy:LinearAxis>
                             </oxy:Plot.Axes>
                         </oxy:Plot>
                     </TabItem>

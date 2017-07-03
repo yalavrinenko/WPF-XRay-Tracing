@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Collections;
 using Newtonsoft.Json;
 using Microsoft.Win32;
+using OxyPlot.Wpf;
 
 namespace Interface
 {
@@ -26,6 +27,8 @@ namespace Interface
     {
         public DataGrid dgrid;
         public WavePlotter wavePlot;
+        public DetectorPlot detectorPlot;
+        public Detector detector;
     }
     public partial class MainWindow : Window
     {
@@ -35,6 +38,8 @@ namespace Interface
         private SystemConfig m_SysConf;
         private ConfigPlotter m_ConfPlot;
         private CrystalPlot m_CrystalPlot;
+        private Detector m_Detector;
+        private DetectorPlot m_DetectorPlot;
 
         private UIList m_UIS;
         public MainWindow()
@@ -55,11 +60,32 @@ namespace Interface
 
             m_CrystalPlot = new Interface.CrystalPlot(CrystalPlotViev);
 
+            m_Detector = new Detector();
+            m_DetectorPlot = new DetectorPlot(DetectorPlotCanvas, ObservedSpectrumCanvas);
+            m_DetectorPlot.XZoom += DetectorPlot_XZoom;
+            m_DetectorPlot.YZoom += DetectorPlot_YZoom;
+
             m_UIS = new UIList()
             {
                 dgrid = SelectedWavesList,
-                wavePlot = m_WavePlot
+                wavePlot = m_WavePlot,
+                detector = m_Detector,
+                detectorPlot = m_DetectorPlot
             };
+        }
+
+        private void DetectorPlot_YZoom(object sender, DetectorPlot.Point e)
+        {
+            m_Detector.MaxDetectorPositionSag = e.max;
+            m_Detector.MinDetectorPositionSag = e.min;
+            UpdateDatectorLimsContent();
+        }
+
+        private void DetectorPlot_XZoom(object sender, DetectorPlot.Point e)
+        {
+            m_Detector.MaxDetectorPositionMer = e.max;
+            m_Detector.MinDetectorPositionMer = e.min;
+            UpdateDatectorLimsContent();
         }
 
         private void SelectedWaves_onWaveChange(object sender, EventArgs e)
@@ -76,7 +102,7 @@ namespace Interface
         {
             this.DataContext = "";
             this.DataContext = m_SysConf;
-            ConfigurationOuput.Text = m_SysConf.GenerateOutputConfig();
+            UpdateConfigurationOutput();
             m_ConfPlot.DrawConfiguration(m_SysConf);
         }
 
@@ -129,9 +155,15 @@ namespace Interface
             try
             {
                 if ((sender as TextBox) == CentralWaveLenght)
-                    m_SysConf.UpdateConfigurationWithNewCentralWave(); 
+                    m_SysConf.UpdateConfigurationWithNewCentralWave();
                 else
                     m_SysConf.UpdateConfiguration();
+
+                if (m_Detector.isReady)
+                {
+                    var scalef = m_SysConf.CrystalProps.crystal2d[0] * m_SysConf.mainOrder / (1.0 * m_SysConf.CrystalProps.crystal2d[m_SysConf.mainOrder - 1]);
+                    m_DetectorPlot.PlotSpectrum(m_Detector, scalef);
+                }
             }
             catch (Exception exc)
             {
@@ -145,7 +177,7 @@ namespace Interface
             {
                 m_SysConf.ConstructFSSR1();
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 ConfigurationOuput.Text = exc.Message + "\n" + exc.StackTrace;
             }
@@ -191,12 +223,22 @@ namespace Interface
 
         private void RadioButton_Click(object sender, RoutedEventArgs e)
         {
-            var wave = SelectedWavesList.SelectedItem as Wave;
-            m_SysConf.ZeroWaveStr = wave.name + " " + wave.lambda.ToString("0.#####");
-            m_SysConf.zeroWave = wave.lambda;
-            m_SysConf.centralWave = wave.lambda;
+            var wave = m_SelectedWaves.GetZeroWave();//SelectedWavesList.Se as Wave;
+            if (m_SysConf != null)
+            {
+                m_SysConf.ZeroWaveStr = wave.name + " " + wave.lambda.ToString("0.#####");
+                m_SysConf.zeroWave = wave.lambda;
+                m_SysConf.centralWave = wave.lambda;
+            }
 
             ConfValue_SourceUpdated(CentralWaveLenght, null);
+
+            if (m_Detector.isReady)
+            {
+                SetLinesFeatures(m_SelectedWaves.Wave.ToArray());
+                var scalef = m_SysConf.CrystalProps.crystal2d[0] * m_SysConf.mainOrder / (m_SysConf.mainOrder * m_SysConf.CrystalProps.crystal2d[m_SysConf.mainOrder - 1]);
+                m_DetectorPlot.PlotSpectrum(m_Detector, scalef);
+            }
         }
 
         private void GenerateAdditionalLine_Click(object sender, RoutedEventArgs e)
@@ -279,12 +321,14 @@ namespace Interface
             m_WavePlot.SetWaveLimits(m_SysConf.waveLimits);
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void Trace_Click(object sender, RoutedEventArgs e)
         {
             if (m_SysConf.waveLimits == null)
                 return;
 
-            Computation c = new Computation(ref m_SysConf, m_SelectedWaves.GetWaveInRagne(m_SysConf.waveLimits));
+            var PreparedWaves = m_SelectedWaves.GetWaveInRagne(m_SysConf.waveLimits);
+
+            Computation c = new Computation(ref m_SysConf, PreparedWaves);
             c.Title = "XRay-tracing";
             c.WaveProcessed += OnWaveProcessed;
 
@@ -295,75 +339,278 @@ namespace Interface
 
             c.Show();
 
+            CalculationProgressBar.Value = 0;
+            CalculationProgressLabel.Content = "Tracing...";
+
             bool res = await c.StartXRayTracing();
 
             c.Close();
 
-            PerformAnalis();
+            PerformAnalis(PreparedWaves);
 
             this.IsEnabled = true;
         }
 
-        private async void PerformAnalis()
+        private async void PerformAnalis(Wave[] WaveList)
         {
-            string crystalFileName = "results/Order_0.dump";
-            await Task.Factory.StartNew( () => m_CrystalPlot.ReadCrystalPlane(crystalFileName));
+            CalculationProgressLabel.Content = "Read crystal plane.";
+            CalculationProgressBar.Value = 2;
 
+            string crystalFileName = "results/Order_0.dump";
+            await Task.Factory.StartNew(() => m_CrystalPlot.ReadCrystalPlane(crystalFileName));
             m_CrystalPlot.PlotMirror(m_SysConf.crystalW, m_SysConf.crystalH);
+
+
+            CalculationProgressLabel.Content = "Read detector plane.";
+            CalculationProgressBar.Value = 3;
+            string detectorFile = "results/Order_0/Detector.dmp";
+            await Task.Factory.StartNew(() => m_Detector.ReadDetectorPlane(detectorFile));
+
+            CalculationProgressLabel.Content = "Build spectrum.";
+            CalculationProgressBar.Value = 4;
+            await Task.Factory.StartNew(() => m_Detector.BuildHistogram());
+
+            CalculationProgressLabel.Content = "Build detector heatmap.";
+            CalculationProgressBar.Value = 5;
+            await Task.Factory.StartNew(() => m_Detector.BuildHeatMap());
+
+            CalculationProgressLabel.Content = "Calculate line position, magnification, fwhm.";
+            CalculationProgressBar.Value = 6;
+            await Task.Factory.StartNew(() => SetLinesFeatures(WaveList));
+
+            LogConfiguration();
+
+            UpdateDatectorLimsContent();
+
+            PixelSize.DataContext = "";
+            PixelSize.DataContext = m_Detector;
+
+            m_DetectorPlot.PlotDetector(m_Detector);
+            var scalef = m_SysConf.CrystalProps.crystal2d[0] * m_SysConf.mainOrder / (m_SysConf.mainOrder * m_SysConf.CrystalProps.crystal2d[m_SysConf.mainOrder - 1]);
+            m_DetectorPlot.PlotSpectrum(m_Detector, scalef);
+
+            CalculationProgressLabel.Content = "Done.";
+            CalculationProgressBar.Value = 7;
+
+            //ConfigurationOuput.Text += LogConfiguration();
+            UpdateConfigurationOutput();
+        }
+
+        private void UpdateConfigurationOutput()
+        {
+            ConfigurationOuput.Text = m_SysConf.GenerateOutputConfig();
+            ConfigurationOuput.Text += LogConfiguration();
+        }
+
+        public string LogConfiguration()
+        {
+            var data = "\n\n[RESULTS]\n";
+            data += "Reflection limits for " + m_SysConf.mainOrder + " order\n";
+            data += "Min wavelength = " + m_SysConf.waveLimits?.min.lambda.ToString() + "\tPosition = " + m_SysConf.waveLimits?.min.position.ToString() + "\n";
+            data += "Max wavelength = " + m_SysConf.waveLimits?.max.lambda.ToString() + "\tPosition = " + m_SysConf.waveLimits?.max.position.ToString() + "\n";
+            data += "Reference line = " + m_SysConf.ZeroWaveStr + "\n"; ;
+            data += "Dispersion curve: " + m_SelectedWaves.GetZeroWave()?.Curve?.ToString() + "\n";
+            
+            data += "***************************************************************\n";
+            data += "Name\tWavelength\tEmitted\tReflected\tEfficiency\tXCoords\tMagnification\tFWHM\tOrder\tLine Width\n";
+            foreach (var w in m_SelectedWaves.Wave)
+            {
+                data += String.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\n",
+                    w.name, Extension.mstr(w.lambda), Extension.mstr(w.Emited),
+                    Extension.mstr(w.Reflected), w.Efficiency,
+                    Extension.mstr(w.XCoord), Extension.mstr(w.Magnification),
+                    Extension.mstr(w.FWHM), Extension.mstr(w.Order),
+                    Extension.mstr(w.FWHM));
+            }
+
+            data += "\n\nDispercion curves for the following reference lines\n";
+            foreach (var l in m_SelectedWaves.Wave) {
+                data += "For L_ref = " + Extension.mstr(l.lambda) + ":\t" + l.Curve?.ToString() + "\n";
+            }
+
+            data += m_SysConf.GetCrystalConfig();
+
+            return data;
+        }
+
+        private void SetLinesFeatures(Wave[] WaveList)
+        {
+            var ZeroWaveFeatures = m_Detector.GetLineFeatures(m_SelectedWaves.GetZeroWave());
+            if (ZeroWaveFeatures == null)
+                return;
+
+            foreach (var wave in WaveList)
+            {
+                var feature = m_Detector.GetLineFeatures(wave);
+
+                if (feature == null)
+                    continue;
+
+                feature.XCoord -= ZeroWaveFeatures.XCoord;
+                feature.Size /= m_SysConf.SrcSizeH;
+
+                m_SelectedWaves.AddFeatures(feature, wave);
+            }
+
+            m_Detector.SetZeroWave(m_SelectedWaves.GetZeroWave());
+        }
+
+        private void UpdateDatectorLimsContent()
+        {
+            YMin.DataContext = "";
+            YMin.DataContext = m_Detector;
+
+            XMin.DataContext = "";
+            XMin.DataContext = m_Detector;
+
+            YMax.DataContext = "";
+            YMax.DataContext = m_Detector;
+
+            XMax.DataContext = "";
+            XMax.DataContext = m_Detector;
         }
 
         private void OnWaveProcessed(object sender, Wave e)
         {
             m_SelectedWaves.UpdateWave(e);
         }
+
+        private void DetectorChange_SourceUpdated(object sender, DataTransferEventArgs e)
+        {
+            m_Detector.BuildHeatMap();
+            m_DetectorPlot.PlotDetector(m_Detector);
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (m_WavePlot != null)
+            {
+                m_WavePlot.FullRange = (bool)(sender as CheckBox).IsChecked;
+                m_SelectedWaves.UpdateUI(m_UIS);
+            }
+        }
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            var wave = (sender as RadioButton).DataContext as Wave;
+            wave.isZeroWave = true;
+        }
+
+        private void RadioButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var wave = (sender as RadioButton).DataContext as Wave;
+            wave.isZeroWave = false;
+        }
+
+        private void DeleteAdditionalLine_Click(object sender, RoutedEventArgs e)
+        {
+            m_SelectedWaves.RemoveAdditionalWaves();
+        }
+
+        private void SaveResuts_Click(object sender, RoutedEventArgs e)
+        {
+            var saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "Text file (*.txt)|*.txt|All file (*.*)|*.*";
+
+            if (saveDialog.ShowDialog() == false)
+                return;
+
+            var FileName = saveDialog.FileName;
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(FileName);
+            sw.Write(ConfigurationOuput.Text.Replace("\n","\r\n"));
+            sw.Close();
+        }
+
+        private void SaveDetectorPlane(string path)
+        {
+            
+                var xrange = new Extension.Range()
+                {
+                    VMax = m_Detector.MaxDetectorPositionMer,
+                    VMin = m_Detector.MinDetectorPositionMer
+                };
+
+                var yrange = new Extension.Range()
+                {
+                    VMax = m_Detector.MaxDetectorPositionSag,
+                    VMin = m_Detector.MinDetectorPositionSag
+                };
+
+                var heatMap = Extension.Histogram2D(m_Detector.Points.Select(p => p.x), m_Detector.Points.Select(p => p.y), xrange, yrange, m_Detector.PixelSize);
+
+                var w = heatMap.GetLength(0);
+                var h = heatMap.GetLength(1) - 2;
+
+                var unbounded = RemoveBound(heatMap);
+
+                Extension.SaveTiff(path, unbounded, w, h);
+        }
+
+        private void SaveCrystalPlane(string path)
+        {
+            var xrange = new Extension.Range()
+            {
+                VMax = m_SysConf.crystalW / 2,
+                VMin = -m_SysConf.crystalW / 2
+            };
+
+            var yrange = new Extension.Range()
+            {
+                VMax = m_SysConf.crystalH / 2,
+                VMin = -m_SysConf.crystalH / 2
+            };
+
+            var heatMap = Extension.Histogram2D(m_CrystalPlot.Points.Select(p => p.X), m_CrystalPlot.Points.Select(p => p.Y), xrange, yrange, m_SysConf.crystalW / 1000);
+
+            var w = heatMap.GetLength(0);
+            var h = heatMap.GetLength(1) - 2;
+
+            var unbounded = RemoveBound(heatMap);
+
+            Extension.SaveTiff(path, unbounded, w, h);
+        }
+
+        private void SaveImages_Click(object sender, RoutedEventArgs e)
+        {
+            var saveDialog = new SaveFileDialog();
+            saveDialog.Filter = "TIFF file (*.tiff)|*.tiff";
+
+            if (saveDialog.ShowDialog() == false)
+                return;
+
+            var path = saveDialog.FileName;
+
+            //
+            try
+            {
+                var detectorImagePath = System.IO.Path.GetDirectoryName(path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path) + "_detector" + System.IO.Path.GetExtension(path);
+                SaveDetectorPlane(detectorImagePath);
+            }
+            catch (Exception exc) { }
+            //
+
+            //
+            try
+            {
+                var crystalImagePath = System.IO.Path.GetDirectoryName(path) + "\\" +  System.IO.Path.GetFileNameWithoutExtension(path) + "_crystal" + System.IO.Path.GetExtension(path);
+                SaveCrystalPlane(crystalImagePath);
+            }
+            catch (Exception exc) { }
+            //
+
+            /*var spectrumImagePath = System.IO.Path.GetDirectoryName(path) + "\\" +  System.IO.Path.GetFileNameWithoutExtension(path) + "_spectrum" + ".png";
+            var pngExporter = new OxyPlot.Wpf.PngExporter { Width = 600, Height = 400, Background = OxyPlot.OxyColors.White };
+            pngExporter.ExportToFile(ObservedSpectrumCanvas.ActualModel, spectrumImagePath);*/
+        }
+
+        private Int16[] RemoveBound(double[,] heatMap)
+        {
+            List<Int16> detector = new List<Int16>();
+            for (int i = 0; i < heatMap.GetLength(0); ++i)
+                for (int j = 1; j < heatMap.GetLength(1) - 1; ++j)
+                    detector.Add((Int16)heatMap[i, j]);
+            return detector.ToArray();
+        }
     }
 
-    public static class Extension
-    {
-        public static void Search(this WaveLengthLoader loader, string pattern, DataGrid WavesDatabaseList)
-        {
-            WavesDatabaseList.ItemsSource = loader.Search(pattern);
-            WavesDatabaseList.Items.Refresh();
-        }
-
-        public static void UpdateUI(this WaveLenghts waves, UIList ui)
-        {
-            ui.dgrid.ItemsSource = waves.Wave;
-            ui.dgrid.Items.Refresh();
-
-            ui.wavePlot.PlotLines(waves.Wave);
-        }
-
-        public static string mstr(object value)
-        {
-            return value?.ToString();
-        }
-
-        public static string mstr(double value)
-        {
-            return (value).ToString("0.#####");
-        }
-
-        public static double vectorLenght(double[] v)
-        {
-            return Math.Sqrt(v[0] * v[0] + v[1] * v[1]);
-        }
-
-        public static double[] Sub(double[] a, double[] b)
-        {
-            double[] c = { a[0] - b[0], a[1] - b[1]};
-            return c;
-        }
-
-        public static double[] Mul(double[] a, double[] b)
-        {
-            double[] c = { a[0] * b[0], a[1] * b[1] };
-            return c;
-        }
-
-        public static double dot(double[] a, double[] b)
-        {
-            return Mul(a,b).Sum();
-        }
-    }
 }

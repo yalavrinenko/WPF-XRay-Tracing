@@ -178,6 +178,11 @@ namespace Interface
                     RaysProgresLabel.Content = value.linkedLibraryMinorOutput.ToString() + "/" + value.linkedLibraryTotalOutput.ToString();
                 }));
             };
+            /*try
+            {
+                System.IO.Directory.Delete("results/Order_0", true);
+            }
+            catch(Exception expc) { }*/
 
             XRayTraceOutput.Text = "Here some log info";
 

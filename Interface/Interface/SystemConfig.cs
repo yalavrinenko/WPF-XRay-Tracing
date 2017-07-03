@@ -185,7 +185,14 @@ namespace Interface
             var data = "";
             data += "[INPUT]\n";
             data += "Crystal type = " + CrystType + "\n";
-            data += "Crystal 2d = " + Extension.mstr(CrystalProps?.crystal2d[mainOrder - 1]) + " [A]\n";
+            try
+            {
+                data += "Crystal 2d = " + Extension.mstr(CrystalProps?.crystal2d[mainOrder - 1]) + " [A]\n";
+            }
+            catch(Exception e)
+            {
+                data += e.ToString();
+            }
             data += "Crystal radius R = " + Extension.mstr(crystalR) + " [mm]\n";
             data += "Crystal W x H = " + Extension.mstr(crystalW) + " X " + Extension.mstr(crystalH) + " [mm]\n";
             data += "Source size W x H= " + Extension.mstr(SrcSizeW) + " X " + Extension.mstr(SrcSizeH) + " [mm]\n";
@@ -203,6 +210,20 @@ namespace Interface
             data += "Detector to crystal = " + Extension.mstr(DstDist) + " [mm]\n";
             data += "Detector to center = " + Extension.mstr(FilmDistFromCenter) + " [mm]\n";
 
+            return data;
+        }
+
+        public string GetCrystalConfig()
+        {
+            var data = "";
+            for (int i=0; i<CrystalProps.crystal2d.Count; ++i) {
+                data += "\n[REFL. FUNCTION IN " + (i + 1).ToString() + " ORDER]\n";
+                data += "Crystal 2d = " + CrystalProps.crystal2d[i].ToString() + " [A]\n";
+                data += "REFL. File Name = " + CrystalProps.DistrFileName[i] + "\n";
+                data += "REFL. HW = " + (CrystalProps.DistrHW[i]).ToString() + " [deg]\n";
+                data += "REFL. Step = " + (CrystalProps.DistrStep[i]).ToString() + "\n";
+                data += "REFL. Size = " + (CrystalProps.DistrSize[i]).ToString() + " [points]\n";
+             }
             return data;
         }
 

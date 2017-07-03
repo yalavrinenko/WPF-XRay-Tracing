@@ -106,7 +106,8 @@ void addDumpPlanesSrcLined(vector<tObject> &obj, double startPoint, Vec3d dir,
 		N.x = nx;
 		N.y = ny;
 
-		string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
+		//string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
+		string name = p->dumpPlaneName + "Detector.dmp";
 
 		tDumpPlane *dp = new tDumpPlane(N, r0, sizeW, sizeH, (char*)name.c_str());
 		dp->setCrossPattern(crossPattern);
@@ -131,7 +132,8 @@ void addDumpPlanes(vector<tObject> &obj, double startPoint, Vec3d dir,
 		N = dir - N;
 		N = N / sqrt(dot(N));
 
-		string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
+		//string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
+		string name = p->dumpPlaneName + "Detector.dmp";
 
 		tDumpPlane *dp = new tDumpPlane(N, r0, sizeW, sizeH, (char*)name.c_str());
 		dp->setCrossPattern(crossPattern);
