@@ -54,7 +54,7 @@
                     <Label Content="Wave base" d:LayoutOverrides="Width, LeftMargin, RightMargin, TopMargin, BottomMargin" HorizontalContentAlignment="Center"/>
                     <Label FontSize="13" Content="Search Wavelengths" Grid.Row="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" HorizontalContentAlignment="Center"/>
                     <local:OpenFileButton Loaded="WaveDataBaseSelection_Loaded" 
-                                          SelectedFileName="../../trans-db.txt"
+                                          SelectedFileName="./Input/trans-db.txt"
                                           Extension="Wave base (*.txt)|*.txt|All files (*.*)|*.*" 
                                           x:Name="WaveDataBaseSelection" FileSelect="WaveDataBaseSelection_FileSelect" Height="32" Grid.Column="1" 
                                           d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" 
