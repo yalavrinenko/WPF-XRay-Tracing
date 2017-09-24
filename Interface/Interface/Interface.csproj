@@ -96,6 +96,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AdditionalApproximation.cs" />
+    <Compile Include="Averaging.cs" />
     <Compile Include="Computation.xaml.cs">
       <DependentUpon>Computation.xaml</DependentUpon>
     </Compile>

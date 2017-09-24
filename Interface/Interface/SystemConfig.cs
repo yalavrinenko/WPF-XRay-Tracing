@@ -136,6 +136,8 @@ namespace Interface
         public double zeroWave { get; set; }
 
         public string ZeroWaveStr { get; set; }
+
+        public bool UseBetterStatistic { get; set; } = false; ///TODO: Set false as default
         #endregion
 
         public event EventHandler onChange = null;
@@ -172,6 +174,7 @@ namespace Interface
                     }
                     catch (Exception e)
                     {
+                        Logger.Warning(e.Message);
                         continue;
                     }
                 }
@@ -423,6 +426,7 @@ namespace Interface
                 }
                 catch(Exception e)
                 {
+                    Logger.Warning(e.ToString());
                     return null;
                 }
             }

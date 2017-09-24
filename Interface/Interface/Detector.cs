@@ -31,10 +31,10 @@ namespace Interface
 
         public class DispersionCurve
         {
-            public double a;
-            public double b;
-            public double c;
-            public bool isExist;
+            public double a = 0;
+            public double b = 0;
+            public double c = 0;
+            public bool isExist = false;
 
             public double Evaluate(double x)
             {
@@ -190,6 +190,7 @@ namespace Interface
             }
             catch (Exception e)
             {
+                Logger.Error(e.ToString());
                 return;
             }
         }
@@ -229,7 +230,7 @@ namespace Interface
                     c = fitCoeff[0]
                 };
             }
-            catch(Exception e)
+            catch
             {
                 Features.Curve = new DispersionCurve()
                 {

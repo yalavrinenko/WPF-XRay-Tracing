@@ -27,7 +27,7 @@ namespace Interface
         }
 
         public DataBaseWavelength() { }
-        public string ToString()
+        public override string ToString()
         {
             return name + " " + lambda.ToString();
         }
@@ -82,7 +82,8 @@ namespace Interface
 
             while (!sr.EndOfStream)
             {
-                var values = sr.ReadLine().Split('\t');
+                var readedLine = sr.ReadLine();
+                var values = readedLine.Split('\t');
                 try
                 {
                     m_WaveDatabase.Add(new DataBaseWavelength()
@@ -95,7 +96,7 @@ namespace Interface
                 }
                 catch (Exception e)
                 {
-                    Logger.Warning("Read db warning. " + e.ToString());
+                    Logger.Warning("Read db warning. " + readedLine);
                 }
             }
             sr.Close();

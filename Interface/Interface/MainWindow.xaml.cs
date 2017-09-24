@@ -45,6 +45,10 @@ namespace Interface
         public MainWindow()
         {
             InitializeComponent();
+
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo("en-US");
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo("en-US");
+
             m_SelectedWaves = new WaveLenghts();
             m_SelectedWaves.onWaveAdd += SelectedWaves_onWaveAdd;
             m_SelectedWaves.onWaveChange += SelectedWaves_onWaveChange;
@@ -72,6 +76,8 @@ namespace Interface
                 detector = m_Detector,
                 detectorPlot = m_DetectorPlot
             };
+
+            Logger.InitLogger("ExceptionLog.txt");
         }
 
         private void DetectorPlot_YZoom(object sender, DetectorPlot.Point e)
@@ -253,6 +259,7 @@ namespace Interface
             }
             catch (Exception exc)
             {
+                Logger.Error(exc.ToString());
                 return;
             }
         }
@@ -377,6 +384,10 @@ namespace Interface
             CalculationProgressLabel.Content = "Calculate line position, magnification, fwhm.";
             CalculationProgressBar.Value = 6;
             await Task.Factory.StartNew(() => SetLinesFeatures(WaveList));
+           
+            CalculationProgressLabel.Content = "Provide approximation of Magnification and Efficiency.";
+            CalculationProgressBar.Value = 6;
+            await ProvideAdditionalApproximation(WaveList);
 
             LogConfiguration();
 
@@ -390,7 +401,7 @@ namespace Interface
             m_DetectorPlot.PlotSpectrum(m_Detector, scalef);
 
             CalculationProgressLabel.Content = "Done.";
-            CalculationProgressBar.Value = 7;
+            CalculationProgressBar.Value = 8;
 
             //ConfigurationOuput.Text += LogConfiguration();
             UpdateConfigurationOutput();
@@ -428,6 +439,26 @@ namespace Interface
                 data += "For L_ref = " + Extension.mstr(l.lambda) + ":\t" + l.Curve?.ToString() + "\n";
             }
 
+            if (m_AdditionalApproximation != null)
+            {
+                data += "\n\nAdditional fits\n";
+                data += "Efficiency curve:" + m_AdditionalApproximation?.m_EfficiencyFit.ToString() + "\n";
+                data += "Magnification curve:" + m_AdditionalApproximation?.m_MagnificationFit.ToString() + "\n";
+                if (m_AproximatedWavePoints != null)
+                {
+                    data += "***************************************************************\n";
+                    data += "Name\tWavelength\tEfficiency\tFit_Efficiency\tEfficiency_fit_quality\tMagnification\tFit_Magnification\tMagnification_fit_quality\n";
+                    foreach (var w in m_AproximatedWavePoints)
+                    {
+                        data += String.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\n",
+                            w.name, Extension.mstr(w.lambda),
+                            w.Efficiency, w.Approx_Efficiency, Extension.mstr(Math.Abs(w.Approx_Efficiency - w.Efficiency) / w.Efficiency),
+                            Extension.mstr(w.Magnification), Extension.mstr(w.Approx_Magnification), Extension.mstr(Math.Abs(w.Approx_Magnification - w.Magnification) / w.Magnification)
+                            );
+                    }
+                }
+            }
+
             data += m_SysConf.GetCrystalConfig();
 
             return data;
@@ -450,6 +481,11 @@ namespace Interface
                 feature.Size /= m_SysConf.SrcSizeH;
 
                 m_SelectedWaves.AddFeatures(feature, wave);
+
+                wave.FWHM = feature.FWHM;
+                wave.XCoord = feature.XCoord;
+                wave.Magnification = feature.Size;
+                wave.Curve = feature.Curve;
             }
 
             m_Detector.SetZeroWave(m_SelectedWaves.GetZeroWave());
@@ -586,7 +622,9 @@ namespace Interface
                 var detectorImagePath = System.IO.Path.GetDirectoryName(path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(path) + "_detector" + System.IO.Path.GetExtension(path);
                 SaveDetectorPlane(detectorImagePath);
             }
-            catch (Exception exc) { }
+            catch (Exception exc) {
+                Logger.Error(exc.ToString());
+            }
             //
 
             //
@@ -595,7 +633,9 @@ namespace Interface
                 var crystalImagePath = System.IO.Path.GetDirectoryName(path) + "\\" +  System.IO.Path.GetFileNameWithoutExtension(path) + "_crystal" + System.IO.Path.GetExtension(path);
                 SaveCrystalPlane(crystalImagePath);
             }
-            catch (Exception exc) { }
+            catch (Exception exc) {
+                Logger.Error(exc.ToString());
+            }
             //
 
             /*var spectrumImagePath = System.IO.Path.GetDirectoryName(path) + "\\" +  System.IO.Path.GetFileNameWithoutExtension(path) + "_spectrum" + ".png";
@@ -610,6 +650,11 @@ namespace Interface
                 for (int j = 1; j < heatMap.GetLength(1) - 1; ++j)
                     detector.Add((Int16)heatMap[i, j]);
             return detector.ToArray();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Logger.StopLogger();
         }
     }
 

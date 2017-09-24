@@ -155,6 +155,7 @@ namespace Interface
             }
             catch (Exception e)
             {
+                Logger.Error(e.ToString());
                 return false;
             }
             finally

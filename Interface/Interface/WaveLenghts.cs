@@ -22,7 +22,6 @@ namespace Interface
         {
 
         }
-
         public void Clear()
         {
             Emited = 0;
