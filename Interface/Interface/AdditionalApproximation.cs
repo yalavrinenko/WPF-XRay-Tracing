@@ -143,10 +143,12 @@ namespace Interface
                             break;
                         }
                     }
-
-                    waveSet[index].Efficiency = wave.Efficiency;
-                    waveSet[index].Emited = wave.Emited;
-                    waveSet[index].Reflected = wave.Reflected;
+                    if (index < waveSet.Length && index >= 0)
+                    {
+                        waveSet[index].Efficiency = wave.Efficiency;
+                        waveSet[index].Emited = wave.Emited;
+                        waveSet[index].Reflected = wave.Reflected;
+                    }
                 });
 
                 this.IsEnabled = false;

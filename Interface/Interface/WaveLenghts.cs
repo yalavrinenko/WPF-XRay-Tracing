@@ -91,7 +91,13 @@ namespace Interface
 
         public Wave GetZeroWave()
         {
-            return m_Waves.Find(w => w.isZeroWave == true);
+            var zeroWave = m_Waves.Find(w => w.isZeroWave == true);
+            if (zeroWave == null) {
+                zeroWave = m_Waves.Find(w => w.Efficiency > 0);
+                if (zeroWave != null)
+                    m_Waves.Find(w => w == zeroWave).isZeroWave = true;
+            }
+            return zeroWave;
         }
 
         public void GenerateAdditionalWaves(List<int> orders, SystemConfig self)

@@ -64,7 +64,17 @@ namespace Interface
         {
             long M = (long)Math.Ceiling(Math.Abs(xrange.VMax - xrange.VMin) / step);
             long N = (long)Math.Ceiling(Math.Abs(yrange.VMax - yrange.VMin) / step) + 2;
-            double[,] hist =new double[M,N];
+
+            double[,] hist;
+            try
+            {
+                hist = new double[M, N];
+            }
+            catch(Exception exc)
+            {
+                System.Windows.MessageBox.Show("Detector cell size to small! Changed to default size 0.025.", "Detector cell size error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                return Histogram2D(xvalue, yvalue, xrange, yrange, 0.025);
+            }
 
             var InRegion = Enumerable.Zip(xvalue, yvalue, (x, y) => new { x, y })
                 .Where(v => (xrange.VMin <= v.x && v.x <= xrange.VMax) && (yrange.VMin <= v.y && v.y <= yrange.VMax))
@@ -82,6 +92,9 @@ namespace Interface
 
         public static long[] Histogram(IEnumerable<double> xvalue, Range xrange, double step)
         {
+            if (xvalue.Count() == 0)
+                return new long[1]{0};
+
             long N = (long)Math.Ceiling(Math.Abs(xrange.VMax - xrange.VMin) / step);
             long[] hist = new long[N];
 

@@ -12,9 +12,9 @@ namespace Interface
         {
             Wave[] generated = new Wave[Count];
             double WaveStep = (HiLimit - LowLimit) / Count;
-            var index = 0;
-            for (double wavel = LowLimit; wavel < HiLimit; wavel += WaveStep)
+            for (uint index = 0; index < Count; ++index)
             {
+                var wavel = LowLimit + index * WaveStep;
                 DataBaseWavelength dbWave = new DataBaseWavelength()
                 {
                     lambda = wavel,
@@ -23,7 +23,6 @@ namespace Interface
                     name = "Line " + wavel.ToString("#.00")
                 };
                 generated[index] = new Wave(dbWave);
-                ++index;
             }
             return generated;
         }

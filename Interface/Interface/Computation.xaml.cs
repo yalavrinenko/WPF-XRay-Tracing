@@ -54,12 +54,12 @@ namespace Interface
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate void WaveTracedCallback(WaveTraceResult value);
 
-        [DllImport(@"sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"./sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int RayTracing(int argc, [MarshalAs(UnmanagedType.LPStr)] string argv, 
             [MarshalAs(UnmanagedType.FunctionPtr)] RayProgressCallback callbackPointer,
             [MarshalAs(UnmanagedType.FunctionPtr)] WaveTracedCallback waveCallbackPointer);
 
-        [DllImport(@"sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"./sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void terminate();
         #endregion
 

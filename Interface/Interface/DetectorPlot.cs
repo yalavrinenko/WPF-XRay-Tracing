@@ -96,10 +96,13 @@ namespace Interface
             waveSeries.XAxisKey = "WaveLength";
 
             List<DataPoint> waveList = new List<DataPoint>();
-            for (int i = 0; i < bins.Length; ++i)
+            if (detector.ZeroCurve != null)
             {
-                double x = detector.MeredionalMin + i * step - detector.XShift;
-                waveList.Add(new DataPoint(detector.ZeroCurve.Evaluate(x) * OrderScale, 1));
+                for (int i = 0; i < bins.Length; ++i)
+                {
+                    double x = detector.MeredionalMin + i * step - detector.XShift;
+                    waveList.Add(new DataPoint(detector.ZeroCurve.Evaluate(x) * OrderScale, 1));
+                }
             }
             waveSeries.ItemsSource = waveList;
             waveSeries.Items.Refresh();

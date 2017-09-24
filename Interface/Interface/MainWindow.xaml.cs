@@ -335,6 +335,9 @@ namespace Interface
 
             var PreparedWaves = m_SelectedWaves.GetWaveInRagne(m_SysConf.waveLimits);
 
+            if (PreparedWaves.Length == 0)
+                return;
+
             Computation c = new Computation(ref m_SysConf, PreparedWaves);
             c.Title = "XRay-tracing";
             c.WaveProcessed += OnWaveProcessed;
@@ -349,7 +352,14 @@ namespace Interface
             CalculationProgressBar.Value = 0;
             CalculationProgressLabel.Content = "Tracing...";
 
-            bool res = await c.StartXRayTracing();
+            try
+            {
+                bool res = await c.StartXRayTracing();
+            }
+            catch (Exception exc)
+            {
+                Logger.Error("C Trace Exception. " + exc.Message + "\n" + exc.StackTrace);
+            }
 
             c.Close();
 
@@ -366,7 +376,6 @@ namespace Interface
             string crystalFileName = "results/Order_0.dump";
             await Task.Factory.StartNew(() => m_CrystalPlot.ReadCrystalPlane(crystalFileName));
             m_CrystalPlot.PlotMirror(m_SysConf.crystalW, m_SysConf.crystalH);
-
 
             CalculationProgressLabel.Content = "Read detector plane.";
             CalculationProgressBar.Value = 3;

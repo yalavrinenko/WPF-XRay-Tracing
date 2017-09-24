@@ -27,6 +27,7 @@ namespace Interface
         public static void Error(string msg)
         {
             Log("ERROR", msg);
+            m_LogStream.Flush();
         }
 
         public static void Warning(string msg)
