@@ -40,7 +40,7 @@ double dot2(const Vec3d &a, const Vec3d &b){
 
 double rdrand(int a){
 	long long int r;
-//	asm("rdrand %0" : "=r" (r));
+	asm("rdrand %0" : "=r" (r));
 	throw std::runtime_error("Use wrong rand");
 	return (double)(r%a)/a;
 }
