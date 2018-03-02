@@ -151,7 +151,7 @@ bool tSphere::checkPosition(Vec3d point) {
 	double Theta = acos(R.z / r);
 	double Phi = acos(R.x / (r * sin(Theta)));
 
-	if (isnan(Phi))
+	if (std::isnan(Phi))
 		Phi = M_PI;
 
 	if (R.y < 0)

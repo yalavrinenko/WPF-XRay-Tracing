@@ -12,7 +12,11 @@
 #include "InputOutput.hpp"
 #include "InputOutput.hpp"
 
+#ifdef _WIN32
 #include <filesystem>
+#else
+#include <experimental/filesystem>
+#endif
 
 bool TestDir(string dir) {
 	return std::experimental::filesystem::exists(dir);
@@ -98,7 +102,7 @@ double tParameters::distr(double phi, double lambda) {
 
 	if (reflectionFileName == "") {
 		double newProgramAngle = M_PI / 2 - asin(lambda / crystal2d);
-		if (isnan(newProgramAngle))
+		if (std::isnan(newProgramAngle))
 			newProgramAngle=40*M_PI;
 
 
@@ -115,7 +119,7 @@ double tParameters::distr(double phi, double lambda) {
 
 		double newProgramAngle = M_PI / 2 - asin(lambda / crystal2d);
 
-		if (isnan(newProgramAngle))
+		if (std::isnan(newProgramAngle))
 			newProgramAngle=40*M_PI;
 
 		if (fabs(phi - newProgramAngle) <= dprogramAngle) {
@@ -335,7 +339,7 @@ void tParameters::init(char* initFileName) {
 
 	if (!TestDir(dumpPlaneName)) {
 		string commang;
-#ifdef WIN32
+#ifdef _WIN32
 		commang = "md " + dumpPlaneName;
 		cout << commang << endl;
 		for (int i=0; i<commang.length(); i++)

@@ -51,19 +51,11 @@ void dumpPoint(char* name) {
 }
 
 string doubleToStr(double a) {
-	stringstream ss;
-	ss << a;
-	string o;
-	ss >> o;
-	return o;
+	return std::to_string(a);
 }
 
 string intToStr(int a) {
-	stringstream ss;
-	ss << a;
-	string o;
-	ss >> o;
-	return o;
+	return std::to_string(a);
 }
 
 void dumpPlane(char* name, vector<Vec3d> odata) {
@@ -133,12 +125,17 @@ void dumpRays(tRay* d,char* fileName,int count, Vec3d dir){
 	off.close();
 }
 
-infoOut::infoOut() {
-	out.open("log.txt");
+infoOut::infoOut():
+        infoOut("log.txt", nullptr){
+
 }
 
-infoOut::infoOut(char* name) {
-	out.open(name);
+infoOut::infoOut(char const* name):
+        infoOut(name, nullptr){
+}
+
+infoOut::infoOut(char const* name, std::function<void(char const*)> stdout_callback): _callback(stdout_callback){
+    out.open(name);
 }
 
 void infoOut::logScene(tSphere *mirror, SphereLight *light) {
@@ -161,4 +158,7 @@ void infoOut::logScene(tCylinder *mirror, SphereLight *light) {
 
 void infoOut::logText(string text) {
 	out << text << endl;
+	if (_callback){
+        _callback(text.c_str());
+    }
 }

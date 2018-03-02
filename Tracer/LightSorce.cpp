@@ -235,7 +235,7 @@ tRay* SphereLight::GenerateRays(double lambda, double dlambda, int count) {
 
 		p = p / sqrt(dot(p));
 
-		if (isnan(p.x) || isnan(p.y) || isnan(p.z)) {
+		if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) {
 			i--;
 			continue;
 			cout << "NaN" << endl;
@@ -365,7 +365,7 @@ tRay* SphereLight::generateCylindricRays(double lambda, double dlambda,
 
 		p = p / sqrt(dot(p));
 
-		if (isnan(p.x) || isnan(p.y) || isnan(p.z)) {
+		if (std::isnan(p.x) || std::isnan(p.y) || std::isnan(p.z)) {
 			i--;
 			continue;
 			cout << "NaN" << endl;

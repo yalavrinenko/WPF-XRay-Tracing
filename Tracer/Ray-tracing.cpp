@@ -29,30 +29,9 @@ using namespace std;
 string linkedLibraryOutput;
 const char* plinkedLibraryOutput;
 
-struct XRayTracingLog{
-	int linkedLibraryMinorOutput;
-	int linkedLibraryTotalOutput;
-	int totalWaves;
-	int currentWaves;
-};
-
-struct XRayWaveResult {
-	double lambda;
-	double dlambda;
-	double intensity;
-	double generate;
-	double captured;
-	double reflected;
-	double relfectivity;
-};
-
-typedef void(__stdcall * ProgressCallback)(XRayTracingLog);
-typedef void(__stdcall * WaveCallback)(XRayWaveResult);
-
 bool isTerminated;
 
-extern "C"
-__declspec(dllexport) void terminate() {
+__lib_spec void terminate() {
 	isTerminated = true;
 }
 
@@ -187,10 +166,10 @@ void addCollimator(vector<tObject> &obj, Vec3d mirrorPos, double gridPosition,
 	obj.push_back(og);
 }
 
-extern "C"
-__declspec(dllexport) int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, WaveCallback waveTraced) {
+__lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, WaveCallback waveTraced,
+                          StdOutCallback stdoutCallback){
 
-#ifdef WIN32
+#ifdef _WIN32
 	std::setlocale(LC_ALL, "C");
 #endif
 

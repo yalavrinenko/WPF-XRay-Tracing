@@ -15,13 +15,16 @@
 #define DUMP_PLANE 4
 
 #include <cmath>
+#include <limits>
 
+#ifdef __USE_OWN_PI__
 constexpr double M_PI = 3.14159265358979323846264338327950288;
+#endif
 
-#define VERY_BIG_NUM 1298999e+2
+constexpr double VERY_BIG_NUM = std::numeric_limits<double>::max();
 #define RadToGrad(A) (A*180.0/M_PI)
 #define GradToRad(A) (A*M_PI/180)
-#define c_eps	1E-6
+const double c_eps = 1E-6;
 
 struct waveInput{
 	double waveLenght;

@@ -17,6 +17,8 @@
 #include "tSphere.hpp"
 #include "LightSorce.hpp"
 #include "tCylinder.hpp"
+#include <sstream>
+#include <functional>
 
 using namespace std;
 
@@ -36,9 +38,12 @@ void dumpPoint(char* name);
 class infoOut{
 private:
 	ofstream out;
+
+    std::function<void(char const*)> _callback = nullptr;
 public:
 	infoOut();
-	infoOut(char* name);
+	infoOut(char const* name);
+    infoOut(char const* name, std::function<void(char const*)> stdout_callback);
 
 	void logScene(tSphere *mirror, SphereLight *light);
 	void logScene(tCylinder *mirror, SphereLight *light);
