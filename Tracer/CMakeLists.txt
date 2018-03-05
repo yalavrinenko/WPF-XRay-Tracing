@@ -41,6 +41,13 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
+
+option(TEST_MODE "Set seed for rand to 42" OFF)
+
+if (TEST_MODE)
+    add_definitions(-DDEUBG_MODE)
+endif()
+
 add_library(xray-tracing SHARED ${SOURCES} ${HEADERS})
 
 add_subdirectory(test)

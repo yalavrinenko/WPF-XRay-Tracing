@@ -38,7 +38,7 @@ tRay* LightSorce::GenerateRays(double lambda, double dlambda, int count,
 	tRay* res;
 	res = new tRay[count];
 
-	srand(time(0));
+	srand(this->RAND_SEED);
 
 	int index = 0;
 
@@ -86,7 +86,7 @@ tRay* circleLightSorce::GenerateRays(double lambda, double dlambda, int count,
 	tRay* res;
 	res = new tRay[count];
 
-	srand(time(0));
+	srand(this->RAND_SEED);
 
 	int index = 0;
 
@@ -133,7 +133,7 @@ SphereLight::SphereLight() {
 	type = sphereType;
 	breggAngle = 0;
 
-	srand(time(0));
+	srand(this->RAND_SEED);
 }
 
 SphereLight::SphereLight(Vec3d _position, Vec3d _direction, double _app,
@@ -158,7 +158,7 @@ SphereLight::SphereLight(Vec3d _position, Vec3d _direction, double _app,
 
 	type = sphereType;
 
-	srand(time(0));
+	srand(this->RAND_SEED);
 }
 
 SphereLight::SphereLight(Vec3d _position, Vec3d _direction, double _app,
@@ -184,7 +184,7 @@ SphereLight::SphereLight(Vec3d _position, Vec3d _direction, double _app,
 
 	type = sphereType;
 
-	srand(time(0));
+	srand(this->RAND_SEED);
 }
 
 tRay* SphereLight::GenerateRays(double lambda, double dlambda, int count) {

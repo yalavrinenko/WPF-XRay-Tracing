@@ -220,7 +220,7 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 			addCollimator(obj, mirror->getR0(), p->gridPos, p->gridSize, p->programAngle, p);
 	}
 
-	infoOut log((char*)p->logFileName.c_str());
+	infoOut log((char*)p->logFileName.c_str(), stdoutCallback);
 
 	log.logText("Input File Name = " + string(argv) + "\n");
 	p->logVariable(log);

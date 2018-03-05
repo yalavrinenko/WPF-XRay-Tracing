@@ -10,8 +10,23 @@
 
 #include "tRay.hpp"
 #include "general.hpp"
+#include <ctime>
 
-class SphereLight{
+class XRaySouce {
+protected:
+	mutable double RAND_SEED;
+
+public:
+	XRaySouce(){
+#ifdef DEUBG_MODE
+        RAND_SEED = 42;
+#else
+        RAND_SEED = time(0);
+#endif
+	}
+};
+
+class SphereLight: public XRaySouce{
 private:
 	double apperture;
 	double R;
@@ -56,7 +71,7 @@ public:
 
 };
 
-class LightSorce{
+class LightSorce: public XRaySouce{
 private:
 	double L,H;
 
@@ -72,7 +87,7 @@ public:
 
 };
 
-class circleLightSorce{
+class circleLightSorce: public XRaySouce{
 private:
 
 	double R;
