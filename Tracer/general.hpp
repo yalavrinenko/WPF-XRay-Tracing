@@ -22,6 +22,7 @@ constexpr double M_PI = 3.14159265358979323846264338327950288;
 #endif
 
 constexpr double VERY_BIG_NUM = std::numeric_limits<double>::max();
+constexpr int VERY_BIG_NUM_INT = std::numeric_limits<int>::max();
 #define RadToGrad(A) (A*180.0/M_PI)
 #define GradToRad(A) (A*M_PI/180)
 const double c_eps = 1E-6;
@@ -54,11 +55,6 @@ struct Vec2d {
 	Vec2d() :
 			x(0), y(0) {
 	}
-};
-
-struct tObject{
-	void* obj;
-	int type;
 };
 
 void readReflectionFunction();

@@ -12,8 +12,9 @@
 #include <vector>
 #include <string>
 #include "mainParameters.hpp"
+#include "Object.hpp"
 
-class tSphere {
+class tSphere: public XRTObject, public XRTMirror {
 private:
 
 	struct outVec{
@@ -67,12 +68,15 @@ public:
 			createDumpFile((char*)mirrorDumpFileName.c_str());
 	}
 
-	void initRayCounter();
-	long long int getReflRayCount();
-	long long int getCatchRayCount();
+	void initRayCounter() override ;
+	long long int getReflRayCount() override ;
+	long long int getCatchRayCount() override ;
+	Vec3d GetR0() override {
+		return r0;
+	}
 
-	double cross(tRay ray);
-	tRay crossAndGen(tRay ray,double &t);
+	double cross(tRay ray) override ;
+	tRay crossAndGen(tRay ray,double &t) override ;
 
 	void setDistrFunction(double (*_distrf)(double Theta,double lambda));
 	void setDistrFunction(tParameters *p);

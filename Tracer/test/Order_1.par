@@ -1,4 +1,4 @@
-$GenName = EtaRes
+$GenName = Output
 $rayCnt = 1000000
 $rayByIt = 100000
 $cR = 150

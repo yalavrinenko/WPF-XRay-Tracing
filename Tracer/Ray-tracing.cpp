@@ -7,12 +7,12 @@
 
 #include "tSphere.hpp"
 #include "tCylinder.hpp"
-#include "mainParameters.hpp"
 #include "LightSorce.hpp"
 #include "Trace.hpp"
 #include "InputOutput.hpp"
 #include "tMirror.hpp"
 #include "Ray-tracing.hpp"
+#include "Object.hpp"
 #include <clocale>
 
 #define DEBUGMSG(A) cout << A << endl
@@ -36,7 +36,7 @@ __lib_spec void terminate() {
 }
 
 template <class mirrorClass>
-tMirror *initScene(vector<tObject> &obj, SphereLight **slight, tParameters *p) {
+std::shared_ptr<mirrorClass> initScene(XRTObjectVector &obj, SphereLight **slight, tParameters *p) {
 	double mirrorYpos = p->sourceDistance * cos(p->programAngle) - p->mirrorR;
 	double srcXpos = p->sourceDistance * sin(p->programAngle);
 
@@ -53,21 +53,16 @@ tMirror *initScene(vector<tObject> &obj, SphereLight **slight, tParameters *p) {
 	Vec3d mprop(p->mirrorR, p->mirrorTheta, p->mirrorPsi);
 	Vec3d mdprop(0, p->dmTh, p->dmPsi);
 
-	//select mirror type
-	mirrorClass *mirror = new mirrorClass(mpos, mprop, mdprop, p->mirrorDumpFileName);
+	auto mirror = std::make_shared<mirrorClass>(mpos, mprop, mdprop, p->mirrorDumpFileName);
 	mirror->setDistrFunction(p);
-	tObject toAdd;
-	toAdd.type = p->mirrorType + 1;
-	toAdd.obj = mirror;
+	mirror->type = p->mirrorType + 1;
 
-	obj.push_back(toAdd);
+	obj.push_back(mirror);
 
-	tMirror* toRet = new tMirror(p->mirrorType, mirror);
-	//
-	return toRet;
+	return mirror;
 }
 
-void addDumpPlanesSrcLined(vector<tObject> &obj, double startPoint, Vec3d dir,
+void addDumpPlanesSrcLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
 	Vec3d srcDir, int count, double step, double sizeW, double sizeH, double angl,
 	double crossPattern, tParameters *p) {
 	double h = startPoint;
@@ -88,17 +83,15 @@ void addDumpPlanesSrcLined(vector<tObject> &obj, double startPoint, Vec3d dir,
 		//string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
 		string name = p->dumpPlaneName + "Detector.dmp";
 
-		tDumpPlane *dp = new tDumpPlane(N, r0, sizeW, sizeH, (char*)name.c_str());
+		auto dp = std::make_shared<tDumpPlane>(N, r0, sizeW, sizeH, (char*)name.c_str());
 		dp->setCrossPattern(crossPattern);
-		tObject tAdd;
-		tAdd.obj = dp;
-		tAdd.type = DUMP_PLANE;
-		obj.push_back(tAdd);
+		dp->type = DUMP_PLANE;
+		obj.push_back(dp);
 		h += step;
 	}
 }
 
-void addDumpPlanes(vector<tObject> &obj, double startPoint, Vec3d dir,
+void addDumpPlanes(XRTObjectVector &obj, double startPoint, Vec3d dir,
 	int count, double step, double sizeW, double sizeH, double angl, double crossPattern, tParameters *p) {
 	double h = startPoint;
 	for (int i = 0; i < count; i++) {
@@ -114,17 +107,15 @@ void addDumpPlanes(vector<tObject> &obj, double startPoint, Vec3d dir,
 		//string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
 		string name = p->dumpPlaneName + "Detector.dmp";
 
-		tDumpPlane *dp = new tDumpPlane(N, r0, sizeW, sizeH, (char*)name.c_str());
+		auto dp = std::make_shared<tDumpPlane>(N, r0, sizeW, sizeH, (char*)name.c_str());
 		dp->setCrossPattern(crossPattern);
-		tObject tAdd;
-		tAdd.obj = dp;
-		tAdd.type = DUMP_PLANE;
-		obj.push_back(tAdd);
+		dp->type = DUMP_PLANE;
+		obj.push_back(dp);
 		h += step;
 	}
 }
 
-void addGrid(vector<tObject> &obj, Vec3d mirrorPos, double gridPosition,
+void addGrid(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
 	double size, double angl, tParameters *p) {
 	double x, y;
 	x = -gridPosition * sin(angl);
@@ -136,16 +127,14 @@ void addGrid(vector<tObject> &obj, Vec3d mirrorPos, double gridPosition,
 
 	direction = direction / sqrt(dot(direction));
 
-	tGrid *g = new tGrid(direction, posGrid, size, regularMesh);
+	auto g = std::make_shared<tGrid>(direction, posGrid, size, regularMesh);
 
-	tObject og;
-	og.type = GRID;
-	og.obj = g;
+	g->type = GRID;
 
-	obj.push_back(og);
+	obj.push_back(g);
 }
 
-void addCollimator(vector<tObject> &obj, Vec3d mirrorPos, double gridPosition,
+void addCollimator(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
 	double size, double angl, tParameters *p) {
 	double x, y;
 	x = -gridPosition * sin(angl);
@@ -157,13 +146,10 @@ void addCollimator(vector<tObject> &obj, Vec3d mirrorPos, double gridPosition,
 
 	direction = direction / sqrt(dot(direction));
 
-	tGrid *g = new tGrid(direction, posGrid, size, collimator);
+	auto g = std::make_shared<tGrid>(direction, posGrid, size, collimator);
+	g->type = GRID;
 
-	tObject og;
-	og.type = GRID;
-	og.obj = g;
-
-	obj.push_back(og);
+	obj.push_back(g);
 }
 
 __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, WaveCallback waveTraced,
@@ -175,7 +161,7 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 
 	isTerminated = false;
 
-	vector<tObject> obj;
+	XRTObjectVector obj;
 	SphereLight *light = nullptr;
 	tParameters *p = nullptr;
 
@@ -188,14 +174,14 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 	else
 		p = new tParameters(argv);
 
-	tMirror* mirror = nullptr;
+	std::shared_ptr<XRTMirror> mirror = nullptr;
 	if (p->mirrorType == MIRROR_SPHERE)
 		mirror = initScene<tSphere>(obj, &light, p);
 	if (p->mirrorType == MIRROR_CYLINDER)
 		mirror = initScene<tCylinder>(obj, &light, p);
 
 
-	Vec3d dumpPlaneStart = mirror->getR0();
+	Vec3d dumpPlaneStart = mirror->GetR0();
 
 	dumpPlaneStart.y += p->mirrorR;
 
@@ -215,9 +201,9 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 
 	if (p->gridPos > 0) {
 		if (p->gridType == "mesh")
-			addGrid(obj, mirror->getR0(), p->gridPos, p->gridSize, p->programAngle, p);
+			addGrid(obj, mirror->GetR0(), p->gridPos, p->gridSize, p->programAngle, p);
 		if (p->gridType == "slit")
-			addCollimator(obj, mirror->getR0(), p->gridPos, p->gridSize, p->programAngle, p);
+			addCollimator(obj, mirror->GetR0(), p->gridPos, p->gridSize, p->programAngle, p);
 	}
 
 	infoOut log((char*)p->logFileName.c_str(), stdoutCallback);
@@ -226,10 +212,7 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 	p->logVariable(log);
 	log.logText("Rmirror\t=\t" + doubleToStr(p->mirrorR));
 
-	if (p->mirrorType == MIRROR_SPHERE)
-		log.logScene(mirror->getSphere(), light);
-	else if (p->mirrorType == MIRROR_CYLINDER)
-		log.logScene(mirror->getCylinder(), light);
+	log.logScene(mirror, light);
 
 	log.logText("Size\t=\t" + doubleToStr(p->sourceSize));
 	log.logText("Dist\t=\t" + doubleToStr(p->sourceDistance));
@@ -338,19 +321,7 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 	cout << "Done!\nCleaning memory..." << endl;
 	log.logText("Done!\n Cleaning memory...");
 	try {
-		for (int i = 0; i < obj.size(); i++)
-			if (obj[i].type == DUMP_PLANE) {
-				tDumpPlane *tmp = (tDumpPlane*)obj[i].obj;
-				tmp->~tDumpPlane();
-			}
-			else if (obj[i].type == SPHERE) {
-				tSphere* tmp = (tSphere*)obj[i].obj;
-				tmp->~tSphere();
-			}
-			else if (obj[i].type == CYLINDER) {
-				tCylinder* tmp = (tCylinder*)obj[i].obj;
-				tmp->~tCylinder();
-			}
+		obj.clear();
 	}
 	catch (...) {
 		cout << "Catch something strange!" << endl;

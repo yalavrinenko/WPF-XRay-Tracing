@@ -13,7 +13,7 @@
 #include "tPlane.hpp"
 #include "mainParameters.hpp"
 
-class tCylinder{
+class tCylinder: public XRTObject, public XRTMirror{
 private:
 	struct outVec{
 		Vec3d point;
@@ -50,15 +50,20 @@ public:
 	tCylinder();
 	tCylinder(Vec3d _r0, Vec3d _RadThetaPhi, Vec3d _delta, std::string mdfName);
 
-	double cross(tRay ray);
-	tRay crossAndGen(tRay ray,double &t);
+	double cross(tRay ray) override;
+	tRay crossAndGen(tRay ray,double &t) override ;
+
 	void setDistrFunction(double (*_distrf)(double Theta,double lambda));
 
 	void setDistrFunction(tParameters *p);
 
-	void initRayCounter();
-	long long int getReflRayCount();
-	long long int getCatchRayCount();
+	void initRayCounter() override ;
+	long long int getReflRayCount() override ;
+	long long int getCatchRayCount() override ;
+
+	Vec3d GetR0() override {
+		return r0;
+	}
 
 	double setMirrorDumpFileName(std::string name){
 		this->mirrorDumpFileName=name;

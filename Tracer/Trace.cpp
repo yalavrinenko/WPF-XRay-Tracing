@@ -15,7 +15,7 @@
 using namespace std;
 bool writeRoad=false;
 
-void rayTrace(tRay* ray, int ray_count, std::vector<tObject> &object,
+void rayTrace(tRay* ray, int ray_count, XRTObjectVector &object,
 		int obj_count) {
 	bool flag = true;
 
@@ -42,25 +42,12 @@ void rayTrace(tRay* ray, int ray_count, std::vector<tObject> &object,
 			double t;
 
 			double nearestObj = VERY_BIG_NUM;
-			int nearestObjId = VERY_BIG_NUM;
+			int nearestObjId = VERY_BIG_NUM_INT;
 
 			tRay r_out;
 
 			for (int j = 0; j < obj_count; j++) {
-				if (object[j].type == SPHERE)
-					t = crossPointWithSphere(r, object[j]);
-
-				if (object[j].type == PLANE)
-					t = crossPointWithPlane(r, object[j]);
-
-				if (object[j].type == CYLINDER)
-					t = crossPointWithCylinder(r, object[j]);
-
-				if (object[j].type == GRID)
-					t = crossPointWithGrid(r, object[j]);
-
-				if (object[j].type == DUMP_PLANE)
-					t = crossPointWithDumpPlane(r, object[j]);
+				t = object[j]->cross(r);
 
 				if (t < nearestObj && t > 0 && fabs(t) >= c_eps) {
 					nearestObj = t;
@@ -69,24 +56,9 @@ void rayTrace(tRay* ray, int ray_count, std::vector<tObject> &object,
 			}
 
 			if (nearestObj != VERY_BIG_NUM) {
-				tObject obj=object[nearestObjId];
-				switch (obj.type){
-				case SPHERE:
-					ray[i]=crossWithSphere(r,obj,t);
-					break;
-				case PLANE:
-					ray[i]=crossWithPlane(r,obj,t);
-					break;
-				case CYLINDER:
-					ray[i]=crossWithCylinder(r,obj,t);
-					break;
-				case GRID:
-					ray[i]=crossWithGrid(r,obj,t);
-					break;
-				case DUMP_PLANE:
-					ray[i]=crossWithDumpPlane(r,obj,t);
-					break;
-				};
+				auto obj=object[nearestObjId];
+
+				ray[i] = object[nearestObjId]->crossAndGen(r, t);
 
 				if (ray[i].I==0)
 					proccessed++;
@@ -100,64 +72,8 @@ void rayTrace(tRay* ray, int ray_count, std::vector<tObject> &object,
 				proccessed++;
 			}
 		}
-		//printf("\r%lf",((double)proccessed/(double)ray_count)*100.0);
 	}
 
 	if (writeRoad)
 		dumpRoadNOSPH("Road.m", "Road", road);
-}
-
-double crossPointWithDumpPlane(tRay ray, tObject obj) {
-	tDumpPlane *tpl = (tDumpPlane*) obj.obj;
-	return tpl->cross(ray);
-}
-
-double crossPointWithPlane(tRay ray, tObject obj) {
-	tPlane *tpl = (tPlane*) obj.obj;
-	return tpl->cross(ray);
-}
-
-double crossPointWithGrid(tRay ray, tObject obj) {
-	tGrid *tgl = (tGrid*) obj.obj;
-	return tgl->plane.cross(ray);
-}
-
-double crossPointWithSphere(tRay ray, tObject obj) {
-	tSphere *sph = (tSphere*) obj.obj;
-	return sph->cross(ray);
-}
-
-double crossPointWithCylinder(tRay ray, tObject obj) {
-	tCylinder *s = (tCylinder*) obj.obj;
-	return s->cross(ray);
-}
-
-tRay crossWithDumpPlane(tRay ray, tObject obj, double &t) {
-	tDumpPlane *tpl = (tDumpPlane*) obj.obj;
-	ray = tpl->crossAndGen(ray, t);
-	return ray;
-}
-
-tRay crossWithPlane(tRay ray, tObject obj, double &t) {
-	tPlane *tpl = (tPlane*) obj.obj;
-	ray = tpl->crossAndGen(ray, t);
-	return ray;
-}
-
-tRay crossWithGrid(tRay ray, tObject obj, double &t) {
-	tGrid *tgl = (tGrid*) obj.obj;
-	ray = tgl->crossAndGen(ray, t);
-	return ray;
-}
-
-tRay crossWithSphere(tRay ray, tObject obj, double &t) {
-	tSphere *sph = (tSphere*) obj.obj;
-	ray = sph->crossAndGen(ray, t);
-	return ray;
-}
-
-tRay crossWithCylinder(tRay ray, tObject obj, double &t) {
-	tCylinder *s = (tCylinder*) obj.obj;
-	ray = s->crossAndGen(ray, t);
-	return ray;
 }

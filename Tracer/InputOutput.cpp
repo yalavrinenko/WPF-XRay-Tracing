@@ -91,7 +91,7 @@ void dumpRoad(char* name, char* name_func, vector<vector<Vec3d> > road) {
 	out << "end" << endl;
 }
 
-void dumpRoadNOSPH(char* name, char* name_func, vector<vector<Vec3d> > road) {
+void dumpRoadNOSPH(char const* name, char const* name_func, vector<vector<Vec3d> > road) {
 	ofstream out(name);
 	out << "function [] = " << name_func << "()" << endl;
 	out << "\tfigure" << endl;
@@ -138,25 +138,17 @@ infoOut::infoOut(char const* name, std::function<void(char const*)> stdout_callb
     out.open(name);
 }
 
-void infoOut::logScene(tSphere *mirror, SphereLight *light) {
+void infoOut::logScene(std::shared_ptr<XRTMirror> const &mirror, SphereLight *light) {
+	auto r0 = mirror->GetR0();
 	out << "[MIRROR]" << endl;
-	out << "[X,Y,Z]" << "[" << mirror->r0.x << ", " << mirror->r0.y << ", "
-			<< mirror->r0.z << "]" << endl << endl;
+	out << "[X,Y,Z]" << "[" << r0.x << ", " << r0.y << ", "
+			<<r0.z << "]" << endl << endl;
 	out << "[LIGHT SOURCE]" << endl;
 	out << "[X,Y,Z]" << "[" << light->position.x << ", " << light->position.y
 			<< ", " << light->position.z << "]" << endl;
 }
 
-void infoOut::logScene(tCylinder *mirror, SphereLight *light) {
-	out << "[MIRROR]" << endl;
-	out << "[X,Y,Z]" << "[" << mirror->r0.x << ", " << mirror->r0.y << ", "
-			<< mirror->r0.z << "]" << endl << endl;
-	out << "[LIGHT SOURCE]" << endl;
-	out << "[X,Y,Z]" << "[" << light->position.x << ", " << light->position.y
-			<< ", " << light->position.z << "]" << endl;
-}
-
-void infoOut::logText(string text) {
+void infoOut::logText(string const &text) {
 	out << text << endl;
 	if (_callback){
         _callback(text.c_str());

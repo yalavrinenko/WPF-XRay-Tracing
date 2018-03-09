@@ -12,8 +12,9 @@
 #include "tRay.hpp"
 #include <fstream>
 #include <vector>
+#include "Object.hpp"
 
-class tPlane{
+class tPlane: public XRTObject{
 
 public:
 	Vec3d r0;
@@ -26,14 +27,14 @@ public:
 	tPlane(Vec3d _N,Vec3d _r0);
 	tPlane(Vec3d _N,Vec3d _r0,double _lim_area);
 
-	virtual double cross(tRay ray);
+	virtual double cross(tRay ray) override;
 
-	tRay crossAndGen(tRay ray,double &t);
+	virtual tRay crossAndGen(tRay ray,double &t) override;
 
-    Vec3d crossPoint(tRay);
+    virtual Vec3d crossPoint(tRay) override;
 };
 
-class tDumpPlane{
+class tDumpPlane: public XRTObject{
 
 	struct outVec{
 		Vec3d point;
@@ -67,15 +68,15 @@ public:
 	tDumpPlane(Vec3d _N,Vec3d _r0,double _lim_area,char* dumpName);
 	tDumpPlane(Vec3d _N,Vec3d _r0,double _lim_area_w,double _lim_area_h,char* dumpName);
 
-	double cross(tRay ray);
+	double cross(tRay ray) override ;
 
 	void setCrossPattern(int pattern);
 
-	tRay crossAndGen(tRay ray,double &t);
+	tRay crossAndGen(tRay ray,double &t) override ;
 
 	bool check(Vec3d p);
 
-	Vec3d crossPoint(tRay);
+	Vec3d crossPoint(tRay) override ;
 
 	~tDumpPlane();
 };
@@ -85,7 +86,7 @@ double regularMesh(Vec3d p, tPlane pl);
 double collimator(Vec3d p, tPlane pl);
 double circleMesh(Vec3d p, tPlane pl);
 
-class tGrid{
+class tGrid: public  XRTObject{
 private:
 	double (*transp)(Vec3d,tPlane);
 	Vec3d r0;
@@ -95,7 +96,12 @@ public:
 	tGrid();
 	tGrid(Vec3d _N,Vec3d _r0,double _lim_area,double (*_transp)(Vec3d,tPlane));
 
-	tRay crossAndGen(tRay ray, double &t);
+	tRay crossAndGen(tRay ray, double &t) override;
+	Vec3d crossPoint(tRay) override {
+	}
+
+	double cross(tRay ray) override {
+    }
 };
 
 #endif /* TPLANE_HPP_ */

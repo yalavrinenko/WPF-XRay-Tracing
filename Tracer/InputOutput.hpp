@@ -19,13 +19,14 @@
 #include "tCylinder.hpp"
 #include <sstream>
 #include <functional>
+#include <memory>
 
 using namespace std;
 
 void dump(char* name,char* name_func,tRay *arr,int count,double *t);
 void dumpRef(char* name,char* name_func,tRay* arr,int count,double *t);
 void dumpRoad(char* name,char* name_func,vector<vector<Vec3d> > road);
-void dumpRoadNOSPH(char* name,char* name_func,vector<vector<Vec3d> > road);
+void dumpRoadNOSPH(char const* name, char const* name_func, vector<vector<Vec3d> > road);
 string doubleToStr(double a);
 string intToStr(int a);
 void dumpPlane(char* name,vector<Vec3d> odata);
@@ -45,9 +46,8 @@ public:
 	infoOut(char const* name);
     infoOut(char const* name, std::function<void(char const*)> stdout_callback);
 
-	void logScene(tSphere *mirror, SphereLight *light);
-	void logScene(tCylinder *mirror, SphereLight *light);
-	void logText(string text);
+	void logScene(std::shared_ptr<XRTMirror> const &mirror, SphereLight *light);
+	void logText(string const &text);
 };
 
 #endif /* INPUTOUTPUT_HPP_ */

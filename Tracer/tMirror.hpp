@@ -14,7 +14,7 @@
 #include "tSphere.hpp"
 #include "tCylinder.hpp"
 
-class tMirror{
+class [[deprecated]] tMirror{
 private:
 	tSphere *sm;
 	tCylinder *cm;

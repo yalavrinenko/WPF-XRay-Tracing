@@ -32,6 +32,7 @@ set (HEADERS general.hpp
         Trace.hpp
         tRay.hpp
         tSphere.hpp
+        Object.hpp
         )
 
 find_package(OpenMP)
