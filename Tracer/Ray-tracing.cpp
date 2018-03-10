@@ -179,7 +179,7 @@ void addManualObject(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
     obj.push_back(g);
 }
 
-__lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, WaveCallback waveTraced,
+__lib_spec int RayTracing(int argc, char const* argv, ProgressCallback raysGenerated, WaveCallback waveTraced,
                           StdOutCallback stdoutCallback){
 
 #ifdef _WIN32

@@ -7,8 +7,11 @@
 
 int main(int argc,char ** argv){
     RayTracing(1, "../../test/Order_1.par",
-               [](XRayTracingLog log){},
-               [](XRayWaveResult res){},
+               [](XRayTracingLog log){
+                   std::cout << log.linkedLibraryMinorOutput << "/" << log.linkedLibraryTotalOutput << std::endl;
+               },
+               [](XRayWaveResult res){
+               },
                [](char const* msg){
 
                });
