@@ -106,7 +106,11 @@ void addDumpPlanes(XRTObjectVector &obj, double startPoint, Vec3d dir,
 		N = N / sqrt(dot(N));
 
 		//string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
-		string name = p->dumpPlaneName + "Detector.dmp";
+#ifdef DEUBG_MODE
+        string name = p->dumpPlaneName + std::to_string(h) + ".dmp";
+#else
+        string name = p->dumpPlaneName + "Detector.dmp";
+#endif
 
 		auto dp = std::make_shared<tDumpPlane>(N, r0, sizeW, sizeH, (char*)name.c_str());
 		dp->setCrossPattern(crossPattern);
