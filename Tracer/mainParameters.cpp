@@ -186,8 +186,8 @@ void tParameters::readWaveLenghts() {
 	waveLenghtCount = realIdx;
 }
 
-void tParameters::init(char* initFileName) {
-	ParseFile(initFileName);
+void tParameters::init(char const* initFileName) {
+	ParseFile(const_cast<char*>(initFileName));
 
 	char* tmp = new char[1024];
 

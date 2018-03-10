@@ -108,10 +108,10 @@ public:
 
 	tParameters(){
 	}
-	tParameters(char* initFileName){
+	tParameters(char const* initFileName){
 		this->init(initFileName);
 	}
-	void init(char* initFileName);
+	void init(char const* initFileName);
 	double distr(double phi, double lambda);
 	void logVariable(infoOut &logger);
 };
