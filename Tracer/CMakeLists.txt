@@ -17,7 +17,7 @@ set (SOURCES general.cpp
         tPlane.cpp
         Trace.cpp
         tRay.cpp
-        tSphere.cpp)
+        tSphere.cpp TransitivityMap.cpp TransitivityMap.hpp)
 
 set (HEADERS general.hpp
         InputOutput.hpp
@@ -33,7 +33,7 @@ set (HEADERS general.hpp
         tRay.hpp
         tSphere.hpp
         Object.hpp
-        )
+        TransitivityMap.cpp TransitivityMap.hpp)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)

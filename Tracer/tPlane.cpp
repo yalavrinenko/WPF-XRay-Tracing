@@ -72,13 +72,6 @@ tRay tPlane::crossAndGen(tRay ray, double &t) {
 	Vec3d dirNormal = N * dot2(direction, N);
 	Vec3d dirTangential = direction - dirNormal;
 
-	/*cout << "(Dx,Dy,Dz):(" << direction.x << "," << direction.y << ","
-	 << direction.z << ")" << endl;
-	 cout << "(Dnx,Dny,Dnz):(" << dirNormal.x << "," << dirNormal.y << ","
-	 << dirNormal.z << ")" << endl;
-	 cout << "(Dtx,Dty,Dtz):(" << dirTangential.x << "," << dirTangential.y
-	 << "," << dirTangential.z << ")" << endl;*/
-
 	Vec3d newDirection = dirTangential - dirNormal;
 
 	P = RadToGrad( acos(dot2(newDirection,N)/(sqrt(dot(newDirection))*sqrt(dot(N)))) );

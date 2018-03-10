@@ -16,6 +16,9 @@
 
 #include <cmath>
 #include <limits>
+#include <vector>
+#include <string>
+#include "TransitivityMap.hpp"
 
 #ifdef __USE_OWN_PI__
 constexpr double M_PI = 3.14159265358979323846264338327950288;

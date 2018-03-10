@@ -415,6 +415,24 @@ void tParameters::init(char* initFileName) {
 		gridType = "slit";
 
 
+	if (gridType == "manual"){
+        gridLocation = (ExistsPar("OBJECT.Location")) ?
+                   ((GetBoolPar("OBJECT.Location") == 0) ? GridLocation::BEFORE : GridLocation::AFTER) : GridLocation::BEFORE;
+
+        gridWidth = (ExistsPar("OBJECT.Width")) ?
+                    GetDblPar("OBJECT.Width") : -1;
+
+        gridHeight = (ExistsPar("OBJECT.Height")) ?
+                     GetDblPar("OBJECT.Height") : -1;
+
+        gridPixelSize = (ExistsPar("OBJECT.PixelSize")) ?
+                        GetDblPar("OBJECT.PixelSize") : -1;
+
+        GetStrPar("OBJECT.MapPath", tmp);
+        auto map_path = string(tmp);
+
+        gridMap = TransitivityMap(gridPixelSize, map_path);
+	}
 }
 
 

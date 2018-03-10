@@ -10,7 +10,7 @@ int main(int argc,char ** argv){
                [](XRayTracingLog log){},
                [](XRayWaveResult res){},
                [](char const* msg){
-                   std::cout << "TEST " << msg << std::endl;
+
                });
     return 0;
 }

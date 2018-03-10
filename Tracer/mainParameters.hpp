@@ -68,7 +68,6 @@ public:
 	double crystal2d;
 	int mirrorType;
 
-
 	//OUTPUT
 	string dumpPlaneName; //par
 	double startPoint = 0;//43.86;
@@ -96,6 +95,16 @@ public:
 	string gridType;
 	double whiteConst;
 	double blackConst;
+
+    enum class GridLocation{
+        BEFORE, AFTER
+    };
+
+    GridLocation gridLocation;
+    double gridWidth;
+    double gridHeight;
+    double gridPixelSize;
+    TransitivityMap gridMap;
 
 	tParameters(){
 	}

@@ -20,12 +20,17 @@ $SrcSizeW = 0.05
 $SrcSizeH = 0.05
 $FilmH = 400
 $FilmW = 500
-$SlitPos = 0
+$SlitPos = 200
 $SlitW = 0
 $SlitH = 0
 $MrType = Sphere
 
-
+$GridType = manual
+$GridLocation = 0
+$GridWidth = 2
+$GridHeight = 5
+$GridPixelSize = 0.1
+$GridMap = /home/cheshire/Files/jiht/svn/WPF-XRay-Tracing/Tracer/cmake-build-debug/test/map.tiff
 
 angleType = "dec"
 rayCount = $(rayCnt)
@@ -65,11 +70,18 @@ Direction = "srcLine"
 logFileName = "$(GenName).log"
 
 [OBJECT]
-Type = slit ; mesh
+Type = $(GridType)
 Position = $(SlitPos)
 Size = 1000
 Prop1 = $(SlitW)
 Prop2 = $(SlitH)
+
+Location = $(GridLocation)
+Width = $(GridWidth)
+Height = $(GridHeight)
+PixelSize = $(GridPixelSize)
+MapPath = $(GridMap)
+
 
 
 [SRC]

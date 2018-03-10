@@ -14,6 +14,7 @@
 #include "Ray-tracing.hpp"
 #include "Object.hpp"
 #include <clocale>
+#include "tObject.hpp"
 
 #define DEBUGMSG(A) cout << A << endl
 
@@ -152,6 +153,28 @@ void addCollimator(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
 	obj.push_back(g);
 }
 
+void addManualObject(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
+                   double size, double angl, tParameters *p) {
+    double x, y;
+
+    x = -gridPosition * sin(angl);
+    if (p->gridLocation == tParameters::GridLocation::AFTER)
+        x = -x;
+
+    y = (mirrorPos.y + p->mirrorR) - gridPosition * cos(angl);
+
+    Vec3d posGrid(x, y, 0);
+    mirrorPos.y += p->mirrorR;
+    Vec3d direction = mirrorPos - posGrid;
+
+    direction = direction / sqrt(dot(direction));
+
+    auto g = std::make_shared<tObjectPlane>(direction, posGrid, Vec2d{p->gridWidth, p->gridHeight}, p->gridMap);
+    g->type = GRID;
+
+    obj.push_back(g);
+}
+
 __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, WaveCallback waveTraced,
                           StdOutCallback stdoutCallback){
 
@@ -204,10 +227,13 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 			addGrid(obj, mirror->GetR0(), p->gridPos, p->gridSize, p->programAngle, p);
 		if (p->gridType == "slit")
 			addCollimator(obj, mirror->GetR0(), p->gridPos, p->gridSize, p->programAngle, p);
+        if (p->gridType == "manual")
+            addManualObject(obj, mirror->GetR0(), p->gridPos, p->gridSize, p->programAngle, p);
+
 	}
 
 	infoOut log((char*)p->logFileName.c_str(), stdoutCallback);
-
+	log.logText("XRT Version: DATE [" + std::string(__DATE__)+"], TIME [" + std::string(__TIME__) + "]");
 	log.logText("Input File Name = " + string(argv) + "\n");
 	p->logVariable(log);
 	log.logText("Rmirror\t=\t" + doubleToStr(p->mirrorR));
@@ -318,8 +344,8 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 	}
 	//
 
-	cout << "Done!\nCleaning memory..." << endl;
-	log.logText("Done!\n Cleaning memory...");
+	cout << "Done!\n\tCleaning memory..." << endl;
+	log.logText("Done!\n\tCleaning memory...");
 	try {
 		obj.clear();
 	}
@@ -328,8 +354,8 @@ __lib_spec int RayTracing(int argc, char* argv, ProgressCallback raysGenerated, 
 		log.logText("Catch something strange!");
 	}
 
-	cout << "Clean!" << endl;
-	log.logText("Clean!");
+	cout << "\tClean!" << endl;
+	log.logText("\tClean!");
 
 	double finishTime = omp_get_wtime();
 	cout << "Working time:" << "\t" << finishTime - startTime << " sec.";

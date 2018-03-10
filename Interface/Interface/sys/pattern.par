@@ -36,12 +36,17 @@ Direction = "srcLine"
 logFileName = "results/$(GenName).log"
 
 [OBJECT]
-Type = slit ; mesh
+Type = $(GridType)
 Position = $(SlitPos)
 Size = 1000
 Prop1 = $(SlitW)
 Prop2 = $(SlitH)
 
+Location = $(GridLocation)
+Width = $(GridWidth)
+Height = $(GridHeight)
+PixelSize = $(GridPixelSize)
+MapPath = $(GridMap)
 
 [SRC]
 waveLenghtCount = $(WLCount) 
