@@ -174,14 +174,14 @@ namespace Interface
                     m_Points.Add(Rotate(cp, phi));
                 }
 
-                MaxDetectorPositionMer = Math.Round(m_Points.Max(x => x.x) * 1.2, 3);
-                MinDetectorPositionMer = Math.Round(m_Points.Min(x => x.x) * 1.2, 3);
+                MaxDetectorPositionMer = 30;// Math.Round(m_Points.Max(x => x.x) * 1.2, 3);
+                MinDetectorPositionMer = -30;// Math.Round(m_Points.Min(x => x.x) * 1.2, 3);
 
                 MeredionalMax = MaxDetectorPositionMer;
                 MeredionalMin = MinDetectorPositionMer;
 
-                MaxDetectorPositionSag = Math.Round(m_Points.Max(x => x.z) * 1.2, 3);
-                MinDetectorPositionSag = Math.Round(m_Points.Min(x => x.z) * 1.2, 3);
+                MaxDetectorPositionSag = 5;// Math.Round(m_Points.Max(x => x.z) * 1.2, 3);
+                MinDetectorPositionSag = -5;// Math.Round(m_Points.Min(x => x.z) * 1.2, 3);
 
                 SaggitalMax = MaxDetectorPositionSag;
                 SaggitalMin = MinDetectorPositionSag;
