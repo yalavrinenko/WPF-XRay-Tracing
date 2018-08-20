@@ -296,7 +296,8 @@ namespace Interface
             var d = L * L + l * l - 2 * L * l * Math.Sin(Math.PI - theta);
             d = Math.Sqrt(d);
 
-            var cone_Cos = SrcDist / (Math.Sqrt(SrcDist * SrcDist + crystalW * crystalW));
+            var max_edge_dist = Math.Max(crystalH, crystalW);
+            var cone_Cos = SrcDist / (Math.Sqrt(SrcDist * SrcDist + max_edge_dist * max_edge_dist));
             SrcCone = Math.Acos(cone_Cos);
             SrcCone *= 1.05;
             SolidCone = 2.0 * Math.PI * (1.0 - cone_Cos);
