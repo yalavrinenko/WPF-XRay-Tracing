@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include "mainParameters.hpp"
 using namespace std;
@@ -39,10 +39,14 @@ double dot2(const Vec3d &a, const Vec3d &b){
 }
 
 double rdrand(int a){
+#ifdef WIN32
+	throw "Not implemented for win32 arch";
+#else
 	long long int r;
 	asm("rdrand %0" : "=r" (r));
 	throw std::runtime_error("Use wrong rand");
 	return (double)(r%a)/a;
+#endif
 }
 
 double ngrand(int a){

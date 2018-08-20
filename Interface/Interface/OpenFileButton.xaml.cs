@@ -66,5 +66,11 @@ namespace Interface
         {
             this.ButtonLabel.Content = ButtonLabelContent;
         }
+
+        public void clear()
+        {
+            SelectedFileName = "";
+            this.ButtonLabel.Content = ButtonLabelContent;
+        }
     }
 }

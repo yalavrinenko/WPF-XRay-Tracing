@@ -6,7 +6,7 @@
  */
 
 #include "tSphere.hpp"
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include "InputOutput.hpp"
 #include <string>

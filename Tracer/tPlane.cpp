@@ -8,7 +8,7 @@
 #include "tPlane.hpp"
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 using namespace std;
 
 tPlane::tPlane() {

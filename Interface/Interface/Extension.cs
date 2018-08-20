@@ -95,7 +95,7 @@ namespace Interface
             if (xvalue.Count() == 0)
                 return new long[1]{0};
 
-            long N = (long)Math.Ceiling(Math.Abs(xrange.VMax - xrange.VMin) / step);
+            ulong N = (ulong)Math.Ceiling(Math.Abs(xrange.VMax - xrange.VMin) / step);
             long[] hist = new long[N];
 
             var InRegion = xvalue.Where(x => xrange.VMin <= x && x <= xrange.VMax).Select(x => x - xrange.VMin);

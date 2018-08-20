@@ -10,7 +10,7 @@
 #include "InputOutput.hpp"
 
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 bool writeRoad=false;

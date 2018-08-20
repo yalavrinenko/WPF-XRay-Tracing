@@ -12,6 +12,17 @@ namespace Interface
 {
     public class SystemConfig
     {
+        public class ObjectInfo
+        {
+            public string GridType { get; set; } = "none";
+            public short GridLocation { get; set; } = 0; //0 - before, 1 - after the mirror
+            public double GridWidth { get; set; } = 10;
+            public double GridHeight { get; set; } = 5;
+            public double GridPixelSize { get; set; } = 0.001;
+            public string GridMap { get; set; } = "";
+            public double GridPosition { get; set; } = 0.0;
+        }
+
         public class CrystalInfo
         {
             public List<double> crystal2d { get; set; }
@@ -42,6 +53,7 @@ namespace Interface
             }
         }
         public CrystalInfo CrystalProps;
+
         #region public vars
         public string Crystal2d { get
             {
@@ -85,9 +97,12 @@ namespace Interface
 
         public int mainOrder { get; set; } = 1;
 
-        public double SlitPos { get; set; }
+        public ObjectInfo Object { get; set; } = new ObjectInfo { };
+        public bool ObjectExist { get; set; } = false;
+
+        /*public double SlitPos { get; set; }
         public double SlitW { get; set; }
-        public double SlitH { get; set; }
+        public double SlitH { get; set; }*/
 
         public class WaveLimit
         {
@@ -107,7 +122,7 @@ namespace Interface
         {
             get
             {
-                return "Position λ = " + waveLimits?.min.position.ToString();
+                return "Position λmin = " + waveLimits?.min.position.ToString();
             }
         }
 
@@ -115,7 +130,7 @@ namespace Interface
         {
             get
             {
-                return "Position λ = " + waveLimits?.max.position.ToString();
+                return "Position λmax = " + waveLimits?.max.position.ToString();
             }
         }
 
@@ -212,6 +227,16 @@ namespace Interface
             data += "Detector angle = " + Extension.mstr(FilmRotationAngle) + " [deg]\n";
             data += "Detector to crystal = " + Extension.mstr(DstDist) + " [mm]\n";
             data += "Detector to center = " + Extension.mstr(FilmDistFromCenter) + " [mm]\n";
+
+            if (ObjectExist)
+            {
+                data += "\n\n[OBJECT]\n";
+                data += String.Format("Map = {0}\n", Object.GridMap);
+                data += String.Format("Distance = {0} [mm]\n", Object.GridPosition);
+                data += String.Format("Position = {0} crystal\n", (Object.GridLocation == 1) ? "after" : "before");
+                data += String.Format("Object W x H = {0} X {1} [mm]\n", Object.GridWidth, Object.GridHeight);
+                data += String.Format("PixelSize = {0} [mm]\n", Object.GridPixelSize);
+            }
 
             return data;
         }

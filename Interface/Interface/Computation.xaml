@@ -22,11 +22,10 @@
         <Label Panel.ZIndex="1" Grid.Row="1" Name="RaysProgresLabel" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0,4,0,5">Computation</Label>
         <ProgressBar Name="RaysProgres"   Grid.Row="1" Margin="0,10"/>
         <Button Width="562" Grid.Row="2" Content="Cancel" HorizontalAlignment="Center" Name="Terminate" Click="Terminate_Click" VerticalAlignment="Center" Margin="10,6,10,10"/>
-        <Expander Collapsed="Expander_Collapsed" Expanded="Expander_Expanded"  Grid.Row="3" Header="Show tracing output" HorizontalAlignment="Left" Height="185" VerticalAlignment="Top" Width="582">
+        <Expander Collapsed="Expander_Collapsed" Expanded="Expander_Expanded"  Grid.Row="3" Header="Show tracing output" HorizontalAlignment="Left" Height="200" VerticalAlignment="Top" Width="582">
             <Grid Background="Black">
-                <TextBox IsEnabled="False" Name="XRayTraceOutput" Background="Black" Foreground="White" FontSize="12">
-                    Some log text
-                </TextBox>
+                <RichTextBox IsReadOnly="True" VerticalScrollBarVisibility="Auto" Name="XRayTraceOutput" Background="Black" Foreground="White" FontSize="12">
+                </RichTextBox>
             </Grid>
         </Expander>
     </Grid>

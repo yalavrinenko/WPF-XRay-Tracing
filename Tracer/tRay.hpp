@@ -9,7 +9,7 @@
 #define TRAY_HPP_
 
 #include "general.hpp"
-#include <math.h>
+#include <cmath>
 
 struct tRay{
 	Vec3d b;

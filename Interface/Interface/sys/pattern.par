@@ -37,10 +37,7 @@ logFileName = "results/$(GenName).log"
 
 [OBJECT]
 Type = $(GridType)
-Position = $(SlitPos)
-Size = 1000
-Prop1 = $(SlitW)
-Prop2 = $(SlitH)
+Position = $(GridPosition)
 
 Location = $(GridLocation)
 Width = $(GridWidth)

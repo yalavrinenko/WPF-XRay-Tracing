@@ -226,7 +226,7 @@ __lib_spec int RayTracing(int argc, char const* argv, ProgressCallback raysGener
 		addDumpPlanes(obj, p->objStartPoint, dumpPlaneStart, p->objPlaneCount,
 			p->objPlaneStep, p->objPlaneSizeW, p->objPlaneSizeH, -p->programAngle, tDumpPlane::OBJECT, p);
 
-	if (p->gridPos > 0) {
+	if (p->gridPos > 0 && p->gridType != "none") {
 		if (p->gridType == "mesh")
 			addGrid(obj, mirror->GetR0(), p->gridPos, p->gridSize, p->programAngle, p);
 		if (p->gridType == "slit")

@@ -5,7 +5,7 @@
  *      Author: cheshire
  */
 #include "mainParameters.hpp"
-#include <math.h>
+#include <cmath>
 #include "general.hpp"
 #include "param.h"
 #include "LightSorce.hpp"
@@ -412,12 +412,15 @@ void tParameters::init(char const* initFileName) {
 		GetStrPar("OBJECT.Type", tmp);
 		gridType = string(tmp);
 	} else
-		gridType = "slit";
+		gridType = "none";
 
 
 	if (gridType == "manual"){
-        gridLocation = (ExistsPar("OBJECT.Location")) ?
-                   ((GetBoolPar("OBJECT.Location") == 0) ? GridLocation::BEFORE : GridLocation::AFTER) : GridLocation::BEFORE;
+		if (ExistsPar("OBJECT.Location")) {
+			gridLocation = ((GetIntPar("OBJECT.Location") == 0) ? GridLocation::BEFORE : GridLocation::AFTER);
+		}
+		else
+			gridLocation = GridLocation::BEFORE;
 
         gridWidth = (ExistsPar("OBJECT.Width")) ?
                     GetDblPar("OBJECT.Width") : -1;

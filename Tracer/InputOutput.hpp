@@ -40,11 +40,11 @@ class infoOut{
 private:
 	ofstream out;
 
-    std::function<void(char const*)> _callback = nullptr;
+    std::function<void(char const*, size_t)> _callback = nullptr;
 public:
 	infoOut();
 	infoOut(char const* name);
-    infoOut(char const* name, std::function<void(char const*)> stdout_callback);
+    infoOut(char const* name, std::function<void(char const*, size_t)> stdout_callback);
 
 	void logScene(std::shared_ptr<XRTMirror> const &mirror, SphereLight *light);
 	void logText(string const &text);

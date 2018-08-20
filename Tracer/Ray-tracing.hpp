@@ -21,7 +21,7 @@ struct XRayWaveResult {
 #ifdef _WIN32
 typedef void(__stdcall * ProgressCallback)(XRayTracingLog);
 typedef void(__stdcall * WaveCallback)(XRayWaveResult);
-typedef void(__stdcall * StdOutCallback)(char const*);
+typedef void(__stdcall * StdOutCallback)(char const*, size_t);
 
 #define __lib_spec __declspec(dllexport)
 

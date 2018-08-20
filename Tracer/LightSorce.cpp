@@ -8,7 +8,7 @@
 #include "LightSorce.hpp"
 #include <stdlib.h>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <time.h>
 
 using namespace std;

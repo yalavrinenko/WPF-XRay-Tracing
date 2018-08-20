@@ -134,7 +134,7 @@ infoOut::infoOut(char const* name):
         infoOut(name, nullptr){
 }
 
-infoOut::infoOut(char const* name, std::function<void(char const*)> stdout_callback): _callback(stdout_callback){
+infoOut::infoOut(char const* name, std::function<void(char const*, size_t)> stdout_callback): _callback(stdout_callback){
     out.open(name);
 }
 
@@ -151,6 +151,6 @@ void infoOut::logScene(std::shared_ptr<XRTMirror> const &mirror, SphereLight *li
 void infoOut::logText(string const &text) {
 	out << text << endl;
 	if (_callback){
-        _callback(text.c_str());
+        _callback(text.c_str(), text.length());
     }
 }

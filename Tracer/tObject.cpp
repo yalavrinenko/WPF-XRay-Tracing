@@ -21,7 +21,8 @@ tRay tObjectPlane::crossAndGen(tRay ray,double &t)  {
     cross_point.y=px*sin(phi) - py*cos(phi);
 
     if (std::fabs(cross_point.x) >= this->width/2.0 || std::fabs(cross_point.z) >= this->height / 2.0){
-        return tRay{Vec3d{0, 0, 0}, Vec3d{0, 0, 0}, -1};
+		ray.b = point;
+        return ray;
     }
 
     double TValue = map.transitivity(cross_point.x, cross_point.z);

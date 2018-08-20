@@ -99,7 +99,7 @@ namespace Interface
 
             // plot detector;
             var b_phi = self.BraggA * Math.PI / 180.0;
-            double[] source_pos = { -self.SrcDist * Math.Cos(b_phi), -self.SrcDist * Math.Sin(b_phi) - self.crystalR };
+            double[] source_pos = { -self.SrcDist * Math.Cos(b_phi), -self.SrcDist * Math.Sin(b_phi) + self.crystalR };
 
             var detector_center = new double[] { self.DstDist * Math.Cos(b_phi), -self.DstDist * Math.Sin(b_phi) + self.crystalR };
 
@@ -121,9 +121,27 @@ namespace Interface
 
             PlotFunc(line, step, "#00FF00", 5);
             // plot object;
+            if (self.ObjectExist)
+            {
+                var object_distance = self.Object.GridPosition;
+                double[] object_coord = { ((self.Object.GridLocation == 0) ? -1 : 1) *  object_distance * Math.Cos(b_phi),
+                    -object_distance * Math.Sin(b_phi) + self.crystalR };
+
+                double[] object_vector = { -object_coord[0], self.crystalR - object_coord[1] };
+                double tmp = object_vector[0];
+                double object_vector_norm = Extension.vectorLenght(object_vector);
+                object_vector[0] = -object_vector[1] / object_vector_norm;
+                object_vector[1] = tmp / object_vector_norm;
+
+                var ObjectN = (int)(self.Object.GridWidth / 0.1);
+                var object_t_step = Vector<double>.Build.Dense(ObjectN, i => - self.Object.GridWidth / 2.0 + i*0.1);
+
+                Func<double, double[]> object_line = (steps) => { return new double[] { steps * object_vector[0] + object_coord[0], steps * object_vector[1] + object_coord[1] }; };
+                PlotFunc(object_line, object_t_step, "#00FFFF", 3);
+            }
+
 
             // plot lines;
-
             var dh = Math.Sqrt(self.crystalR * self.crystalR - self.crystalW * self.crystalW / 4.0);
             double[] cross_point_1 = { -self.crystalW / 2.0, dh };
             double[] cross_point_2 = { self.crystalW / 2.0, dh };

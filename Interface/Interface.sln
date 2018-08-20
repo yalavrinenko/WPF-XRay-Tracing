@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26206.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interface", "Interface\Interface.csproj", "{95D45495-8308-4E5D-B17F-B533DC1E0597}"
+	ProjectSection(ProjectDependencies) = postProject
+		{84DA4B78-DB97-4AD1-A972-0F23521FD925} = {84DA4B78-DB97-4AD1-A972-0F23521FD925}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tracer", "..\Tracer\Tracer.vcxproj", "{84DA4B78-DB97-4AD1-A972-0F23521FD925}"
 EndProject
@@ -42,5 +45,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {97316B94-6838-446C-AB2A-ED827EFACEF9}
 	EndGlobalSection
 EndGlobal

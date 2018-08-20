@@ -54,10 +54,14 @@ namespace Interface
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate void WaveTracedCallback(WaveTraceResult value);
 
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate void StdOutCallback(IntPtr ptr, UInt64 count);
+
         [DllImport(@"./sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int RayTracing(int argc, [MarshalAs(UnmanagedType.LPStr)] string argv, 
             [MarshalAs(UnmanagedType.FunctionPtr)] RayProgressCallback callbackPointer,
-            [MarshalAs(UnmanagedType.FunctionPtr)] WaveTracedCallback waveCallbackPointer);
+            [MarshalAs(UnmanagedType.FunctionPtr)] WaveTracedCallback waveCallbackPointer,
+            [MarshalAs(UnmanagedType.FunctionPtr)] StdOutCallback stdOutCallback);
 
         [DllImport(@"./sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void terminate();
@@ -125,9 +129,11 @@ namespace Interface
                 outFile.Write("$SrcSizeH = " + Extension.mstr(m_self.SrcSizeH / 2.0) + "\n");
                 outFile.Write("$FilmH = " + Extension.mstr(m_self.FilmSizeH) + "\n");
                 outFile.Write("$FilmW = " + Extension.mstr(m_self.FilmSizeW) + "\n");
-                outFile.Write("$SlitPos = " + Extension.mstr(m_self.SlitPos) + "\n");
-                outFile.Write("$SlitW = " + Extension.mstr(m_self.SlitW) + "\n");
-                outFile.Write("$SlitH = " + Extension.mstr(m_self.SlitH) + "\n");
+
+                foreach (var object_props in m_self.Object.GetType().GetProperties())
+                {
+                    outFile.Write(String.Format("${0} = {1}\n", object_props.Name, Extension.mstr(object_props.GetValue(this.m_self.Object))));
+                }
 
                 outFile.Write("$MrType = " + m_self.CrystType + "\n");
 
@@ -185,16 +191,23 @@ namespace Interface
             }
             catch(Exception expc) { }*/
 
-            XRayTraceOutput.Text = "Here some log info";
-
-            await Task<int>.Factory.StartNew(() =>   RayTracing(1, parFileName, rpc, WaveTraced));
+            await Task<int>.Factory.StartNew(() =>   RayTracing(1, parFileName, rpc, WaveTraced, stdOutCallback));
 
             return false;
         }
 
+        private void stdOutCallback(IntPtr ptr, UInt64 count)
+        {
+            string Message = Marshal.PtrToStringAnsi(ptr, (int)count);
+            Dispatcher.Invoke(new Action(() => {
+                XRayTraceOutput.AppendText(Message+"\n");
+                XRayTraceOutput.ScrollToEnd();
+                }));
+        }
+
         private void P_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => XRayTraceOutput.Text += e.Data.ToString()));
+            Dispatcher.Invoke(new Action(() => XRayTraceOutput.AppendText(e.Data.ToString())));
         }
 
         private void WaveTraced(WaveTraceResult waveInfo)

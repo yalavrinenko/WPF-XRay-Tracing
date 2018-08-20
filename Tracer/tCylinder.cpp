@@ -6,7 +6,7 @@
  */
 
 #include "tCylinder.hpp"
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 using namespace std;

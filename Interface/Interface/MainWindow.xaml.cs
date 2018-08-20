@@ -665,6 +665,26 @@ namespace Interface
         {
             Logger.StopLogger();
         }
+
+        private void ObjectMap_FileSelect(object sender, OpenFileButton.FileSelectionArgs e)
+        {
+            if (e.isSelected)
+            {
+                this.m_SysConf.Object.GridMap = e.FileName;
+                this.m_SysConf.ObjectExist = true;
+                m_SysConf.Object.GridType = "manual";
+                SysConf_onChange(this, null);
+            }
+        }
+
+        private void OnRemoveObject_Click(object sender, RoutedEventArgs e)
+        {
+            ObjectFileSelection.clear();
+            this.m_SysConf.ObjectExist = false;
+            m_SysConf.Object = new SystemConfig.ObjectInfo();
+
+            SysConf_onChange(this, null);
+        }
     }
 
 }

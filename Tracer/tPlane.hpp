@@ -98,9 +98,11 @@ public:
 
 	tRay crossAndGen(tRay ray, double &t) override;
 	Vec3d crossPoint(tRay) override {
+		throw "Not implemented yet!";
 	}
 
 	double cross(tRay ray) override {
+		throw "Not implemented yet!";
     }
 };
 

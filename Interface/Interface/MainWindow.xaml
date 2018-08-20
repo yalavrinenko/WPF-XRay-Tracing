@@ -14,7 +14,7 @@
     </Window.DataContext>
     <Grid DockPanel.Dock="Top">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400*"/>
+            <ColumnDefinition Width="350*"/>
             <ColumnDefinition Width="450*"/>
             <ColumnDefinition Width="700*"/>
         </Grid.ColumnDefinitions>
@@ -89,9 +89,9 @@
         </Border>
 
         <Border Grid.Row="1" Grid.Column="1" Margin="2,6,0,5">
-            <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <StackPanel Orientation="Vertical">
-                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18">Crystal</Label>
+                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="12">Crystal</Label>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
@@ -131,10 +131,13 @@
                             <ComboBoxItem>Cylinder</ComboBoxItem>
                         </ComboBox>
                     </Grid>
+                    
                     <Separator></Separator>
-                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Object"/>
-                    <Grid IsEnabled="False">
+                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="12" Content="Object"/>
+                    <Grid IsEnabled="True">
                         <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
@@ -145,26 +148,42 @@
                             <ColumnDefinition Width="350*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
-                        <Label Grid.Column="0" Content="Object file" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"></Label>
-                        <local:OpenFileButton Grid.Column="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                        <Label Grid.Column="0" Content="Object file" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"
+                               VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center"></Label>
+                        <local:OpenFileButton x:Name="ObjectFileSelection" Grid.Column="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"
+                                              FileSelect="ObjectMap_FileSelect" Extension="Object map (*.map) |*.map|All files (*.*)|*.*"/>
 
-                        <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Distance/offset" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                        <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" 
+                               Content="Distance/location" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
                         <Grid Grid.Column="1" Grid.Row="1" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Height="20" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0" Text="0.1"/>
-                            <TextBox Height="20" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width" Text="0.1"/>
+                            <TextBox  SourceUpdated="ConfValue_SourceUpdated" Text="{Binding Object.GridPosition, NotifyOnSourceUpdated=True}" Height="20" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0"/>
+                            <ComboBox  SourceUpdated="ConfValue_SourceUpdated" Height="20" Grid.Column="1" SelectedIndex="{Binding Object.GridLocation, NotifyOnSourceUpdated=True}" VerticalAlignment="Stretch" d:LayoutOverrides="Width">
+                                <ComboBoxItem>Before</ComboBoxItem>
+                                <ComboBoxItem>After</ComboBoxItem>
+                            </ComboBox>
                         </Grid>
 
-                        <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Object pixel size" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
-                        <TextBox Grid.Column="1" Grid.Row="2" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                        <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Object WxH [mm]"/>
+                        <Grid Grid.Column="1" Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox  SourceUpdated="ConfValue_SourceUpdated" Text="{Binding Object.GridWidth, NotifyOnSourceUpdated=True}" Height="20" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBox  SourceUpdated="ConfValue_SourceUpdated" Text="{Binding Object.GridHeight, NotifyOnSourceUpdated=True}" Height="20" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width"/>
+                        </Grid>
 
+                        <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Object pixel size" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                        <TextBox  SourceUpdated="ConfValue_SourceUpdated" Text ="{Binding Object.GridPixelSize, NotifyOnSourceUpdated=True}"  Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                        <Button IsEnabled="{Binding ObjectExist, NotifyOnSourceUpdated=True}" Name="RemoveObjectButton" Grid.Row="4" Grid.Column="1" Click="OnRemoveObject_Click" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin">Remove object</Button>
                     </Grid>
 
                     <Separator></Separator>
-                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Source"/>
+                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="12" Content="Source"/>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
@@ -198,38 +217,43 @@
                     </Grid>
 
                     <Separator Height="20"></Separator>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Button Height="32" Margin="5,0,15,0" Width="100" Name="FSSR1_Scheme" Click="FSSR1_Scheme_Click">FSSR-1</Button>
-                        <Button Height="32" Margin="15,0" Width="150" Name="UpdateConfig" Click="UpdateConfig_Click">Update system</Button>
-                        <Button Height="32" Margin="15,0,5,0" Width="100" Name="Trace"  Click="Trace_Click">Trace</Button>
-                    </StackPanel>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Height="32" Margin="5,0,15,0" Name="FSSR1_Scheme" Click="FSSR1_Scheme_Click">FSSR-1</Button>
+                        <Button Grid.Column="1" Height="32" Margin="15,0" Name="UpdateConfig" Click="UpdateConfig_Click">Update system</Button>
+                        <Button Grid.Column="2" Height="32" Margin="15,0,5,0" Name="Trace"  Click="Trace_Click">Trace</Button>
+                    </Grid>
                     <Grid Margin="0,5">
                         <Label FontSize="10" Content="" Name="CalculationProgressLabel" Panel.ZIndex="1" HorizontalContentAlignment="Center" Foreground="#FF0A1583"></Label>
                         <ProgressBar Name="CalculationProgressBar" Maximum="8" Value="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"></ProgressBar>
                     </Grid>
-                    <Separator Height="20"></Separator>
-                    <Label  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="Wavelength limits"></Label>
+                    <Separator Height="10"></Separator>
+                    <Label  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold" FontSize="12" Content="Wavelength limits"></Label>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="222*"/>
                             <ColumnDefinition Width="222*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Orientation="Vertical" Grid.ColumnSpan="2">
-                            <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MinWaveStr, StringFormat={}{0:0.00000}}"></Label>
-                            <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MaxWaveStr, StringFormat={}{0:0.00000}}"></Label>
+                            <Label  FontWeight="Bold" FontSize="12" Content="{Binding MinWaveStr, StringFormat={}{0:0.00000}}"></Label>
+                            <Label   FontWeight="Bold" FontSize="12" Content="{Binding MaxWaveStr, StringFormat={}{0:0.00000}}"></Label>
                         </StackPanel>
 
                         <StackPanel Grid.Column="1" Orientation="Vertical" Grid.ColumnSpan="2">
-                            <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MinWavePosStr, StringFormat={}{0:0.00000}}"></Label>
-                            <Label  Background="#FFA7C2DE" Foreground="#FF124785" FontWeight="Bold" FontSize="14" Content="{Binding MaxWavePosStr, StringFormat={}{0:0.00000}}"></Label>
+                            <Label  FontWeight="Bold" FontSize="12" Content="{Binding MinWavePosStr, StringFormat={}{0:0.00000}}"></Label>
+                            <Label  FontWeight="Bold" FontSize="12" Content="{Binding MaxWavePosStr, StringFormat={}{0:0.00000}}"></Label>
                         </StackPanel>
                     </Grid>
 
 
 
-                    <Separator Height="20"></Separator>
+                    <Separator Height="10"></Separator>
 
-                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Simulation"/>
+                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="12" Content="Simulation"/>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
@@ -268,7 +292,7 @@
 
                     </Grid>
 
-                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="18" Content="Detector limits"/>
+                    <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFECE0E0" Foreground="#FFDC2020" FontWeight="Bold" FontSize="12" Content="Detector limits"/>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
@@ -340,15 +364,24 @@
                         <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="270*"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                        <Button Height="20" HorizontalContentAlignment="Left" Margin="0,5" Name="AddNewLine" Click="AddNewLine_Click">Add new line</Button>
-                        <Button Height="20" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteLine" Click="DeleteLine_Click">Delete line</Button>
-                        <Button Height="20" HorizontalContentAlignment="Left" Margin="0,5" Name="GenerateAdditionalLine" Click="GenerateAdditionalLine_Click">Add additional orders</Button>
-                        <Button Height="20" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteAdditionalLine" Click="DeleteAdditionalLine_Click">Delete additional lines</Button>
-                        <Button Height="20" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteAll" Click="DeleteAll_Click">Clear all lines</Button>
-                        <CheckBox Margin="0,5" Click="CheckBox_Checked" IsChecked="True">Display All</CheckBox>
-                        <CheckBox Margin="0,5" IsChecked="{Binding Path=UseBetterStatistic}">Gen. wave sequence</CheckBox>
-                    </StackPanel>
+                    <Grid VerticalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Button Grid.Row="0" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" Margin="0,5" Name="AddNewLine" Click="AddNewLine_Click">Add new line</Button>
+                        <Button Grid.Row="1" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteLine" Click="DeleteLine_Click">Delete line</Button>
+                        <Button Grid.Row="2" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" Margin="0,5" Name="GenerateAdditionalLine" Click="GenerateAdditionalLine_Click">Include 	additional orders</Button>
+                        <Button Grid.Row="3" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteAdditionalLine" Click="DeleteAdditionalLine_Click">Remove additional orders</Button>
+                        <Button Grid.Row="4" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" Margin="0,5" Name="DeleteAll" Click="DeleteAll_Click">Clear all lines</Button>
+                        <CheckBox Grid.Row="5" VerticalAlignment="Stretch" Margin="0,5" Click="CheckBox_Checked" IsChecked="True">Display All</CheckBox>
+                        <CheckBox Grid.Row="6" VerticalAlignment="Stretch" Margin="0,5" IsChecked="{Binding Path=UseBetterStatistic}">Gen. wave sequence</CheckBox>
+                    </Grid>
 
                     <DataGrid x:Name="SelectedWavesList" Margin="5,-2,0,5" Grid.Column="1"
                           ScrollViewer.CanContentScroll="True" 

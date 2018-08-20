@@ -10,7 +10,7 @@
 
 #include <fstream>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <omp.h>
