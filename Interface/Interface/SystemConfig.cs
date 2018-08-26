@@ -72,6 +72,12 @@ namespace Interface
         public double crystalR { get; set; } = 150;
         public double centralWave { get; set; } = 2.0;
         public double BraggA { get; set; } = 50;
+        public double ScatterAngle
+        {
+            get { return 90 - BraggA; }
+            set { BraggA = 90 - value; }
+        }
+
         public double SrcDist { get; set; } = 100;
         public double DstDist { get; set; }
         public string CrystType { get; set; } = "Sphere"; // $MrType = "Sphere"  ;"Sphere" ;Cylinder;

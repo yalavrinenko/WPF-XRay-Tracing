@@ -278,7 +278,7 @@
                         <TextBox Height="20" Grid.Column="1" Grid.Row="2" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding ZeroWaveStr}"/>
 
                         <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Scat. angle [dec]"/>
-                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="20" Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding BraggA, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}"/>
+                        <TextBox SourceUpdated="ConfValue_SourceUpdated" Height="20" Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" Text="{Binding ScatterAngle, NotifyOnSourceUpdated=True, StringFormat={}{0:0.00000}}"/>
 
                         <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Rays / For iter"/>
                         <Grid Grid.Column="1" Grid.Row="4">
