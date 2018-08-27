@@ -25,5 +25,5 @@ double XRTRockingCurve::reflectivity(double dangle) const {
     if (reflectivity>1 || reflectivity<0.0)
         std::cout<<"Reflection interpolation error!"<< std::endl;
 
-	return 1.0; // reflectivity;
+	return reflectivity;
 }
