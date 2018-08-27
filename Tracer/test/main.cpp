@@ -12,8 +12,8 @@ int main(int argc,char ** argv){
                },
                [](XRayWaveResult res){
                },
-               [](char const* msg){
-
+               [](char const* msg, size_t count){
+                    std::cout << "STDOUT:"<< std::string(msg, count) << std::endl;
                });
     return 0;
 }

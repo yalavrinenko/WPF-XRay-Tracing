@@ -11,7 +11,7 @@
 #include "LightSorce.hpp"
 #include "InputOutput.hpp"
 #include "InputOutput.hpp"
-
+#include <map>
 #ifdef _WIN32
 #include <filesystem>
 #else
@@ -85,67 +85,65 @@ void tParameters::logVariable(infoOut &logger){
 }
 
 void tParameters::readReflectionFunction() {
-	reflectionFunction.resize(reflSize);
 	ifstream reflStream(reflectionFileName.c_str());
-	for (int i = 0; i < reflSize; i++) {
-		double shr;
-		reflStream>>shr>>reflectionFunction[i];
+
+	std::string head_line;
+	std::getline(reflStream, head_line);
+	bool three_col_format;
+	if (head_line.find("#v2") != std::string::npos){
+	    //v2 format
+	    three_col_format = true;
+	} else {
+	    //v1 format
+	    reflStream.close();
+        reflStream.open(reflectionFileName.c_str());
+        three_col_format = false;
+	}
+
+    std::map<double, std::vector<XRTCurvePoint>> reflection_surface;
+
+	while (reflStream.good()){
+	    double wave = 1.0;
+	    XRTCurvePoint point;
+	    if (three_col_format)
+	        reflStream >> wave >> point.angle >> point.reflectivity;
+	    else {
+            reflStream >> point.angle >> point.reflectivity;
+        }
+
+        if (!reflStream.eof()) {
+            if (!reflection_surface.count(wave))
+                reflection_surface[wave] = std::vector<XRTCurvePoint>();
+
+            reflection_surface[wave].emplace_back(point);
+        }
+	}
+
+	for (auto &kv : reflection_surface){
+	    auto lambda = (4.13566766225e-15 * 299792458) / kv.first * 1e10;
+	    m_reflection_curves.emplace_back(std::make_pair(lambda, XRTRockingCurve(kv.second, lambda)));
 	}
 }
 
 double tParameters::distr(double phi, double lambda) {
 	double dPhi;
-	int k;
-	int k1;
 	double currentRefValue;
 	double randomNumber;
 
-	if (reflectionFileName == "") {
-		double newProgramAngle = M_PI / 2 - asin(lambda / crystal2d);
-		if (std::isnan(newProgramAngle))
-			newProgramAngle=40*M_PI;
+    double newProgramAngle = M_PI / 2 - asin(lambda / crystal2d);
 
+    if (std::isnan(newProgramAngle))
+        newProgramAngle=40*M_PI;
 
-		if (fabs(phi - newProgramAngle) <= dprogramAngle) {
-			randomNumber = (double) (rand() % 100) / 100.0;
-			if (randomNumber <= refValue)
-				return 2;
-			else
-				return 0;
-		} else
-			return 0;
+    dPhi = phi - newProgramAngle;
+    currentRefValue = m_reflection_curves[m_working_curve].second.reflectivity(dPhi);
 
-	} else {
+    randomNumber =reflection_distribution(random_engine);
 
-		double newProgramAngle = M_PI / 2 - asin(lambda / crystal2d);
-
-		if (std::isnan(newProgramAngle))
-			newProgramAngle=40*M_PI;
-
-		if (fabs(phi - newProgramAngle) <= dprogramAngle) {
-			dPhi = (phi - newProgramAngle) + dprogramAngle;
-
-			k = dPhi / reflStep;
-			k1 = k + 1;
-
-			if (k1>=reflSize) k1=k;
-			currentRefValue = reflectionFunction[k]
-					+ (reflectionFunction[k1] - reflectionFunction[k])
-							/ reflStep * (dPhi - k * reflStep);
-
-			if (currentRefValue>1 || currentRefValue<0.0)
-				cout<<"Reflection interpolation error!"<<endl;
-
-			randomNumber = (double) (rand() % 100) / 100.0;
-
-			if (randomNumber <= currentRefValue)
-				return 2;
-			else
-				return 0;
-		} else
-			return 0;
-
-	}
+    if (randomNumber <= currentRefValue)
+        return 2;
+    else
+        return 0;
 }
 
 void tParameters::readWaveLenghts() {

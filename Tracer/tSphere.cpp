@@ -168,20 +168,3 @@ bool tSphere::checkPosition(Vec3d point) {
 	}
 
 }
-
-void tSphere::setDistrFunction(double (*_distrf)(double Theta,double lambda)){
-	p_distrf=_distrf;
-	parameters = NULL;
-}
-
-void tSphere::setDistrFunction(tParameters *p){
-	p_distrf=NULL;
-	parameters = p;
-}
-
-double tSphere::distrf(double Theta, double lambda) {
-	if (parameters != NULL)
-		return parameters->distr(Theta, lambda);
-	if (p_distrf != NULL)
-		return p_distrf(Theta, lambda);
-}

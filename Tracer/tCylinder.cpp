@@ -186,16 +186,6 @@ tRay tCylinder::crossAndGen(tRay ray, double &t) {
 	return toRet;
 }
 
-void tCylinder::setDistrFunction(double (*_distrf)(double Theta,double lambda)){
-	p_distrf=_distrf;
-	parameters = NULL;
-}
-
-void tCylinder::setDistrFunction(tParameters *p){
-	p_distrf=NULL;
-	parameters = p;
-}
-
 void tCylinder::initRayCounter(){
 	rayCatch=rayReflected=0;
 }
@@ -247,11 +237,3 @@ void tCylinder::addDumpData(Vec3d crossPoint, double I, double l) {
 		rayIter = 0;
 	}
 }
-
-double tCylinder::distrf(double Theta, double lambda) {
-	if (parameters != NULL)
-		return parameters->distr(Theta, lambda);
-	if (p_distrf != NULL)
-		return p_distrf(Theta, lambda);
-}
-

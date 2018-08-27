@@ -1,6 +1,8 @@
 #ifndef RAY_TRACING_H
 #define RAY_TRACING_H
 
+#include <cstdint>
+
 struct XRayTracingLog{
     int linkedLibraryMinorOutput;
     int linkedLibraryTotalOutput;
@@ -28,7 +30,7 @@ typedef void(__stdcall * StdOutCallback)(char const*, size_t);
 #else
 typedef void(* ProgressCallback)(XRayTracingLog);
 typedef void(* WaveCallback)(XRayWaveResult);
-typedef void(* StdOutCallback)(char const*);
+typedef void(* StdOutCallback)(char const*, uint64_t);
 #define __lib_spec
 #endif
 

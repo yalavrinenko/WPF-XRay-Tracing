@@ -236,7 +236,7 @@ __lib_spec int RayTracing(int argc, char const* argv, ProgressCallback raysGener
 
 	}
 
-	infoOut log((char*)p->logFileName.c_str(), stdoutCallback);
+	infoOut log(p->logFileName.c_str(), stdoutCallback);
 	log.logText("XRT Version: DATE [" + std::string(__DATE__)+"], TIME [" + std::string(__TIME__) + "]");
 	log.logText("Input File Name = " + string(argv) + "\n");
 	p->logVariable(log);
@@ -285,6 +285,8 @@ __lib_spec int RayTracing(int argc, char const* argv, ProgressCallback raysGener
 		int generatedRay = 0;
 
 		mirror->initRayCounter();
+		mirror->setWorkingWave(currentWaveLenght.waveLenght);
+		log.logText("Switch working wavelenght to"+std::to_string(currentWaveLenght.waveLenght));
 
 		int rayByIter = p->rayByIter;
 		xlog.linkedLibraryMinorOutput = 0;

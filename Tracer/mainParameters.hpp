@@ -18,6 +18,10 @@
 #include <string>
 #include <vector>
 #include "general.hpp"
+#include "xrt_rocking_curve.h"
+#include <vector>
+#include <random>
+#include <chrono>
 
 using namespace std;
 
@@ -26,77 +30,86 @@ using namespace std;
 
 class infoOut;
 
-class tParameters{
+class tParameters {
 
 private:
-	void readWaveLenghts();
-	void readReflectionFunction();
+    void readWaveLenghts();
+
+    void readReflectionFunction();
+
+    using xrt_curve = std::pair<double, XRTRockingCurve>;
+
+    std::vector<xrt_curve> m_reflection_curves;
+    size_t m_working_curve = 0;
+
+    std::mt19937_64 random_engine;
+    std::uniform_real_distribution<double> reflection_distribution;
 
 public:
-	//GENERAL
-	int rayCount = 1000000; //par
-	bool isRad=true;
-	int rayByIter=1e+6;
+    //GENERAL
+    int rayCount = 1000000; //par
+    bool isRad = true;
+    int rayByIter = 1e+6;
 
-	//SRC
-	double sourceDistance; //par
-	double sourceSize;//par
-	double sourceSize_W;
-	double sourceSize_H;
-	double aperture; //par
-	int src_type; //SphereLight::cylindricType; //par
-	double H; //par
-	int orientation; //par
+    //SRC
+    double sourceDistance; //par
+    double sourceSize;//par
+    double sourceSize_W;
+    double sourceSize_H;
+    double aperture; //par
+    int src_type; //SphereLight::cylindricType; //par
+    double H; //par
+    int orientation; //par
 
-	int waveLenghtCount;
-	vector<waveInput> waveLenghts;
+    int waveLenghtCount;
+    vector<waveInput> waveLenghts;
 
-	//MIRROR
-	double mirrorR;//par
-	double mirrorTheta = 90; //par
-	double mirrorPsi = 90; //par
-	double dmTh, dmPsi; //p
-	double breggAngle; //60 //par
-	double programAngle;
-	double dprogramAngle;//0.0175; //par
-	string mirrorDumpFileName;
-	double refValue;
-	vector<double> reflectionFunction;
-	string reflectionFileName;
-	double reflStep;
-	int reflSize;
-	double crystal2d;
-	int mirrorType;
+    //MIRROR
+    double mirrorR;//par
+    double mirrorTheta = 90; //par
+    double mirrorPsi = 90; //par
+    double dmTh, dmPsi; //p
+    double breggAngle; //60 //par
+    double programAngle;
+    double dprogramAngle;//0.0175; //par
+    string mirrorDumpFileName;
+    double refValue;
+    vector<double> reflectionFunction;
+    string reflectionFileName;
+    double reflStep;
+    int reflSize;
+    double crystal2d;
+    int mirrorType;
 
-	//OUTPUT
-	string dumpPlaneName; //par
-	double startPoint = 0;//43.86;
-	double planeCount = 0;
-	double planeStep = 0;
+    //OUTPUT
+    string dumpPlaneName; //par
+    double startPoint = 0;//43.86;
+    double planeCount = 0;
+    double planeStep = 0;
 
-	double planeSize = 0;
-	double planeSizeW = 0;
-	double planeSizeH = 0;
+    double planeSize = 0;
+    double planeSizeW = 0;
+    double planeSizeH = 0;
 
-	string logFileName;
-	string dumpDirection;
+    string logFileName;
+    string dumpDirection;
 
-	//OBJECT_PLANE
-	double objStartPoint;
-	double objPlaneCount;
-	double objPlaneStep;
-	double objPlaneSize;
-	double objPlaneSizeH;
-	double objPlaneSizeW;
+    //OBJECT_PLANE
+    double objStartPoint;
+    double objPlaneCount;
+    double objPlaneStep;
+    double objPlaneSize;
+    double objPlaneSizeH;
+    double objPlaneSizeW;
 
-	//OBJECT
-	double gridPos;
-	double gridSize;
-	string gridType;
-	double whiteConst;
-	double blackConst;
+    //OBJECT
+    double gridPos;
+    double gridSize;
+    string gridType;
+    double whiteConst;
+    double blackConst;
 
-    enum class GridLocation{
+    enum class GridLocation {
         BEFORE, AFTER
     };
 
@@ -106,14 +119,34 @@ public:
     double gridPixelSize;
     TransitivityMap gridMap;
 
-	tParameters(){
-	}
-	tParameters(char const* initFileName){
-		this->init(initFileName);
-	}
-	void init(char const* initFileName);
-	double distr(double phi, double lambda);
-	void logVariable(infoOut &logger);
+    tParameters() : random_engine(std::chrono::system_clock::now().time_since_epoch().count()),
+                    reflection_distribution(0.0, 1.0) {
+    }
+
+    tParameters(char const *initFileName) : random_engine(std::chrono::system_clock::now().time_since_epoch().count()),
+                                            reflection_distribution(0.0, 1.0) {
+        this->init(initFileName);
+    }
+
+    void init(char const *initFileName);
+
+    double distr(double phi, double lambda);
+
+    void logVariable(infoOut &logger);
+
+    void set_working_wave(double wave){
+        double min_div = std::numeric_limits<double>::max();
+        size_t index = 0;
+        for (auto i = 0u; i < m_reflection_curves.size(); ++i){
+            auto dw = std::abs(m_reflection_curves[i].first - wave);
+            if (dw < min_div){
+                min_div = dw;
+                index = i;
+            }
+        }
+
+        m_working_curve = index;
+    }
 };
 
 bool TestDir(string dir);

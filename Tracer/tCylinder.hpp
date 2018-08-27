@@ -26,9 +26,6 @@ private:
 
 	bool checkPoint(double t, tRay r);
 
-	double (*p_distrf)(double Theta,double lambda);
-	tParameters *parameters;
-
 	long long int rayCatch;
 	long long int rayReflected;
 	static const int rayLimit=1000;
@@ -36,8 +33,6 @@ private:
 	std::string mirrorDumpFileName;
 	std::vector<outVec> outArr;
 	int rayIter;
-
-	double distrf(double Theta, double lambda);
 
 public:
 
@@ -53,10 +48,6 @@ public:
 	double cross(tRay ray) override;
 	tRay crossAndGen(tRay ray,double &t) override ;
 
-	void setDistrFunction(double (*_distrf)(double Theta,double lambda));
-
-	void setDistrFunction(tParameters *p);
-
 	void initRayCounter() override ;
 	long long int getReflRayCount() override ;
 	long long int getCatchRayCount() override ;
@@ -65,7 +56,7 @@ public:
 		return r0;
 	}
 
-	double setMirrorDumpFileName(std::string name){
+	double setMirrorDumpFileName(std::string const &name){
 		this->mirrorDumpFileName=name;
 	}
 

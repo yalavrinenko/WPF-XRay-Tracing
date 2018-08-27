@@ -6,6 +6,7 @@
 #define XRAY_TRACING_LIB_OBJECT_HPP
 
 #include "tRay.hpp"
+#include "mainParameters.hpp"
 #include <memory>
 
 class XRTObject{
@@ -28,6 +29,30 @@ public:
     virtual long long int getCatchRayCount() = 0;
     virtual long long int getReflRayCount() = 0;
     virtual Vec3d GetR0() = 0;
+
+    void setDistrFunction(double (*_distrf)(double Theta,double lambda)){
+        p_distrf=_distrf;
+        parameters = nullptr;
+    }
+
+    void setDistrFunction(tParameters *p){
+        p_distrf=nullptr;
+        parameters = p;
+    }
+
+    double distrf(double Theta, double lambda) {
+        if (parameters != nullptr)
+            return parameters->distr(Theta, lambda);
+        if (p_distrf != nullptr)
+            return p_distrf(Theta, lambda);
+    }
+
+    void setWorkingWave(double lambda){
+        parameters->set_working_wave(lambda);
+    }
+protected:
+    double (*p_distrf)(double Theta,double lambda);
+    tParameters *parameters = nullptr;
 };
 
 using XRTObjectVector = std::vector<std::shared_ptr<XRTObject>>;

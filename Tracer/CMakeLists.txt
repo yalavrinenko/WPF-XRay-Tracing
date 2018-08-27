@@ -33,7 +33,7 @@ set (HEADERS general.hpp
         tRay.hpp
         tSphere.hpp
         Object.hpp
-        TransitivityMap.cpp TransitivityMap.hpp)
+        TransitivityMap.cpp TransitivityMap.hpp xrt_rocking_curve.cpp xrt_rocking_curve.h)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
