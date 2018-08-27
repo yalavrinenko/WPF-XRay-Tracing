@@ -152,6 +152,7 @@
     <ClCompile Include="TransitivityMap.cpp" />
     <ClCompile Include="tRay.cpp" />
     <ClCompile Include="tSphere.cpp" />
+    <ClCompile Include="xrt_rocking_curve.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="general.hpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="TransitivityMap.hpp" />
     <ClInclude Include="tRay.hpp" />
     <ClInclude Include="tSphere.hpp" />
+    <ClInclude Include="xrt_rocking_curve.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

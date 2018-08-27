@@ -111,6 +111,7 @@ void tParameters::readReflectionFunction() {
             reflStream >> point.angle >> point.reflectivity;
         }
 
+		point.angle = GradToRad(point.angle);
         if (!reflStream.eof()) {
             if (!reflection_surface.count(wave))
                 reflection_surface[wave] = std::vector<XRTCurvePoint>();
@@ -138,7 +139,7 @@ double tParameters::distr(double phi, double lambda) {
     dPhi = phi - newProgramAngle;
     currentRefValue = m_reflection_curves[m_working_curve].second.reflectivity(dPhi);
 
-    randomNumber =reflection_distribution(random_engine);
+    randomNumber = reflection_distribution(random_engine);
 
     if (randomNumber <= currentRefValue)
         return 2;

@@ -57,6 +57,9 @@
     <ClCompile Include="TransitivityMap.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="xrt_rocking_curve.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="param.h">
@@ -99,6 +102,9 @@
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="TransitivityMap.hpp">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="xrt_rocking_curve.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

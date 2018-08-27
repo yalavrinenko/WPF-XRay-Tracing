@@ -446,15 +446,23 @@ namespace Interface
         {
             var io = new StreamReader(path);
             List<Tuple<double, double>> points = new List<Tuple<double, double>>();
-            
+
+            int format_shift = 0;
+
             while (!io.EndOfStream)
             {
                 var rline = io.ReadLine().Trim();
                 rline = System.Text.RegularExpressions.Regex.Replace(rline, @"\s+", " ");
+                if (rline.Contains("#v2"))
+                {
+                    format_shift += 1;
+                    continue;
+                }
+
                 var line = rline.Split(" \t".ToArray());
                 try
                 {
-                    points.Add(new Tuple<double, double>(double.Parse(line[0]), double.Parse(line[1])));
+                    points.Add(new Tuple<double, double>(double.Parse(line[format_shift + 0]), double.Parse(line[format_shift + 1])));
                 }
                 catch(Exception e)
                 {

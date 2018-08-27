@@ -286,7 +286,7 @@ __lib_spec int RayTracing(int argc, char const* argv, ProgressCallback raysGener
 
 		mirror->initRayCounter();
 		mirror->setWorkingWave(currentWaveLenght.waveLenght);
-		log.logText("Switch working wavelenght to"+std::to_string(currentWaveLenght.waveLenght));
+		log.logText("Switch working wavelenght to "+std::to_string(currentWaveLenght.waveLenght));
 
 		int rayByIter = p->rayByIter;
 		xlog.linkedLibraryMinorOutput = 0;
