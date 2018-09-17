@@ -222,7 +222,7 @@ namespace Interface
             {
                 Emited = waveInfo.generate,
                 Reflected = waveInfo.reflected,
-                Efficiency = waveInfo.reflected / waveInfo.generate * (m_self.SolidCone / 4.0 * Math.PI),
+                Efficiency = waveInfo.reflected / waveInfo.generate * (m_self.SolidCone / (4.0 * Math.PI)),
             };
             WaveProcessed?.Invoke(this, tracedWave);
         }
