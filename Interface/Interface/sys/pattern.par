@@ -42,7 +42,8 @@ Position = $(GridPosition)
 Location = $(GridLocation)
 Width = $(GridWidth)
 Height = $(GridHeight)
-PixelSize = $(GridPixelSize)
+PixelSizeX = $(GridPixelSizeX)
+PixelSizeY = $(GridPixelSizeY)
 MapPath = $(GridMap)
 
 [SRC]

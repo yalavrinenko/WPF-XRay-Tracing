@@ -52,34 +52,34 @@ public:
     int rayByIter = 1e+6;
 
     //SRC
-    double sourceDistance; //par
-    double sourceSize;//par
-    double sourceSize_W;
-    double sourceSize_H;
-    double aperture; //par
-    int src_type; //SphereLight::cylindricType; //par
-    double H; //par
-    int orientation; //par
+    double sourceDistance{}; //par
+    double sourceSize{};//par
+    double sourceSize_W{};
+    double sourceSize_H{};
+    double aperture{}; //par
+    int src_type{}; //SphereLight::cylindricType; //par
+    double H{}; //par
+    int orientation{}; //par
 
-    int waveLenghtCount;
+    int waveLenghtCount{};
     vector<waveInput> waveLenghts;
 
     //MIRROR
-    double mirrorR;//par
+    double mirrorR{};//par
     double mirrorTheta = 90; //par
     double mirrorPsi = 90; //par
-    double dmTh, dmPsi; //p
-    double breggAngle; //60 //par
-    double programAngle;
-    double dprogramAngle;//0.0175; //par
+    double dmTh{}, dmPsi{}; //p
+    double breggAngle{}; //60 //par
+    double programAngle{};
+    double dprogramAngle{};//0.0175; //par
     string mirrorDumpFileName;
-    double refValue;
+    double refValue{};
     vector<double> reflectionFunction;
     string reflectionFileName;
-    double reflStep;
-    int reflSize;
-    double crystal2d;
-    int mirrorType;
+    double reflStep{};
+    int reflSize{};
+    double crystal2d{};
+    int mirrorType{};
 
     //OUTPUT
     string dumpPlaneName; //par
@@ -95,48 +95,53 @@ public:
     string dumpDirection;
 
     //OBJECT_PLANE
-    double objStartPoint;
-    double objPlaneCount;
-    double objPlaneStep;
-    double objPlaneSize;
-    double objPlaneSizeH;
-    double objPlaneSizeW;
+    double objStartPoint{};
+    double objPlaneCount{};
+    double objPlaneStep{};
+    double objPlaneSize{};
+    double objPlaneSizeH{};
+    double objPlaneSizeW{};
 
     //OBJECT
-    double gridPos;
-    double gridSize;
+    double gridPos{};
+    double gridSize{};
     string gridType;
-    double whiteConst;
-    double blackConst;
+    double whiteConst{};
+    double blackConst{};
 
     enum class GridLocation {
         BEFORE, AFTER
     };
 
-    GridLocation gridLocation;
-    double gridWidth;
-    double gridHeight;
-    double gridPixelSize;
+    GridLocation gridLocation = GridLocation::BEFORE;
+    double gridWidth{};
+    double gridHeight{};
+    double gridPixelSizeX{};
+    double gridPixelSizeY{};
     TransitivityMap gridMap;
 
     tParameters() : random_engine(std::chrono::system_clock::now().time_since_epoch().count()),
                     reflection_distribution(0.0, 1.0) {
     }
 
-    tParameters(char const *initFileName) : random_engine(std::chrono::system_clock::now().time_since_epoch().count()),
+    explicit tParameters(char const *initFileName) : random_engine(std::chrono::system_clock::now().time_since_epoch().count()),
                                             reflection_distribution(0.0, 1.0) {
         this->init(initFileName);
     }
 
     void init(char const *initFileName);
 
-    double distr(double phi, double lambda);
+    double reflection(double phi, double lambda);
 
     void logVariable(infoOut &logger);
 
     void set_working_wave(double wave){
-        double min_div = std::numeric_limits<double>::max();
+        if (m_reflection_curves.empty())
+            throw std::logic_error("The curve set is empty.");
+
+        double min_div = std::numeric_limits<double>::epsilon();
         size_t index = 0;
+
         for (auto i = 0u; i < m_reflection_curves.size(); ++i){
             auto dw = std::abs(m_reflection_curves[i].first - wave);
             if (dw < min_div){

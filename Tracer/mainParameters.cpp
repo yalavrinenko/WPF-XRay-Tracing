@@ -52,7 +52,7 @@ void tParameters::logVariable(infoOut &logger){
 	logger.logText("breggAngle = " + to_string(breggAngle) );
 	logger.logText("programAngle = " + to_string(programAngle) );
 	logger.logText("dprogramAngle = " + to_string(dprogramAngle) );
-	logger.logText("mirrorDumpFileName = " + mirrorDumpFileName );
+	logger.logText("log_filepath = " + mirrorDumpFileName );
 	logger.logText("refValue = " + to_string(refValue) );
 
 	logger.logText("reflectionFileName = " + reflectionFileName );
@@ -86,6 +86,9 @@ void tParameters::logVariable(infoOut &logger){
 
 void tParameters::readReflectionFunction() {
 	ifstream reflStream(reflectionFileName.c_str());
+
+	if (!reflStream.is_open())
+		throw std::logic_error("Unable to open curve file:" + reflectionFileName);
 
 	std::string head_line;
 	std::getline(reflStream, head_line);
@@ -126,7 +129,7 @@ void tParameters::readReflectionFunction() {
 	}
 }
 
-double tParameters::distr(double phi, double lambda) {
+double tParameters::reflection(double phi, double lambda) {
 	double dPhi;
 	double currentRefValue;
 	double randomNumber;
@@ -427,13 +430,16 @@ void tParameters::init(char const* initFileName) {
         gridHeight = (ExistsPar("OBJECT.Height")) ?
                      GetDblPar("OBJECT.Height") : -1;
 
-        gridPixelSize = (ExistsPar("OBJECT.PixelSize")) ?
-                        GetDblPar("OBJECT.PixelSize") : -1;
+        gridPixelSizeX = (ExistsPar("OBJECT.PixelSizeX")) ?
+                        GetDblPar("OBJECT.PixelSizeX") : -1;
+
+		gridPixelSizeY = (ExistsPar("OBJECT.PixelSizeY")) ?
+						 GetDblPar("OBJECT.PixelSizeY") : -1;
 
         GetStrPar("OBJECT.MapPath", tmp);
         auto map_path = string(tmp);
 
-        gridMap = TransitivityMap(gridPixelSize, map_path);
+        gridMap = TransitivityMap(gridPixelSizeX, gridPixelSizeY, map_path);
 	}
 }
 

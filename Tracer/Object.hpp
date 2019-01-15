@@ -8,6 +8,7 @@
 #include "tRay.hpp"
 #include "mainParameters.hpp"
 #include <memory>
+#include "Utils.hpp"
 
 class XRTObject{
 public:
@@ -25,10 +26,19 @@ public:
 
 class XRTMirror{
 public:
+    XRTMirror() = default;
+
+    explicit XRTMirror(Vec3d const &center_position, std::string const &log_filename={}):
+        r0(center_position), logger(log_filename){
+    }
+
     virtual void initRayCounter() = 0;
     virtual long long int getCatchRayCount() = 0;
     virtual long long int getReflRayCount() = 0;
-    virtual Vec3d GetR0() = 0;
+
+    virtual Vec3d const& GetR0() const{
+        return r0;
+    }
 
     void setDistrFunction(double (*_distrf)(double Theta,double lambda)){
         p_distrf=_distrf;
@@ -42,7 +52,7 @@ public:
 
     double distrf(double Theta, double lambda) {
         if (parameters != nullptr)
-            return parameters->distr(Theta, lambda);
+            return parameters->reflection(Theta, lambda);
         if (p_distrf != nullptr)
             return p_distrf(Theta, lambda);
     }
@@ -50,9 +60,34 @@ public:
     void setWorkingWave(double lambda){
         parameters->set_working_wave(lambda);
     }
+
+    Vec3d r0{};
+
+    struct xrt_mirror_intersection{
+        Vec3d point;
+        double I{}, l{};
+
+        std::string to_string() const{
+            auto estimate_size = std::snprintf(nullptr, 0, "%0.10f\t%0.10f\t%0.10f\t%0.10f\t%0.10f",
+                                               point.x, point.y, point.z, l, I);
+            char tmp[estimate_size+1];
+            std::snprintf(tmp, (size_t)estimate_size, "%0.10f\t%0.10f\t%0.10f\t%0.10f\t%0.10f",
+                          point.x, point.y, point.z, l, I);
+
+            return std::string(tmp);
+        }
+    };
+
+    virtual ~XRTMirror() = default;
 protected:
-    double (*p_distrf)(double Theta,double lambda);
+
+    virtual std::string log_header() const {
+        return "No header log.";
+    }
+
+    double (*p_distrf)(double Theta,double lambda) = nullptr;
     tParameters *parameters = nullptr;
+    XRTFLogging<xrt_mirror_intersection> logger;
 };
 
 using XRTObjectVector = std::vector<std::shared_ptr<XRTObject>>;

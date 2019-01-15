@@ -9,44 +9,43 @@
 #include <fstream>
 #include <cmath>
 
-TransitivityMap::TransitivityMap(double __psize, std::string const &path):TransitivityMap(__psize) {
+TransitivityMap::TransitivityMap(double __psize_x, double __psize_y, std::string const &path):
+    TransitivityMap(__psize_x, __psize_y) {
     read_map(path);
 }
 
 void TransitivityMap::read_map(std::string const &path) {
     std::ifstream in (path);
-    std::size_t x = 0;
-    std::size_t y = 0;
     std::string line;
     while (std::getline(in, line)){
         std::vector<double> tmp_vec;
 
         std::istringstream iss(line);
-        std::vector<std::string> tokens;
-        std::copy(std::istream_iterator<std::string>(iss),
-                  std::istream_iterator<std::string>(),
-                  std::back_inserter(tokens));
-
-        std::transform(tokens.begin(), tokens.end(), std::back_inserter(tmp_vec), [](std::string const &str){
-            return std::stod(str);
-        });
-
-        auto tmp_size = tmp_vec.size();
-        if (x != 0 && tmp_size != x){
-            throw std::logic_error("Wrong Map file fromat. ["+path+"]");
-        }
-
-        x = tmp_size;
+        std::copy(std::istream_iterator<double>(iss),
+                  std::istream_iterator<double>(),
+                  std::back_inserter(tmp_vec));
 
         m_map.emplace_back(std::move(tmp_vec));
-        ++y;
     }
 
-    width = x;
-    height = y;
+    height = m_map.size();
+
+    if (height != 0)
+        width = m_map.front().size();
+    else
+        throw std::logic_error("Wrong Map file fromat. ["+path+"]");
+
+    if (std::count_if(m_map.begin(), m_map.end(), [this](auto const& v){
+        return v.size() != width;
+    })){
+        throw std::logic_error("Wrong Map file fromat. ["+path+"]");
+    }
+
 }
 
 double TransitivityMap::transitivity(double x, double y) const {
+    throw std::string("Not inmplemented yet^") + std::string(__FUNCTION__);
+    /*
     if (pixel_size == 0)
         throw std::logic_error("Wrong pixel size");
 
@@ -66,5 +65,5 @@ double TransitivityMap::transitivity(double x, double y) const {
     if (y_idx < 0)
         y_idx = 0;
 
-    return m_map[y_idx][x_idx];
+    return m_map[y_idx][x_idx];*/
 }

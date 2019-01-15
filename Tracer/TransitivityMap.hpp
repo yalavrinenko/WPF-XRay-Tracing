@@ -14,12 +14,15 @@ private:
     std::size_t width = 0;
     std::size_t height = 0;
 
-    double pixel_size = 0;
+    struct {
+        double x;
+        double y;
+    } pixel_size = {0.0, 0.0};
 
 public:
     TransitivityMap() = default;
 
-    explicit TransitivityMap(double __psize): pixel_size(__psize){}
+    TransitivityMap(double __psize_x, double __psize_y): pixel_size({__psize_x, __psize_y}){}
 
     TransitivityMap(TransitivityMap &&m) noexcept :
             pixel_size(m.pixel_size),
@@ -28,7 +31,7 @@ public:
         m_map = std::move(m.m_map);
     }
 
-    TransitivityMap(double __psize, std::string const &path);
+    TransitivityMap(double __psize_x, double __psize_y, std::string const &path);
 
     TransitivityMap& operator= (TransitivityMap const &m) = default;
 

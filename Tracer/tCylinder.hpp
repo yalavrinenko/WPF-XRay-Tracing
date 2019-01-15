@@ -39,6 +39,7 @@ public:
 	Vec3d r0;
 
 	FILE *fout;
+
 	void createDumpFile(char* fileName);
 	void addDumpData(Vec3d crossPoint,double I,double l);
 
@@ -51,14 +52,6 @@ public:
 	void initRayCounter() override ;
 	long long int getReflRayCount() override ;
 	long long int getCatchRayCount() override ;
-
-	Vec3d GetR0() override {
-		return r0;
-	}
-
-	double setMirrorDumpFileName(std::string const &name){
-		this->mirrorDumpFileName=name;
-	}
 
 	~tCylinder();
 };
