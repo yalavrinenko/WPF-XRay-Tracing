@@ -60,7 +60,7 @@ tRay* LightSorce::GenerateRays(double lambda, double dlambda, int count,
 
 		if (kx * kx + ky * ky <= R * R) {
 			res[index] = tRay(b, k, __lambda);
-			res[index].I = 1;
+			res[index].reflection_stage = 1;
 			index++;
 		} else
 			i--;
@@ -112,7 +112,7 @@ tRay* circleLightSorce::GenerateRays(double lambda, double dlambda, int count,
 
 		if (kx * kx + ky * ky <= _R * _R && bx * bx + by * by <= R * R) {
 			res[index] = tRay(b, k, __lambda);
-			res[index].I = 1;
+			res[index].reflection_stage = 1;
 			index++;
 		} else
 			i--;
@@ -250,7 +250,7 @@ tRay* SphereLight::GenerateRays(double lambda, double dlambda, int count) {
 
 		if (dot(tr) <= 1.0){
 			res[index] = tRay(b, p, __lambda);
-			res[index].I = 1;
+			res[index].reflection_stage = 1;
 			index++;
 		} else
 			i--;
@@ -377,7 +377,7 @@ tRay* SphereLight::generateCylindricRays(double lambda, double dlambda,
 			cout << "!" << endl;
 
 		res[index] = tRay(b, p, __lambda);
-		res[index].I = 1;
+		res[index].reflection_stage = 1;
 		index++;
 	}
 	cout << "Gen " << count << " rays" << endl;

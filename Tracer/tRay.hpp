@@ -16,7 +16,7 @@ struct tRay{
 	Vec3d k;
 
 	double lambda;
-	double I;
+	double reflection_stage;
 
 	tRay(Vec3d _b,Vec3d _k, double l):
 		b(_b), k(_k), lambda(l){

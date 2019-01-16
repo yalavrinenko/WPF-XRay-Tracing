@@ -17,93 +17,31 @@
 class tPlane: public XRTObject{
 
 public:
-	Vec3d r0;
 	Vec3d N;
 
-	double limit_area;
+	double limit_area_w{};
+	double limit_area_h{};
 
 public:
-	tPlane();
-	tPlane(Vec3d _N,Vec3d _r0);
-	tPlane(Vec3d _N,Vec3d _r0,double _lim_area);
+	tPlane() = default;
+
+	tPlane(Vec3d _N, Vec3d _r0, std::string const &logpath = {});
+
+	tPlane(Vec3d _N, Vec3d _r0, double _lim_area, std::string const &logpath = {});
+
+	tPlane(Vec3d _N,Vec3d _r0,double _lim_area_w,double _lim_area_h,std::string const &dumpName);
 
 	virtual double cross(tRay ray) override;
 
 	virtual tRay crossAndGen(tRay ray,double &t) override;
 
-    virtual Vec3d crossPoint(tRay) override;
-};
-
-class tDumpPlane: public XRTObject{
-
-	struct outVec{
-		Vec3d point;
-		double I;
-		double lambda;
-	};
-
-public:
-	Vec3d r0;
-	Vec3d N;
-
-	FILE* out;
-	double limit_area;
-	double limit_area_w;
-	double limit_area_h;
-
-	std::vector<outVec> tmpVector;
-	int tmpVectorPosition;
-	static const int tmpVectorSize=1000;
-
-	static const int OBJECT = 1;
-	static const int IMAGE = 2;
-
-	int dumpPattern;
-
-	void dumpHead();
-
-public:
-	tDumpPlane();
-	tDumpPlane(Vec3d _N,Vec3d _r0);
-	tDumpPlane(Vec3d _N,Vec3d _r0,double _lim_area,char* dumpName);
-	tDumpPlane(Vec3d _N,Vec3d _r0,double _lim_area_w,double _lim_area_h,char* dumpName);
-
-	double cross(tRay ray) override ;
-
-	void setCrossPattern(int pattern);
-
-	tRay crossAndGen(tRay ray,double &t) override ;
-
-	bool check(Vec3d p);
-
-	Vec3d crossPoint(tRay) override ;
-
-	~tDumpPlane();
-};
-
-double defaultFunction(Vec3d p,tPlane pl);
-double regularMesh(Vec3d p, tPlane pl);
-double collimator(Vec3d p, tPlane pl);
-double circleMesh(Vec3d p, tPlane pl);
-
-class tGrid: public  XRTObject{
-private:
-	double (*transp)(Vec3d,tPlane);
-	Vec3d r0;
-
-public:
-	tPlane plane;
-	tGrid();
-	tGrid(Vec3d _N,Vec3d _r0,double _lim_area,double (*_transp)(Vec3d,tPlane));
-
-	tRay crossAndGen(tRay ray, double &t) override;
-	Vec3d crossPoint(tRay) override {
-		throw "Not implemented yet!";
+protected:
+	virtual bool transition_decision(Vec3d const &intersection_point) {
+		return true;
 	}
 
-	double cross(tRay ray) override {
-		throw "Not implemented yet!";
-    }
+	virtual bool intersection_check(Vec3d const &intercetion_point);
+
 };
 
 #endif /* TPLANE_HPP_ */

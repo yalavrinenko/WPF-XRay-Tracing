@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(xray-tracing-lib)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 set (SOURCES general.cpp
         gridFunction.cpp
@@ -33,7 +33,7 @@ set (HEADERS general.hpp
         tRay.hpp
         tSphere.hpp
         Object.hpp
-        TransitivityMap.cpp TransitivityMap.hpp xrt_rocking_curve.cpp xrt_rocking_curve.h Object.cpp Utils.cpp Utils.hpp)
+        TransitivityMap.cpp TransitivityMap.hpp xrt_rocking_curve.cpp xrt_rocking_curve.h Object.cpp Utils.cpp Utils.hpp DetectorPlane.cpp DetectorPlane.hpp)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)

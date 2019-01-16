@@ -25,8 +25,8 @@ double defaultFunction(Vec3d p, tPlane pl) {
 	double ys = y * cos(phi) - z * sin(phi);
 	double zs = y * sin(phi) + z * cos(phi);
 
-	double yd = fabs(ys - pl.r0.y) - constB / 2.0;
-	double xd = fabs(p.x - pl.r0.x) - constB / 2.0;
+	double yd = fabs(ys - pl.GetR0().y) - constB / 2.0;
+	double xd = fabs(p.x - pl.GetR0().x) - constB / 2.0;
 
 	int ny = yd / (constB + constW);
 	int nx = xd / (constB + constW);
@@ -49,7 +49,7 @@ double regularMesh(Vec3d p, tPlane pl) {
 	double phi = acos(
 			dot2(zDirection, N) / (sqrt(dot(zDirection)) * sqrt(dot(N))));
 
-	Vec3d op=p - pl.r0;
+	Vec3d op=p - pl.GetR0();
 	double px=op.x;
 	double py=op.y;
 	double pz=op.z;
@@ -85,7 +85,7 @@ double regularMesh(Vec3d p, tPlane pl) {
 
 double circleMesh(Vec3d p, tPlane pl) {
 
-	double dist=sqrt(dot(p-pl.r0));
+	double dist=sqrt(dot(p-pl.GetR0()));
 
 	if (dist<15e-4)
 		return 1;
@@ -100,7 +100,7 @@ double collimator(Vec3d p, tPlane pl) {
 	double phi = acos(
 			dot2(zDirection, N) / (sqrt(dot(zDirection)) * sqrt(dot(N))));
 
-	Vec3d op=p - pl.r0;
+	Vec3d op=p - pl.GetR0();
 	double px=op.x;
 	double py=op.y;
 	double pz=op.z;

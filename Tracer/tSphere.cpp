@@ -37,27 +37,11 @@ double tSphere::cross(tRay ray) {
     return -1;
 }
 
-void tSphere::initRayCounter() {
-    rayCatch = rayReflected = 0;
-}
-
-long long int tSphere::getReflRayCount() {
-    return this->rayReflected;
-}
-
-long long int tSphere::getCatchRayCount() {
-    return this->rayCatch;
-}
-
 tRay tSphere::crossAndGen(tRay ray, double &t) {
     double crossPoint = this->cross(ray);
     t = crossPoint;
     if (crossPoint == -1)
         return tRay(Vec3d(0, 0, 0), Vec3d(0, 0, 0), -1);
-
-    //Ray catch
-
-    rayCatch++;
 
     Vec3d point = ray.trace(crossPoint);
 
@@ -74,10 +58,16 @@ tRay tSphere::crossAndGen(tRay ray, double &t) {
 
     //--------------------------------------------------
     auto Intence = distrf(angle, ray.lambda);
+    {
+        rayCatch++;
 
-    if (Intence == 2) {
-        logger.add_data({point, Intence, ray.lambda});
-        rayReflected++;
+        printf("%lld\n", rayCatch.load());
+
+        if (Intence == 2) {
+            critical_guard lg(critical_section_mut);
+            logger.add_data({point, Intence, ray.lambda});
+            rayReflected++;
+        }
     }
     //--------------------------------------------------
 
@@ -87,7 +77,7 @@ tRay tSphere::crossAndGen(tRay ray, double &t) {
     Vec3d newDirection = dirTangential - dirNormal;
 
     tRay toRet(point, newDirection, ray.lambda);
-    toRet.I = Intence;
+    toRet.reflection_stage = Intence;
     return toRet;
 }
 
@@ -109,12 +99,8 @@ bool tSphere::checkPosition(Vec3d point) {
     Theta = RadToGrad(Theta);
     Phi = RadToGrad(Phi);
 
-    if (fabs(RadThetaPhi.y - Theta) <= deltaRadThetaPhi.y
-        && fabs(RadThetaPhi.z - Phi) <= deltaRadThetaPhi.z) {
-        return true;
-    } else {
-        return false;
-    }
+    return fabs(RadThetaPhi.y - Theta) <= deltaRadThetaPhi.y
+           && fabs(RadThetaPhi.z - Phi) <= deltaRadThetaPhi.z;
 
 }
 
@@ -145,4 +131,5 @@ std::string tSphere::log_header() const {
              RadThetaPhi.z,
              RadThetaPhi.y, deltaRadThetaPhi.z, deltaRadThetaPhi.y);
 
+    return std::string{header};
 }

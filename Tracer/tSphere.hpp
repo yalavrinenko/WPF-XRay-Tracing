@@ -14,35 +14,30 @@
 #include "mainParameters.hpp"
 #include "Object.hpp"
 
-class tSphere: public XRTObject, public XRTMirror {
+class tSphere: public XRTMirror {
 public:
 	tSphere() = default;
 
 	tSphere(Vec3d _r0, Vec3d _RadThetaPhi, Vec3d _delta, std::string const &mdfName) :
 			XRTMirror(_r0, mdfName),
 			RadThetaPhi(_RadThetaPhi), deltaRadThetaPhi(_delta){
+		logger.header(log_header());
 	}
-
-	void initRayCounter() override ;
-	long long int getReflRayCount() override ;
-	long long int getCatchRayCount() override ;
 
 	double cross(tRay ray) override ;
 	tRay crossAndGen(tRay ray,double &t) override ;
 
-	~tSphere() = default;
+	~tSphere() override = default;
 
 protected:
-	virtual std::string log_header() const override;
+	std::string log_header() const;
+
 private:
 	Vec3d RadThetaPhi;
 	Vec3d deltaRadThetaPhi;
 	//x - Radius
 	//y - Theta
 	//z - Phi
-
-	long long int rayCatch{};
-	long long int rayReflected{};
 
 	bool checkPosition(Vec3d point);
 };

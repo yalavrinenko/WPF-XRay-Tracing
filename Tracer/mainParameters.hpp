@@ -120,11 +120,13 @@ public:
     double gridPixelSizeY{};
     TransitivityMap gridMap;
 
-    tParameters() : random_engine(std::chrono::system_clock::now().time_since_epoch().count()),
+    tParameters() : random_engine(
+            static_cast<unsigned long>(std::chrono::system_clock::now().time_since_epoch().count())),
                     reflection_distribution(0.0, 1.0) {
     }
 
-    explicit tParameters(char const *initFileName) : random_engine(std::chrono::system_clock::now().time_since_epoch().count()),
+    explicit tParameters(char const *initFileName) : random_engine(
+            static_cast<unsigned long>(std::chrono::system_clock::now().time_since_epoch().count())),
                                             reflection_distribution(0.0, 1.0) {
         this->init(initFileName);
     }
@@ -151,6 +153,10 @@ public:
         }
 
         m_working_curve = index;
+    }
+
+    TransitivityMap const& transitivity_map() const {
+        return gridMap;
     }
 };
 

@@ -9,61 +9,34 @@
 #include "mainParameters.hpp"
 #include <memory>
 #include "Utils.hpp"
+#include <mutex>
+#include <atomic>
 
 class XRTObject{
 public:
-    virtual double cross(tRay ray) = 0;
+    XRTObject() = default;
 
-    virtual tRay crossAndGen(tRay ray, double &t) = 0;
-
-    virtual Vec3d crossPoint(tRay) {
-        throw std::logic_error(std::string("crossPoint not implemented in ")+ std::string(typeid(this).name()));
-    };
-
-    int type;
-};
-
-
-class XRTMirror{
-public:
-    XRTMirror() = default;
-
-    explicit XRTMirror(Vec3d const &center_position, std::string const &log_filename={}):
-        r0(center_position), logger(log_filename){
+    explicit XRTObject(Vec3d const &center_position, std::string const &logpath = {}):
+        r0(center_position), logger(logpath){
     }
 
-    virtual void initRayCounter() = 0;
-    virtual long long int getCatchRayCount() = 0;
-    virtual long long int getReflRayCount() = 0;
+    //Function to determine intersection time. Call to find nearest object.
+    virtual double cross(tRay ray) = 0;
+
+    //Function to make intersection at time t. Call to make intersection and get reflected ray.
+    virtual tRay crossAndGen(tRay ray, double &t) = 0;
 
     virtual Vec3d const& GetR0() const{
         return r0;
     }
 
-    void setDistrFunction(double (*_distrf)(double Theta,double lambda)){
-        p_distrf=_distrf;
-        parameters = nullptr;
+    void xrt_parameters(tParameters *parameters_ptr){
+        parameters = parameters_ptr;
     }
 
-    void setDistrFunction(tParameters *p){
-        p_distrf=nullptr;
-        parameters = p;
-    }
+    int type = -1;
 
-    double distrf(double Theta, double lambda) {
-        if (parameters != nullptr)
-            return parameters->reflection(Theta, lambda);
-        if (p_distrf != nullptr)
-            return p_distrf(Theta, lambda);
-    }
-
-    void setWorkingWave(double lambda){
-        parameters->set_working_wave(lambda);
-    }
-
-    Vec3d r0{};
-
-    struct xrt_mirror_intersection{
+    struct xrt_intersection{
         Vec3d point;
         double I{}, l{};
 
@@ -78,16 +51,53 @@ public:
         }
     };
 
+protected:
+    using critical_guard = std::lock_guard<std::mutex>;
+
+    Vec3d r0{};
+
+    XRTFLogging<xrt_intersection> logger;
+    tParameters *parameters = nullptr;
+    std::mutex critical_section_mut;
+};
+
+
+class XRTMirror: public XRTObject{
+public:
+    XRTMirror() = default;
+
+    explicit XRTMirror(Vec3d const &center_position, std::string const &log_filename={}):
+        XRTObject(center_position, log_filename){
+    }
+
+    virtual void initRayCounter() {
+        rayCatch=rayReflected=0;
+    }
+
+    virtual long long int getCatchRayCount(){
+        return this->rayCatch.load();
+    }
+
+    virtual long long int getReflRayCount() {
+        return this->rayReflected.load();
+    }
+
+    double distrf(double Theta, double lambda) {
+        if (parameters != nullptr)
+            return parameters->reflection(Theta, lambda);
+        else
+            throw std::logic_error("Error in parameters structure at" + std::string(__FUNCTION__));
+    }
+
+    void setWorkingWave(double lambda){
+        parameters->set_working_wave(lambda);
+    }
+
     virtual ~XRTMirror() = default;
 protected:
 
-    virtual std::string log_header() const {
-        return "No header log.";
-    }
-
-    double (*p_distrf)(double Theta,double lambda) = nullptr;
-    tParameters *parameters = nullptr;
-    XRTFLogging<xrt_mirror_intersection> logger;
+    std::atomic<long long int> rayCatch{};
+    std::atomic<long long int> rayReflected{};
 };
 
 using XRTObjectVector = std::vector<std::shared_ptr<XRTObject>>;

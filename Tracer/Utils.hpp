@@ -15,7 +15,8 @@ public:
     XRTFLogging() = default;
 
     explicit XRTFLogging(std::string const &path):
-        log_path(log_path){
+        log_path(path){
+        open(log_path);
     }
 
     void header(std::string const &header_data) {
@@ -26,7 +27,8 @@ public:
     void flush(){
         if (logptr) {
             for (auto i=0u; i < index; ++i){
-                fprintf(logptr, "%s\n", buffer[i].to_string());
+                auto data = buffer[i].to_string();
+                fprintf(logptr, "%s\n", data.c_str());
             }
             index = 0;
         }

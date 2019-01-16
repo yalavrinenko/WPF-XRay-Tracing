@@ -11,69 +11,94 @@
 
 #include <vector>
 #include <cmath>
+#include <thread>
 
 using namespace std;
-bool writeRoad=false;
+bool writeRoad = false;
 
-void rayTrace(tRay* ray, int ray_count, XRTObjectVector &object,
-		int obj_count) {
-	bool flag = true;
+void trace_single_ray(tRay &current_ray, XRTObjectVector const &object){
+    while (current_ray.lambda > 0 && current_ray.reflection_stage >= c_eps){
+        double close_intersection_time = VERY_BIG_NUM;
+        int intersection_object_id = -1;
 
-	long proccessed=0;
+        for (int j = 0; j < object.size(); j++) {
+            auto intersection_time = object[j]->cross(current_ray);
 
-	vector<vector<Vec3d> > road;
-	if (writeRoad)
-		road.resize(ray_count);
+            if (intersection_time > 0 && intersection_time < close_intersection_time && fabs(intersection_time) >= c_eps) {
+                close_intersection_time = intersection_time;
+                intersection_object_id = j;
+            }
+        }
 
-	vector<Vec3d> toRet;
+        if (intersection_object_id != -1){
+            auto obj = object[intersection_object_id];
 
-	while (flag) {
-		flag = false;
+            auto intersection_time = 0.0;
+            current_ray = object[intersection_object_id]->crossAndGen(current_ray, intersection_time);
+        } else {
+            current_ray = tRay();
+        }
+    }
+}
 
-		for (int i = 0; i < ray_count; i++) {
-			tRay r = ray[i];
+void XRTEnvironment::init_task_pool() {
+    task_pool.resize(threads_count);
 
-			if (r.lambda <= 0 || fabs(r.I) <= c_eps)
-				continue;
+    auto pool_function = [this](){
+        auto range = this->xrt_trace_range();
 
-			if (writeRoad)
-				road[i].push_back(r.b);
+        auto batches = 0u;
+        while (range.first != -1) {
+            for (auto it = range.first; it < range.second; ++it) {
+                trace_single_ray(this->src.xrt_rays[it], *(this->src.xrt_objects));
+            }
 
-			double t;
+            range = this->xrt_trace_range();
+            ++batches;
+        }
 
-			double nearestObj = VERY_BIG_NUM;
-			int nearestObjId = VERY_BIG_NUM_INT;
+        return batches;
+    };
 
-			tRay r_out;
+    std::for_each(task_pool.begin(), task_pool.end(), [pool_function](auto &task){
+       task = std::packaged_task<unsigned (void)>(pool_function);
+    });
+}
 
-			for (int j = 0; j < obj_count; j++) {
-				t = object[j]->cross(r);
+std::pair<long, long> XRTEnvironment::xrt_trace_range() {
+    std::lock_guard<std::mutex> lg(this->access_mutex);
+    if (this->src.xrt_index_begin >= this->src.xrt_ray_count)
+        return {-1, -1};
 
-				if (t < nearestObj && t > 0 && fabs(t) >= c_eps) {
-					nearestObj = t;
-					nearestObjId = j;
-				}
-			}
+    auto begin = this->src.xrt_index_begin;
+    auto end = begin + this->src.xrt_batch_size;
+    if (end > this->src.xrt_ray_count)
+        end = this->src.xrt_ray_count;
 
-			if (nearestObj != VERY_BIG_NUM) {
-				auto obj=object[nearestObjId];
+    this->src.xrt_index_begin = end;
+    return {begin, end};
+}
 
-				ray[i] = object[nearestObjId]->crossAndGen(r, t);
+void XRTEnvironment::trace(tRay *ray_ptr, size_t count, XRTObjectVector const &xrt_objects) {
+    src = {
+            ray_ptr,
+            &xrt_objects,
+            0,
+            count,
+            XRT_DEF_BATCH_SIZE
+    };
 
-				if (ray[i].I==0)
-					proccessed++;
-				flag = true;
-			} else {
+    init_task_pool();
+    std::vector<std::thread> exec_pool;
+    std::vector<std::future<unsigned>> task_futures;
 
-				if (writeRoad)
-					road[i].push_back(ray[i].k * 10 + ray[i].b);
+    for (auto &task : task_pool) {
+        task_futures.emplace_back(task.get_future());
+        exec_pool.emplace_back(std::move(task));
+        exec_pool.back().detach();
+    }
 
-				ray[i] = tRay();
-				proccessed++;
-			}
-		}
-	}
-
-	if (writeRoad)
-		dumpRoadNOSPH("Road.m", "Road", road);
+    std::for_each(task_futures.begin(), task_futures.end(), [](auto &future){
+        future.get();
+    });
 }

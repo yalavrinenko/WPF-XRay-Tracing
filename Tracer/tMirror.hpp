@@ -44,9 +44,9 @@ public:
 
 	Vec3d getR0(){
 		if (type==MIRROR_SPHERE)
-			return sm->r0;
+			return sm->GetR0();
 		if (type == MIRROR_CYLINDER)
-			return cm->r0;
+			return cm->GetR0();
 	}
 
 	tSphere* getSphere(){

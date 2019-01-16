@@ -1,25 +1,6 @@
 #include "tPlane.hpp"
+#include "DetectorPlane.hpp"
 #include <random>
-
-/*
- * class tPlane{
-
-public:
-	Vec3d r0;
-	Vec3d N;
-
-	double limit_area;
-
-public:
-	tPlane();
-	tPlane(Vec3d _N,Vec3d _r0);
-	tPlane(Vec3d _N,Vec3d _r0,double _lim_area);
-
-	virtual double cross(tRay ray);
-
-	virtual tRay crossAndGen(tRay ray,double &t);
-};
- */
 
 class tObjectPlane:public tPlane{
 private:
