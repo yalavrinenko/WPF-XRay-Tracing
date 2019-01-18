@@ -31,7 +31,6 @@ public:
     void trace(tRay* ray_ptr, size_t count, XRTObjectVector const &xrt_objects);
 
 protected:
-    void init_task_pool();
 
     std::pair<long, long> xrt_trace_range();
 

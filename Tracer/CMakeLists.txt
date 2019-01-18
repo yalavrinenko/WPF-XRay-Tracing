@@ -49,6 +49,11 @@ if (TEST_MODE)
     add_definitions(-DDEUBG_MODE)
 endif()
 
+
+
 add_library(xray-tracing SHARED ${SOURCES} ${HEADERS})
+
+add_subdirectory(Logger)
+target_link_libraries(xray-tracing Logger)
 
 add_subdirectory(test)

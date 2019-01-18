@@ -144,6 +144,10 @@ double tParameters::reflection(double phi, double lambda) {
 
     randomNumber = reflection_distribution(random_engine);
 
+#ifdef DEUBG_MODE
+    return 2;
+#endif
+
     if (randomNumber <= currentRefValue)
         return 2;
     else
@@ -191,7 +195,7 @@ void tParameters::readWaveLenghts() {
 void tParameters::init(char const* initFileName) {
 	ParseFile(const_cast<char*>(initFileName));
 
-	char* tmp = new char[1024];
+	auto tmp = new char[1024];
 
 	//GENERAL
 	rayCount = (ExistsPar(".rayCount")) ? GetIntPar(".rayCount") : 1000;
@@ -216,7 +220,7 @@ void tParameters::init(char const* initFileName) {
 
 	aperture = (ExistsPar("SRC.Aperture")) ? GetDblPar("SRC.Aperture") : 1.0;
 
-	if (isRad == false)
+	if (!isRad)
 		aperture *= M_PI / 180.0;
 
 	src_type = SphereLight::sphereType;
@@ -349,9 +353,9 @@ void tParameters::init(char const* initFileName) {
 				commang[i] = '\\';
 #else
 		commang = "mkdir -v -p " + dumpPlaneName;
-		for (int i=0; i<commang.length(); i++)
-			if (commang[i] == '\\')
-				commang[i] = '/';
+		for (char &i : commang)
+			if (i == '\\')
+				i = '/';
 #endif
 		system(commang.c_str());
 	}

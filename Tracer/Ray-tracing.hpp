@@ -4,10 +4,10 @@
 #include <cstdint>
 
 struct XRayTracingLog{
-    int linkedLibraryMinorOutput;
-    int linkedLibraryTotalOutput;
-    int totalWaves;
-    int currentWaves;
+    int linkedLibraryMinorOutput = 0;
+    int linkedLibraryTotalOutput = 0;
+    int totalWaves = 0;
+    int currentWaves = 0;
 };
 
 struct XRayWaveResult {

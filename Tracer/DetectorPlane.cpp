@@ -45,3 +45,8 @@ double tDetectorPlane::cross(tRay ray) {
     return tPlane::cross(ray);
 }
 
+tRay tDetectorPlane::crossAndGen(tRay ray, double &t) {
+    tPlane::crossAndGen(ray, t);
+    return tRay();
+}
+

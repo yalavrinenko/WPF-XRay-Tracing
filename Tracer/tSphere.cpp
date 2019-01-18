@@ -61,8 +61,6 @@ tRay tSphere::crossAndGen(tRay ray, double &t) {
     {
         rayCatch++;
 
-        printf("%lld\n", rayCatch.load());
-
         if (Intence == 2) {
             critical_guard lg(critical_section_mut);
             logger.add_data({point, Intence, ray.lambda});

@@ -33,7 +33,9 @@ public:
         intersection_filter = pattern;
     }
 
-    virtual double cross(tRay ray) override;
+    double cross(tRay ray) override;
+
+    tRay crossAndGen(tRay ray,double &t) override;
 
     ~tDetectorPlane() = default;
 

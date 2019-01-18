@@ -16,8 +16,6 @@
 #include <clocale>
 #include "tObject.hpp"
 
-#define DEBUGMSG(A) cout << A << endl
-
 #ifdef NO_OMP_SUPP
 #include <time.h>
 double omp_get_wtime() {
@@ -221,14 +219,14 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
 
     //
 
-    XRayTracingLog xlog;
+    XRayTracingLog xlog{};
 
     linkedLibraryOutput = std::string("[" + to_string(0) + "/" + to_string(p->waveLenghtCount) + "]:\t");
 
     xlog.totalWaves = p->waveLenghtCount;
     xlog.currentWaves = 0;
 
-    XRTEnvironment xrt_env(1);
+    XRTEnvironment xrt_env;
 
     for (int w = 0; w < p->waveLenghtCount && !isTerminated; w++) {
 
@@ -287,7 +285,7 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
         double rRefl = mirror->getReflRayCount();
         double rI = rRefl / rCatch;
 
-        XRayWaveResult xwave;
+        XRayWaveResult xwave{};
         xwave.captured = rCatch;
         xwave.generate = rCast;
         xwave.dlambda = currentWaveLenght.dwaveLenght;
@@ -310,7 +308,8 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
         log.logText(linkedLibraryOutput);
 
         linkedLibraryOutput =
-                "[" + to_string(w + 1) + "/" + to_string(p->waveLenghtCount) + "]:\t" + linkedLibraryOutput;
+                std::string("[").append(to_string(w + 1)).append("/").append(to_string(p->waveLenghtCount)).append(
+                        "]:\t").append(linkedLibraryOutput);
 
         plinkedLibraryOutput = linkedLibraryOutput.c_str();
 

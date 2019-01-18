@@ -17,6 +17,7 @@ using namespace std;
 bool writeRoad = false;
 
 void trace_single_ray(tRay &current_ray, XRTObjectVector const &object){
+
     while (current_ray.lambda > 0 && current_ray.reflection_stage >= c_eps){
         double close_intersection_time = VERY_BIG_NUM;
         int intersection_object_id = -1;
@@ -34,35 +35,15 @@ void trace_single_ray(tRay &current_ray, XRTObjectVector const &object){
             auto obj = object[intersection_object_id];
 
             auto intersection_time = 0.0;
+
+            auto tmp = current_ray;
+
             current_ray = object[intersection_object_id]->crossAndGen(current_ray, intersection_time);
+
         } else {
             current_ray = tRay();
         }
     }
-}
-
-void XRTEnvironment::init_task_pool() {
-    task_pool.resize(threads_count);
-
-    auto pool_function = [this](){
-        auto range = this->xrt_trace_range();
-
-        auto batches = 0u;
-        while (range.first != -1) {
-            for (auto it = range.first; it < range.second; ++it) {
-                trace_single_ray(this->src.xrt_rays[it], *(this->src.xrt_objects));
-            }
-
-            range = this->xrt_trace_range();
-            ++batches;
-        }
-
-        return batches;
-    };
-
-    std::for_each(task_pool.begin(), task_pool.end(), [pool_function](auto &task){
-       task = std::packaged_task<unsigned (void)>(pool_function);
-    });
 }
 
 std::pair<long, long> XRTEnvironment::xrt_trace_range() {
@@ -88,14 +69,27 @@ void XRTEnvironment::trace(tRay *ray_ptr, size_t count, XRTObjectVector const &x
             XRT_DEF_BATCH_SIZE
     };
 
-    init_task_pool();
-    std::vector<std::thread> exec_pool;
+    auto pool_function = [this](){
+        auto range = this->xrt_trace_range();
+
+        auto batches = 0u;
+        while (range.first != -1) {
+            for (auto it = range.first; it < range.second; ++it) {
+                trace_single_ray(this->src.xrt_rays[it], *(this->src.xrt_objects));
+            }
+
+            range = this->xrt_trace_range();
+            ++batches;
+        }
+
+        return batches;
+    };
+
     std::vector<std::future<unsigned>> task_futures;
 
-    for (auto &task : task_pool) {
-        task_futures.emplace_back(task.get_future());
-        exec_pool.emplace_back(std::move(task));
-        exec_pool.back().detach();
+    task_futures.reserve(this->threads_count);
+    for (auto i = 0; i < this->threads_count; ++i) {
+        task_futures.emplace_back(std::async(std::launch::async, pool_function));
     }
 
     std::for_each(task_futures.begin(), task_futures.end(), [](auto &future){
