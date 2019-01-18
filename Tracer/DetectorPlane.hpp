@@ -33,9 +33,11 @@ public:
         intersection_filter = pattern;
     }
 
-    double cross(tRay ray) override;
+    double cross(const tRay &ray) override;
 
-    tRay crossAndGen(tRay ray,double &t) override;
+    virtual IntersectionResult transition_decision(Vec3d const &intersection_point) {
+        return IntersectionResult ::ABSORPTION;
+    }
 
     ~tDetectorPlane() = default;
 

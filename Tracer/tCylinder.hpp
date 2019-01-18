@@ -18,8 +18,8 @@ public:
 	tCylinder();
 	tCylinder(Vec3d _r0, Vec3d _RadThetaPhi, Vec3d _delta, std::string mdfName);
 
-	double cross(tRay ray) override;
-	tRay crossAndGen(tRay ray,double &t) override ;
+	double cross(const tRay &ray) override;
+	tRay crossAndGen(const tRay &ray, double &t) override ;
 
 	//From raytarget
 	Vec3d surface_point() override;

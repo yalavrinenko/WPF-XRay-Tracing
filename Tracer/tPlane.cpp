@@ -28,7 +28,7 @@ tPlane::tPlane(Vec3d _N, Vec3d _r0, double _lim_area_w, double _lim_area_h, std:
 }
 
 
-double tPlane::cross(tRay ray) {
+double tPlane::cross(const tRay &ray) {
     double p2 = dot2(N, ray.k);
     if (p2 < 0) {
         N.x = -N.x;
@@ -46,7 +46,7 @@ double tPlane::cross(tRay ray) {
         return -1;
 }
 
-tRay tPlane::crossAndGen(tRay ray, double &t) {
+tRay tPlane::crossAndGen(const tRay &ray, double &t) {
     t = this->cross(ray);
     if (t <= 0) {
         t = -1;
@@ -55,32 +55,38 @@ tRay tPlane::crossAndGen(tRay ray, double &t) {
 
     Vec3d point = ray.trace(t);
 
-    auto is_transition = transition_decision(point);
+    auto intersection_decision = transition_decision(point);
 
-    if (!is_transition) {
-        return tRay(Vec3d(0, 0, 0), Vec3d(0, 0, 0), -1);
+    tRay output_ray;
+
+    if (intersection_decision == IntersectionResult::ABSORPTION) {
+        output_ray = tRay(Vec3d(0, 0, 0), Vec3d(0, 0, 0), -1);
     }
 
-    Vec3d direction = ray.k / sqrt(dot(ray.k));
+    if (intersection_decision == IntersectionResult::REFLECTION) {
+        Vec3d direction = ray.k / sqrt(dot(ray.k));
 
-    double P = RadToGrad(acos(dot2(direction, N) / (sqrt(dot(direction)) * sqrt(dot(N)))));
+        Vec3d dirNormal = N * dot2(direction, N);
+        Vec3d dirTangential = direction - dirNormal;
 
-    Vec3d dirNormal = N * dot2(direction, N);
-    Vec3d dirTangential = direction - dirNormal;
+        Vec3d newDirection = dirTangential - dirNormal;
 
-    Vec3d newDirection = dirTangential - dirNormal;
+        output_ray = tRay(point, newDirection, ray.lambda);
+    }
 
-    P = RadToGrad(acos(dot2(newDirection, N) / (sqrt(dot(newDirection)) * sqrt(dot(N)))));
+    if (intersection_decision == IntersectionResult::TRANSMISSION) {
+        output_ray = tRay(point, ray.k, ray.lambda);
+    }
 
-    tRay toRet(point, newDirection, ray.lambda);
-    toRet.reflection_stage = ray.reflection_stage;
+    output_ray.reflection_stage = ray.reflection_stage;
 
+    if (logger.is_open())
     {
         critical_guard lg(critical_section_mut);
-        logger.add_data({point, toRet.reflection_stage, toRet.lambda});
+        logger.add_data({point, output_ray.reflection_stage, output_ray.lambda});
     }
 
-    return toRet;
+    return output_ray;
 }
 
 bool tPlane::intersection_check(Vec3d const &intercetion_point) {

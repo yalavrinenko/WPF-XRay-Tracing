@@ -9,20 +9,11 @@
 #include <string>
 
 class TransitivityMap{
-private:
-    std::vector<std::vector<double>> m_map;
-    std::size_t width = 0;
-    std::size_t height = 0;
-
-    struct {
-        double x;
-        double y;
-    } pixel_size = {0.0, 0.0};
-
 public:
     TransitivityMap() = default;
 
-    TransitivityMap(double __psize_x, double __psize_y): pixel_size({__psize_x, __psize_y}){}
+    TransitivityMap(double __psize_x, double __psize_y): pixel_size({__psize_x, __psize_y}){
+    }
 
     TransitivityMap(TransitivityMap &&m) noexcept :
             pixel_size(m.pixel_size),
@@ -45,6 +36,19 @@ public:
      */
     double transitivity (double x, double y) const;
 
+    std::pair<double, double> size() const {
+        return {width, height};
+    }
+
+private:
+    std::vector<std::vector<double>> m_map;
+    double width = 0;
+    double height = 0;
+
+    struct {
+        double x;
+        double y;
+    } pixel_size = {0.0, 0.0};
 };
 
 

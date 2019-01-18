@@ -21,10 +21,10 @@ public:
     }
 
     //Function to determine intersection time. Call to find nearest object.
-    virtual double cross(tRay ray) = 0;
+    virtual double cross(const tRay &ray) = 0;
 
     //Function to make intersection at time t. Call to make intersection and get reflected ray.
-    virtual tRay crossAndGen(tRay ray, double &t) = 0;
+    virtual tRay crossAndGen(const tRay &ray, double &t) = 0;
 
     virtual Vec3d const& GetR0() const{
         return r0;
@@ -90,13 +90,20 @@ public:
 
     virtual std::vector<tRay> GenerateRays(double lambda, double dlambda, int count) = 0;
 
-    double cross(tRay ray) final{
+    double cross(const tRay &ray) final{
         throw std::logic_error(std::string("Use not intercected object") + std::string(typeid(this).name()));
     }
-    tRay crossAndGen(tRay ray, double &t) final{
+    tRay crossAndGen(const tRay &ray, double &t) final{
         throw std::logic_error(std::string("Use not intercected object") + std::string(typeid(this).name()));
     }
 
+    static inline unsigned long r_engine_seed(){
+#ifdef DEBUG_MODE
+        return 42;
+#else
+        return std::random_device()();
+#endif
+    }
 protected:
     inline auto& engine() {
         return r_engine;
@@ -105,13 +112,6 @@ protected:
     std::shared_ptr<XRTTargetSurface> target = nullptr;
 private:
     std::mt19937_64 r_engine;
-    static inline unsigned long r_engine_seed(){
-#ifdef DEBUG_MODE
-        return 42;
-#else
-        return std::random_device()();
-#endif
-    }
 };
 
 class XRTMirror: public XRTObject, public XRTRaySource::XRTTargetSurface{

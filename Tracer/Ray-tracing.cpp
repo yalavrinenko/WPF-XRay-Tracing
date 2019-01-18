@@ -130,7 +130,7 @@ void addManualObject(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
 
     direction = direction / sqrt(dot(direction));
 
-    auto g = std::make_shared<tObjectPlane>(direction, posGrid, Vec2d{p->gridWidth, p->gridHeight}, p->gridMap);
+    auto g = std::make_shared<tObjectPlane>(direction, posGrid, p);
     g->type = GRID;
     g->xrt_parameters(p);
 

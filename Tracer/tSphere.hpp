@@ -27,8 +27,8 @@ public:
 	}
 
 	//From xray_object
-	double cross(tRay ray) override ;
-	tRay crossAndGen(tRay ray,double &t) override ;
+	double cross(const tRay &ray) override ;
+	tRay crossAndGen(const tRay &ray, double &t) override ;
 
 	//From raytarget
 	Vec3d surface_point() override;

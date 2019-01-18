@@ -25,7 +25,7 @@ struct tRay{
 	tRay():b(),k(),lambda(0){
 	}
 
-	Vec3d trace(double t){
+	Vec3d trace(double t) const{
 		return k*t+b;
 	}
 };

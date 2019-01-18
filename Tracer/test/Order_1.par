@@ -23,7 +23,7 @@ $FilmW = 500
 $SlitPos = 0
 $SlitW = 0
 $SlitH = 0
-$MrType = Cylinder #Sphere
+$MrType = Sphere
 
 $GridType = manual
 $GridLocation = 0

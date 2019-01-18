@@ -10,7 +10,7 @@
 
 using namespace std;
 
-double tSphere::cross(tRay ray) {
+double tSphere::cross(const tRay &ray) {
     double A = dot(ray.k);
     double B = 2 * (ray.b.x - this->r0.x) * ray.k.x
                + 2 * (ray.b.y - this->r0.y) * ray.k.y
@@ -34,7 +34,7 @@ double tSphere::cross(tRay ray) {
     return -1;
 }
 
-tRay tSphere::crossAndGen(tRay ray, double &t) {
+tRay tSphere::crossAndGen(const tRay &ray, double &t) {
     double crossPoint = this->cross(ray);
     t = crossPoint;
     if (crossPoint == -1)

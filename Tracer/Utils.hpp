@@ -44,6 +44,10 @@ public:
         }
     }
 
+    bool is_open() const {
+        return logptr != nullptr;
+    }
+
     ~XRTFLogging(){
         if (!logptr)
             return;
@@ -54,8 +58,10 @@ public:
 
 protected:
     void open(std::string const &path){
-        if (path.empty())
+        if (path.empty()) {
+            logptr = nullptr;
             return;
+        }
 
         logptr = fopen(this->log_path.c_str(), "w");
         if (!logptr)

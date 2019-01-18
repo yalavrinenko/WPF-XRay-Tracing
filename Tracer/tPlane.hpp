@@ -29,15 +29,22 @@ public:
 
 	tPlane(Vec3d _N, Vec3d _r0, double _lim_area, std::string const &logpath = {});
 
-	tPlane(Vec3d _N,Vec3d _r0,double _lim_area_w,double _lim_area_h,std::string const &dumpName);
+	tPlane(Vec3d _N,Vec3d _r0,double _lim_area_w,double _lim_area_h,std::string const &dumpName = {});
 
-	virtual double cross(tRay ray) override;
+	virtual double cross(const tRay &ray) override;
 
-	virtual tRay crossAndGen(tRay ray,double &t) override;
+	virtual tRay crossAndGen(const tRay &ray, double &t) override;
 
 protected:
-	virtual bool transition_decision(Vec3d const &intersection_point) {
-		return true;
+
+    enum class IntersectionResult{
+        REFLECTION,
+		TRANSMISSION,
+        ABSORPTION
+    };
+
+	virtual IntersectionResult transition_decision(Vec3d const &intersection_point) {
+		return IntersectionResult ::REFLECTION;
 	}
 
 	virtual bool intersection_check(Vec3d const &intercetion_point);

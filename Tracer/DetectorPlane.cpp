@@ -38,15 +38,9 @@ std::string tDetectorPlane::log_header() {
     return std::string{header};
 }
 
-double tDetectorPlane::cross(tRay ray) {
+double tDetectorPlane::cross(const tRay &ray) {
     if (ray.reflection_stage != (int)this->intersection_filter){
         return -1;
     }
     return tPlane::cross(ray);
 }
-
-tRay tDetectorPlane::crossAndGen(tRay ray, double &t) {
-    tPlane::crossAndGen(ray, t);
-    return tRay();
-}
-

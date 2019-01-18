@@ -25,7 +25,7 @@ tCylinder::tCylinder(Vec3d _r0, Vec3d _RadThetaPhi, Vec3d _delta, std::string md
 	logger.header(log_header());
 }
 
-double tCylinder::cross(tRay ray) {
+double tCylinder::cross(const tRay &ray) {
 	double cz = ray.b.z - r0.z;
 	double cy = ray.b.y - r0.y;
 
@@ -69,7 +69,7 @@ bool tCylinder::checkPoint(double t, tRay r) {
 	return RadToGrad(fabs(phi) ) <= dPhi;
 }
 
-tRay tCylinder::crossAndGen(tRay ray, double &t) {
+tRay tCylinder::crossAndGen(const tRay &ray, double &t) {
 	t = this->cross(ray);
 	if (t <= 0) {
 		t = -1;
