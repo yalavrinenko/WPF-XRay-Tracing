@@ -21,6 +21,9 @@ public:
 	double cross(tRay ray) override;
 	tRay crossAndGen(tRay ray,double &t) override ;
 
+	//From raytarget
+	Vec3d surface_point() override;
+
 	~tCylinder() override = default;
 
 protected:
@@ -32,6 +35,8 @@ private:
 	double dPhi;  //center At Phi = 90;
 
 	bool checkPoint(double t, tRay r);
+
+	std::uniform_real_distribution<double> distr_phi, distr_z;
 };
 
 

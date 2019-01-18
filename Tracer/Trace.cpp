@@ -6,12 +6,7 @@
  */
 
 #include "Trace.hpp"
-#include "general.hpp"
 #include "InputOutput.hpp"
-
-#include <vector>
-#include <cmath>
-#include <thread>
 
 using namespace std;
 bool writeRoad = false;
@@ -60,12 +55,12 @@ std::pair<long, long> XRTEnvironment::xrt_trace_range() {
     return {begin, end};
 }
 
-void XRTEnvironment::trace(tRay *ray_ptr, size_t count, XRTObjectVector const &xrt_objects) {
+void XRTEnvironment::trace(std::vector<tRay> &ray_ptr, const XRTObjectVector &xrt_objects) {
     src = {
-            ray_ptr,
+            ray_ptr.data(),
             &xrt_objects,
             0,
-            count,
+            ray_ptr.size(),
             XRT_DEF_BATCH_SIZE
     };
 

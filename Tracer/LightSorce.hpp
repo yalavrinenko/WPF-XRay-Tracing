@@ -11,96 +11,31 @@
 #include "tRay.hpp"
 #include "general.hpp"
 #include <ctime>
+#include "Object.hpp"
+#include <utility>
+#include <random>
 
-class XRaySouce {
-protected:
-	mutable double RAND_SEED;
-
+class SphereLight: public XRTRaySource{
 public:
-	XRaySouce(){
-#ifdef DEUBG_MODE
-        RAND_SEED = 42;
-#else
-        RAND_SEED = time(0);
-#endif
-	}
-};
+	SphereLight() = default;
 
-class SphereLight: public XRaySouce{
-private:
-	double apperture;
-	double R;
-	double Rw,Rh;
-
-	Vec3d r;
-	Vec2d dx;
-	Vec2d dy;
-	Vec2d dz;
-
-	int type;
-	double H;
-	int orientation;
-
-	double breggAngle;
-
-	tRay* generateCylindricRays(double lambda,double dlambda,int count);
-
-public:
-	Vec3d position;
-	Vec3d direction;
-
-	static const int sphereType=1;
-	static const int cylindricType=2;
-
-	static const int xOz=0;
-	static const int xOy=1;
-	static const int yOz=2;
-
-public:
-	SphereLight();
-	SphereLight(Vec3d _position,Vec3d _direction,double _app,double _R, double bA);
-	SphereLight(Vec3d _position,Vec3d _direction,double _app,double _Rw,double _Rh, double bA);
-
-	tRay* GenerateRays(double lambda,double dlambda,int count);
-
-	void setCylinricType(double _h,int _orientation);
-	void setSphereType();
-	void setBreggAngle(double bA){
-		breggAngle = bA;
+	SphereLight(Vec3d _position, double _Rw,double _Rh, std::shared_ptr<XRTTargetSurface> &&ray_target):
+		XRTRaySource(_position, std::forward<std::shared_ptr<XRTTargetSurface>>(ray_target)),
+		width(_Rw), height(_Rh),
+		distr_theta(0, 180),
+		distr_phi(0, 360){
 	}
 
-};
+	std::vector<tRay> GenerateRays(double lambda, double dlambda, int count) override;
 
-class LightSorce: public XRaySouce{
 private:
-	double L,H;
+	Vec3d source_point();
 
-	Vec3d position;
-	Vec3d direction;
+	double width = 0;
+	double height = 0;
 
-public:
-	LightSorce();
-
-	LightSorce(Vec3d _position,Vec3d _direction,double _l,double _h);
-
-	tRay* GenerateRays(double lambda,double dlambda,int count,double R);
-
-};
-
-class circleLightSorce: public XRaySouce{
-private:
-
-	double R;
-
-	Vec3d position;
-	Vec3d direction;
-
-public:
-	circleLightSorce();
-
-	circleLightSorce(Vec3d _position,Vec3d _direction,double _r);
-
-	tRay* GenerateRays(double lambda,double dlambda,int count,double R);
+	std::uniform_real_distribution<double> distr_theta;
+	std::uniform_real_distribution<double> distr_phi;
 
 };
 

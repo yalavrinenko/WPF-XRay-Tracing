@@ -61,8 +61,61 @@ protected:
     std::mutex critical_section_mut;
 };
 
+class XRTRaySource : public XRTObject {
+public:
+    class XRTTargetSurface{
+    public:
+        XRTTargetSurface():
+                r_engine(XRTRaySource::r_engine_seed()){
+        }
 
-class XRTMirror: public XRTObject{
+        virtual Vec3d surface_point() = 0;
+
+    protected:
+        inline auto& engine() {
+            return r_engine;
+        }
+
+    private:
+        std::mt19937_64 r_engine;
+    };
+
+    XRTRaySource():
+            XRTRaySource({}, nullptr){
+    }
+
+    explicit XRTRaySource(Vec3d const &position, std::shared_ptr<XRTTargetSurface> &&ray_target) :
+            XRTObject(position), r_engine(XRTRaySource::r_engine_seed()), target(ray_target) {
+    }
+
+    virtual std::vector<tRay> GenerateRays(double lambda, double dlambda, int count) = 0;
+
+    double cross(tRay ray) final{
+        throw std::logic_error(std::string("Use not intercected object") + std::string(typeid(this).name()));
+    }
+    tRay crossAndGen(tRay ray, double &t) final{
+        throw std::logic_error(std::string("Use not intercected object") + std::string(typeid(this).name()));
+    }
+
+protected:
+    inline auto& engine() {
+        return r_engine;
+    }
+
+    std::shared_ptr<XRTTargetSurface> target = nullptr;
+private:
+    std::mt19937_64 r_engine;
+    static inline unsigned long r_engine_seed(){
+#ifdef DEBUG_MODE
+        return 42;
+#else
+        return static_cast<unsigned long>(std::chrono::system_clock::now().time_since_epoch().count());
+#endif
+    }
+};
+
+
+class XRTMirror: public XRTObject, public XRTRaySource::XRTTargetSurface{
 public:
     XRTMirror() = default;
 

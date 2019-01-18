@@ -43,10 +43,10 @@ private:
     std::function<void(char const*, size_t)> _callback = nullptr;
 public:
 	infoOut();
-	infoOut(char const* name);
+	explicit infoOut(char const* name);
     infoOut(char const* name, std::function<void(char const*, size_t)> stdout_callback);
 
-	void logScene(std::shared_ptr<XRTMirror> const &mirror, SphereLight *light);
+	void logScene(std::shared_ptr<XRTMirror> const &mirror, std::shared_ptr<XRTRaySource> const &light);
 	void logText(string const &text);
 };
 

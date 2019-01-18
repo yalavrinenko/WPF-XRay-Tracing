@@ -6,8 +6,6 @@
  */
 
 #include "tCylinder.hpp"
-#include <cmath>
-#include <iostream>
 
 using namespace std;
 
@@ -16,10 +14,14 @@ tCylinder::tCylinder() {
 	R = dZ = dPhi = 0;
 }
 
-tCylinder::tCylinder(Vec3d _r0, Vec3d _RadThetaPhi, Vec3d _delta, std::string mdpName): XRTMirror(_r0, mdpName) {
-	R = _RadThetaPhi.x;
-	dZ = _delta.y;
-	dPhi = _delta.z;
+tCylinder::tCylinder(Vec3d _r0, Vec3d _RadThetaPhi, Vec3d _delta, std::string mdpName) :
+		XRTMirror(_r0, mdpName),
+		R(_RadThetaPhi.x),
+		dZ(_delta.y),
+		dPhi(_delta.z),
+		distr_phi(-dPhi, dPhi),
+		distr_z(-dZ, dZ) {
+
 	logger.header(log_header());
 }
 
@@ -137,4 +139,14 @@ std::string tCylinder::log_header() const {
 			 dZ, dPhi);
 
 	return std::string{header};
+}
+
+Vec3d tCylinder::surface_point() {
+	auto x = this->distr_z(engine());
+	auto phi = GradToRad(this->distr_phi(engine()));
+
+	auto z = R * sin(phi);
+	auto y = R * cos(phi);
+
+    return Vec3d(x, y + r0.y, z + r0.z);
 }

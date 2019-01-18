@@ -10,10 +10,7 @@
 #include "LightSorce.hpp"
 #include "Trace.hpp"
 #include "InputOutput.hpp"
-#include "tMirror.hpp"
 #include "Ray-tracing.hpp"
-#include "Object.hpp"
-#include <clocale>
 #include "tObject.hpp"
 
 #ifdef NO_OMP_SUPP
@@ -35,19 +32,8 @@ __lib_spec void terminate() {
 }
 
 template<class mirrorClass>
-std::shared_ptr<mirrorClass> initScene(XRTObjectVector &obj, SphereLight **slight, tParameters *p) {
+std::shared_ptr<XRTMirror> initMirror(tParameters *p) {
     double mirrorYpos = p->sourceDistance * cos(p->programAngle) - p->mirrorR;
-    double srcXpos = p->sourceDistance * sin(p->programAngle);
-
-    Vec3d spos(-srcXpos, 0, 0);
-    Vec3d sdir(srcXpos, mirrorYpos + p->mirrorR, 0);
-
-    *slight = new SphereLight(spos, sdir, p->aperture, p->sourceSize_W, p->sourceSize_H, p->breggAngle);
-
-    if (p->src_type == SphereLight::cylindricType) {
-        (*slight)->setCylinricType(p->H, p->orientation);
-    }
-
     Vec3d mpos(0, mirrorYpos, 0);
     Vec3d mprop(p->mirrorR, p->mirrorTheta, p->mirrorPsi);
     Vec3d mdprop(0, p->dmTh, p->dmPsi);
@@ -56,9 +42,14 @@ std::shared_ptr<mirrorClass> initScene(XRTObjectVector &obj, SphereLight **sligh
     mirror->type = p->mirrorType + 1;
     mirror->xrt_parameters(p);
 
-    obj.push_back(mirror);
-
     return mirror;
+}
+
+std::shared_ptr<XRTRaySource> initRaySource(tParameters *p, std::shared_ptr<XRTRaySource::XRTTargetSurface> &&target){
+    double srcXpos = p->sourceDistance * sin(p->programAngle);
+    Vec3d spos(-srcXpos, 0, 0);
+    return std::make_shared<SphereLight>(spos, p->sourceSize_W, p->sourceSize_H,
+                                         std::forward<std::shared_ptr<XRTRaySource::XRTTargetSurface>>(target));
 }
 
 void addDumpPlanesSrcLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
@@ -156,7 +147,6 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
     isTerminated = false;
 
     XRTObjectVector obj;
-    SphereLight *light = nullptr;
     tParameters *p = nullptr;
 
     double startTime = omp_get_wtime();
@@ -169,10 +159,13 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
 
     std::shared_ptr<XRTMirror> mirror = nullptr;
     if (p->mirrorType == MIRROR_SPHERE)
-        mirror = initScene<tSphere>(obj, &light, p);
+        mirror = initMirror<tSphere>(p);
     if (p->mirrorType == MIRROR_CYLINDER)
-        mirror = initScene<tCylinder>(obj, &light, p);
+        mirror = initMirror<tCylinder>(p);
 
+    obj.emplace_back(mirror);
+
+    auto light = initRaySource(p, mirror);
 
     Vec3d dumpPlaneStart = mirror->GetR0();
 
@@ -185,7 +178,7 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
                           tDetectorPlane::IntersectionFilter::IMAGE, p);
         else
             addDumpPlanesSrcLined(obj, p->startPoint, dumpPlaneStart,
-                                  light->position, p->planeCount, p->planeStep, p->planeSizeW, p->planeSizeH,
+                                  light->GetR0(), p->planeCount, p->planeStep, p->planeSizeW, p->planeSizeH,
                                   p->programAngle, tDetectorPlane::IntersectionFilter::IMAGE, p);
     }
 
@@ -263,17 +256,15 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
             if (rayByIter > (p->rayCount * currentWaveLenght.intensity - generatedRay))
                 rayByIter = p->rayCount * currentWaveLenght.intensity - generatedRay;
 
-            tRay *ray = light->GenerateRays(currentWaveLenght.waveLenght,
-                                            currentWaveLenght.dwaveLenght, rayByIter);
+            auto ray = std::move(light->GenerateRays(currentWaveLenght.waveLenght,
+                                            currentWaveLenght.dwaveLenght, rayByIter));
 
             if (isTerminated) {
-                delete[] ray;
                 break;
             }
 
-            xrt_env.trace(ray, rayByIter, obj);
+            xrt_env.trace(ray, obj);
 
-            delete[] ray;
             generatedRay += rayByIter;
             xlog.linkedLibraryMinorOutput = generatedRay;
 

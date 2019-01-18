@@ -28,7 +28,7 @@ public:
             threads_count(threads){
     }
 
-    void trace(tRay* ray_ptr, size_t count, XRTObjectVector const &xrt_objects);
+    void trace(std::vector<tRay> &ray_ptr, XRTObjectVector const &xrt_objects);
 
 protected:
 

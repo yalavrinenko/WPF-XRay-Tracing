@@ -6,10 +6,7 @@
  */
 
 #include "tSphere.hpp"
-#include <cmath>
-#include <iostream>
 #include "InputOutput.hpp"
-#include <string>
 
 using namespace std;
 
@@ -130,4 +127,15 @@ std::string tSphere::log_header() const {
              RadThetaPhi.y, deltaRadThetaPhi.z, deltaRadThetaPhi.y);
 
     return std::string{header};
+}
+
+Vec3d tSphere::surface_point() {
+    auto point_theta = GradToRad(distr_theta(engine()));
+    auto point_phi = GradToRad(distr_phi(engine()));
+    auto &r = this->RadThetaPhi.x;
+    auto x = r * std::sin(point_theta) * std::cos(point_phi);
+    auto y = r * std::sin(point_theta) * std::sin(point_phi);
+    auto z = r * std::cos(point_theta);
+
+    return {x + r0.x, y + r0.y, z + r0.z};
 }

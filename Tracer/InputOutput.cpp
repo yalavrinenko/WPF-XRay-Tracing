@@ -6,8 +6,6 @@
  */
 #include "InputOutput.hpp"
 
-#include <sstream>
-
 vector<Vec3d> data;
 
 void dump(char* name, char* name_func, tRay* arr, int count, double *t) {
@@ -46,8 +44,8 @@ void appPoint(Vec3d point) {
 }
 void dumpPoint(char* name) {
 	ofstream out(name);
-	for (int i = 0; i < ::data.size(); i++)
-		out << ::data[i].x << "\t" << ::data[i].y << "\t" << ::data[i].z << endl;
+	for (auto &i : ::data)
+        out << i.x << "\t" << i.y << "\t" << i.z << endl;
 }
 
 string doubleToStr(double a) {
@@ -60,8 +58,8 @@ string intToStr(int a) {
 
 void dumpPlane(char* name, vector<Vec3d> odata) {
 	ofstream out(name);
-	for (int i = 0; i < odata.size(); i++)
-		out << odata[i].x << "\t" << odata[i].y << "\t" << odata[i].z << endl;
+	for (auto &i : odata)
+        out << i.x << "\t" << i.y << "\t" << i.z << endl;
 }
 
 void dumpRoad(char* name, char* name_func, vector<vector<Vec3d> > road) {
@@ -73,14 +71,14 @@ void dumpRoad(char* name, char* name_func, vector<vector<Vec3d> > road) {
 	out << "[x,y,z]=sphere;" << endl;
 	out << "surf(80*x,(80*y+100),(80*z));" << endl;
 
-	for (int i = 0; i < road.size(); i++) {
+	for (auto &i : road) {
 		string x = "[";
 		string y = "[";
 		string z = "[";
-		for (int j = 0; j < road[i].size(); j++) {
-			x += doubleToStr(road[i][j].x) + ";";
-			y += doubleToStr(road[i][j].y) + ";";
-			z += doubleToStr(road[i][j].z) + ";";
+		for (int j = 0; j < i.size(); j++) {
+			x += doubleToStr(i[j].x) + ";";
+			y += doubleToStr(i[j].y) + ";";
+			z += doubleToStr(i[j].z) + ";";
 		}
 		x += "]";
 		y += "]";
@@ -97,14 +95,14 @@ void dumpRoadNOSPH(char const* name, char const* name_func, vector<vector<Vec3d>
 	out << "\tfigure" << endl;
 	out << "\thold on" << endl;
 
-	for (int i = 0; i < road.size(); i++) {
+	for (auto &i : road) {
 		string x = "[";
 		string y = "[";
 		string z = "[";
-		for (int j = 0; j < road[i].size(); j++) {
-			x += doubleToStr(road[i][j].x) + ";";
-			y += doubleToStr(road[i][j].y) + ";";
-			z += doubleToStr(road[i][j].z) + ";";
+		for (int j = 0; j < i.size(); j++) {
+			x += doubleToStr(i[j].x) + ";";
+			y += doubleToStr(i[j].y) + ";";
+			z += doubleToStr(i[j].z) + ";";
 		}
 		x += "]";
 		y += "]";
@@ -138,14 +136,14 @@ infoOut::infoOut(char const* name, std::function<void(char const*, size_t)> stdo
     out.open(name);
 }
 
-void infoOut::logScene(std::shared_ptr<XRTMirror> const &mirror, SphereLight *light) {
+void infoOut::logScene(std::shared_ptr<XRTMirror> const &mirror, std::shared_ptr<XRTRaySource> const &light) {
 	auto r0 = mirror->GetR0();
 	out << "[MIRROR]" << endl;
 	out << "[X,Y,Z]" << "[" << r0.x << ", " << r0.y << ", "
 			<<r0.z << "]" << endl << endl;
 	out << "[LIGHT SOURCE]" << endl;
-	out << "[X,Y,Z]" << "[" << light->position.x << ", " << light->position.y
-			<< ", " << light->position.z << "]" << endl;
+	out << "[X,Y,Z]" << "[" << light->GetR0().x << ", " << light->GetR0().y
+			<< ", " << light->GetR0().z << "]" << endl;
 }
 
 void infoOut::logText(string const &text) {

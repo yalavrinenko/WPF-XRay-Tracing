@@ -5,11 +5,8 @@
  *      Author: cheshire
  */
 #include "mainParameters.hpp"
-#include <cmath>
-#include "general.hpp"
 #include "param.h"
 #include "LightSorce.hpp"
-#include "InputOutput.hpp"
 #include "InputOutput.hpp"
 #include <map>
 #ifdef _WIN32
@@ -144,14 +141,14 @@ double tParameters::reflection(double phi, double lambda) {
 
     randomNumber = reflection_distribution(random_engine);
 
-#ifdef DEUBG_MODE
+#ifdef DEBUG_MODE
     return 2;
-#endif
-
+#else
     if (randomNumber <= currentRefValue)
         return 2;
     else
         return 0;
+#endif
 }
 
 void tParameters::readWaveLenghts() {
@@ -223,33 +220,7 @@ void tParameters::init(char const* initFileName) {
 	if (!isRad)
 		aperture *= M_PI / 180.0;
 
-	src_type = SphereLight::sphereType;
-	if (ExistsPar("SRC.Type")) {
-		GetStrPar("SRC.Type", tmp);
-		if (!strcmp(tmp, "Cylinder"))
-			src_type = SphereLight::cylindricType;
-		else if (!strcmp(tmp, "Sphere"))
-			src_type = SphereLight::sphereType;
-	}
-
-	if (src_type == SphereLight::cylindricType) {
-		H = (ExistsPar("SRC.H")) ? GetDblPar("SRC.H") : 1.0;
-
-		orientation = SphereLight::xOz;
-
-		if (ExistsPar("SRC.Orientation")) {
-			GetStrPar("SRC.Orientation", tmp);
-			if (!strcmp(tmp, "xOz"))
-				orientation = SphereLight::xOz;
-			else if (!strcmp(tmp, "xOy"))
-				orientation = SphereLight::xOy;
-			else if (!strcmp(tmp, "yOz"))
-				orientation = SphereLight::yOz;
-		}
-	} else {
-		H = -1;
-		orientation = -1;
-	}
+	src_type = 1;
 
 	waveLenghtCount =
 			(ExistsPar("SRC.waveLenghtCount")) ?

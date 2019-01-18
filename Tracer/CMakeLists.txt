@@ -46,7 +46,7 @@ endif()
 option(TEST_MODE "Set seed for rand to 42" OFF)
 
 if (TEST_MODE)
-    add_definitions(-DDEUBG_MODE)
+    add_definitions(-DDEBUG_MODE)
 endif()
 
 
