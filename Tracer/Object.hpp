@@ -109,11 +109,10 @@ private:
 #ifdef DEBUG_MODE
         return 42;
 #else
-        return static_cast<unsigned long>(std::chrono::system_clock::now().time_since_epoch().count());
+        return std::random_device()();
 #endif
     }
 };
-
 
 class XRTMirror: public XRTObject, public XRTRaySource::XRTTargetSurface{
 public:
