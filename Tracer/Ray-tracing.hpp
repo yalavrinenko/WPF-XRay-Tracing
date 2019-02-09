@@ -35,7 +35,7 @@ typedef void(* StdOutCallback)(char const*, uint64_t);
 #endif
 
 extern "C"{
-__lib_spec void terminate();
+__lib_spec void xrt_terminate();
 __lib_spec int RayTracing(int argc, char const* argv, ProgressCallback raysGenerated, WaveCallback waveTraced,
                           StdOutCallback stdoutCallback = nullptr);
 };

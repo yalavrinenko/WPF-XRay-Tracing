@@ -114,8 +114,8 @@ public:
     };
 
     GridLocation gridLocation = GridLocation::BEFORE;
-    double gridWidth{};
-    double gridHeight{};
+    /*double gridWidth{};
+    double gridHeight{};*/
     double gridPixelSizeX{};
     double gridPixelSizeY{};
     TransitivityMap gridMap;

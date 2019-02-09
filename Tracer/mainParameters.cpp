@@ -399,11 +399,11 @@ void tParameters::init(char const* initFileName) {
 		else
 			gridLocation = GridLocation::BEFORE;
 
-        gridWidth = (ExistsPar("OBJECT.Width")) ?
+        /*gridWidth = (ExistsPar("OBJECT.Width")) ?
                     GetDblPar("OBJECT.Width") : -1;
 
         gridHeight = (ExistsPar("OBJECT.Height")) ?
-                     GetDblPar("OBJECT.Height") : -1;
+                     GetDblPar("OBJECT.Height") : -1;*/
 
         gridPixelSizeX = (ExistsPar("OBJECT.PixelSizeX")) ?
                         GetDblPar("OBJECT.PixelSizeX") : -1;

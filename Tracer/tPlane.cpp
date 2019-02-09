@@ -83,7 +83,7 @@ tRay tPlane::crossAndGen(const tRay &ray, double &t) {
     if (logger.is_open())
     {
         critical_guard lg(critical_section_mut);
-        logger.add_data({point, output_ray.reflection_stage, output_ray.lambda});
+        logger.add_data({point, output_ray.reflection_stage, ray.lambda});
     }
 
     return output_ray;

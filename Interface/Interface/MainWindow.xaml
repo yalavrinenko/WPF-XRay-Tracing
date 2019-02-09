@@ -178,7 +178,14 @@
                         </Grid>
 
                         <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Content="Object pixel size" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
-                        <TextBox  SourceUpdated="ConfValue_SourceUpdated" Text ="{Binding Object.GridPixelSize, NotifyOnSourceUpdated=True}"  Grid.Column="1" Grid.Row="3" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin"/>
+                        <Grid Grid.Column="1" Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox  SourceUpdated="ConfValue_SourceUpdated" Text="{Binding Object.GridPixelSizeX, NotifyOnSourceUpdated=True}" Height="20" Grid.Column="0"  TextWrapping="NoWrap" VerticalContentAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBox  SourceUpdated="ConfValue_SourceUpdated" Text="{Binding Object.GridPixelSizeY, NotifyOnSourceUpdated=True}" Height="20" Grid.Column="1" TextWrapping="NoWrap" VerticalContentAlignment="Center" d:LayoutOverrides="Width"/>
+                        </Grid>
                         <Button IsEnabled="{Binding ObjectExist, NotifyOnSourceUpdated=True}" Name="RemoveObjectButton" Grid.Row="4" Grid.Column="1" Click="OnRemoveObject_Click" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin">Remove object</Button>
                     </Grid>
 

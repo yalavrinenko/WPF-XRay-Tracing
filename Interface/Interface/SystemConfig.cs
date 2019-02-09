@@ -18,7 +18,8 @@ namespace Interface
             public short GridLocation { get; set; } = 0; //0 - before, 1 - after the mirror
             public double GridWidth { get; set; } = 10;
             public double GridHeight { get; set; } = 5;
-            public double GridPixelSize { get; set; } = 0.001;
+            public double GridPixelSizeX { get; set; } = 0.001;
+            public double GridPixelSizeY { get; set; } = 0.001;
             public string GridMap { get; set; } = "";
             public double GridPosition { get; set; } = 0.0;
         }
@@ -241,7 +242,8 @@ namespace Interface
                 data += String.Format("Distance = {0} [mm]\n", Object.GridPosition);
                 data += String.Format("Position = {0} crystal\n", (Object.GridLocation == 1) ? "after" : "before");
                 data += String.Format("Object W x H = {0} X {1} [mm]\n", Object.GridWidth, Object.GridHeight);
-                data += String.Format("PixelSize = {0} [mm]\n", Object.GridPixelSize);
+                data += String.Format("PixelSizeX = {0} [mm]\n", Object.GridPixelSizeX);
+                data += String.Format("PixelSizeY = {0} [mm]\n", Object.GridPixelSizeY);
             }
 
             return data;

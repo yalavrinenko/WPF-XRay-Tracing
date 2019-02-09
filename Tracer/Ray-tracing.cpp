@@ -12,6 +12,7 @@
 #include "InputOutput.hpp"
 #include "Ray-tracing.hpp"
 #include "tObject.hpp"
+#include <clocale>
 
 #ifdef NO_OMP_SUPP
 #include <time.h>
