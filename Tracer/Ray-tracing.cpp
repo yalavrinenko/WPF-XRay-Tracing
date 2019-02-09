@@ -25,14 +25,12 @@ double omp_get_wtime() {
 }
 #endif
 
-using namespace std;
-
-string linkedLibraryOutput;
+std::string linkedLibraryOutput;
 const char *plinkedLibraryOutput;
 
 bool isTerminated;
 
-__lib_spec void terminate() {
+__lib_spec void xrt_terminate() {
     isTerminated = true;
 }
 

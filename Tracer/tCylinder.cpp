@@ -123,7 +123,11 @@ std::string tCylinder::log_header() const {
 								  dZ, dPhi,
 								  dZ, dPhi);
 
+#ifdef WIN32
+	char header[1024];
+#else
 	char header[estimate_size + 1];
+#endif
 	snprintf(header, estimate_size,
 			 "#[MIRROR Cylinder]\n"
 			 "#[R]\t=\t%0.10f\n"

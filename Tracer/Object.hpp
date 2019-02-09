@@ -43,7 +43,11 @@ public:
         std::string to_string() const{
             auto estimate_size = std::snprintf(nullptr, 0, "%0.10f\t%0.10f\t%0.10f\t%0.10f\t%0.10f",
                                                point.x, point.y, point.z, l, I);
+#ifdef WIN32
+			char tmp[1024];
+#else
             char tmp[estimate_size+1];
+#endif
             std::snprintf(tmp, (size_t)estimate_size, "%0.10f\t%0.10f\t%0.10f\t%0.10f\t%0.10f",
                           point.x, point.y, point.z, l, I);
 

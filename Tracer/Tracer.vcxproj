@@ -43,7 +43,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
-    <CLRSupport>true</CLRSupport>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -103,6 +103,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp14</LanguageStandard>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,11 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DetectorPlane.cpp" />
     <ClCompile Include="general.cpp" />
     <ClCompile Include="gridFunction.cpp" />
     <ClCompile Include="InputOutput.cpp" />
     <ClCompile Include="LightSorce.cpp" />
     <ClCompile Include="mainParameters.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="param.cpp" />
     <ClCompile Include="Ray-tracing.cpp" />
     <ClCompile Include="tCylinder.cpp" />
@@ -152,13 +155,16 @@
     <ClCompile Include="TransitivityMap.cpp" />
     <ClCompile Include="tRay.cpp" />
     <ClCompile Include="tSphere.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="xrt_rocking_curve.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DetectorPlane.hpp" />
     <ClInclude Include="general.hpp" />
     <ClInclude Include="InputOutput.hpp" />
     <ClInclude Include="LightSorce.hpp" />
     <ClInclude Include="mainParameters.hpp" />
+    <ClInclude Include="Object.hpp" />
     <ClInclude Include="param.h" />
     <ClInclude Include="Ray-tracing.hpp" />
     <ClInclude Include="tCylinder.hpp" />
@@ -169,6 +175,7 @@
     <ClInclude Include="TransitivityMap.hpp" />
     <ClInclude Include="tRay.hpp" />
     <ClInclude Include="tSphere.hpp" />
+    <ClInclude Include="Utils.hpp" />
     <ClInclude Include="xrt_rocking_curve.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

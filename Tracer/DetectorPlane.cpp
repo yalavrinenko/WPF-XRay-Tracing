@@ -22,7 +22,11 @@ std::string tDetectorPlane::log_header() {
                                   N.x, N.y, N.z,
                                   limit_area_w,limit_area_h);
 
-    char header[estimate_size + 1];
+#ifdef WIN32
+	char header[1024];
+#else
+	char header[estimate_size + 1];
+#endif
     snprintf(header, (size_t) estimate_size,
              "#[PLANE]\n"
              "#[ScatteringAngle]\t=\t%0.10f\n"

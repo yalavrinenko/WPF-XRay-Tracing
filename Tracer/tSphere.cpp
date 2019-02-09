@@ -117,7 +117,11 @@ std::string tSphere::log_header() const {
                                   RadThetaPhi.z,
                                   RadThetaPhi.y, deltaRadThetaPhi.z, deltaRadThetaPhi.y);
 
-    char header[estimate_size + 1];
+#ifdef WIN32
+	char header[1024];
+#else
+	char header[estimate_size + 1];
+#endif
     snprintf(header, (size_t) estimate_size,
              "#[MIRROR Sphere]\n"
              "#[R]\t=\t%0.10f\n"

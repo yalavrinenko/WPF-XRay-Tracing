@@ -64,10 +64,10 @@ namespace Interface
             [MarshalAs(UnmanagedType.FunctionPtr)] StdOutCallback stdOutCallback);
 
         [DllImport(@"./sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void terminate();
+        private static extern void xrt_terminate();
         #endregion
 
-        private String parFileName = "par/Order_0.par";
+        private String parFileName = System.IO.Directory.GetCurrentDirectory() + "/par/Order_0.par";
 
         private class OutStreamWriter : System.IO.TextWriter
         {
@@ -190,7 +190,7 @@ namespace Interface
                 System.IO.Directory.Delete("results/Order_0", true);
             }
             catch(Exception expc) { }*/
-
+            //var config_file = System.IO.Directory.GetCurrentDirectory() + parFileName;
             await Task<int>.Factory.StartNew(() =>   RayTracing(1, parFileName, rpc, WaveTraced, stdOutCallback));
 
             return false;
@@ -241,7 +241,7 @@ namespace Interface
 
         private void Terminate_Click(object sender, RoutedEventArgs e)
         {
-            terminate();
+            xrt_terminate();
         }
     }
 }
