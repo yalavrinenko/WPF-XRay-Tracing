@@ -175,6 +175,9 @@ namespace Interface
             {
                 ConfigurationOuput.Text = exc.Message + "\n" + exc.StackTrace;
             }
+            catch{
+                ConfigurationOuput.Text = "Catch undefined exception.";
+            }
         }
 
         private void FSSR1_Scheme_Click(object sender, RoutedEventArgs e)
@@ -538,13 +541,15 @@ namespace Interface
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
             var wave = (sender as RadioButton).DataContext as Wave;
-            wave.isZeroWave = true;
+            if (wave != null)
+                wave.isZeroWave = true;
         }
 
         private void RadioButton_Unchecked(object sender, RoutedEventArgs e)
         {
             var wave = (sender as RadioButton).DataContext as Wave;
-            wave.isZeroWave = false;
+            if (wave != null)
+                wave.isZeroWave = false;
         }
 
         private void DeleteAdditionalLine_Click(object sender, RoutedEventArgs e)

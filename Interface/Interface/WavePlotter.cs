@@ -66,6 +66,13 @@ namespace Interface
             }
             else
             {
+                if (m_Limits == null)
+                    m_Limits = new SystemConfig.WaveLimits()
+                    {
+                        min = new SystemConfig.WaveLimit() { lambda = 0, position = 0},
+                        max = new SystemConfig.WaveLimit() { lambda = 1, position = 1}
+                    };
+
                 if (m_Model.Axes[0].Minimum > m_Limits.min.lambda * 0.95 || Double.IsNaN(m_Model.Axes[0].Minimum))
                     m_Model.Axes[0].Minimum = m_Limits.min.lambda * 0.95;
 

@@ -65,7 +65,9 @@ namespace Interface
 
             OxyPlot.Series.ScatterSeries sser = new OxyPlot.Series.ScatterSeries()
             {
-                MarkerType = MarkerType.Circle,
+                MarkerType = MarkerType.Square,
+                BinSize = 2,
+                MarkerSize = 0.75
             };
             
             sser.ItemsSource = m_Points;
