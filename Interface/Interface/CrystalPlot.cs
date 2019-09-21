@@ -61,6 +61,7 @@ namespace Interface
         public void PlotMirror(double w, double h)
         {
             var model = new PlotModel();
+            model.PlotType = PlotType.Cartesian;
 
             OxyPlot.Series.ScatterSeries sser = new OxyPlot.Series.ScatterSeries()
             {
@@ -72,7 +73,10 @@ namespace Interface
             model.Series.Add(sser);
             model.Axes.Add(new OxyPlot.Axes.LinearAxis { Position = AxisPosition.Bottom, Maximum = w / 2.0, Minimum = -w / 2.0, Title="x, [mm]" });
             model.Axes.Add(new OxyPlot.Axes.LinearAxis { Position = AxisPosition.Left, Maximum = h / 2.0, Minimum = -h / 2.0, Title="y, [mm]" });
-            model.Axes.Add(new OxyPlot.Axes.LinearColorAxis { Position = AxisPosition.Right, Palette = OxyPalettes.Rainbow(200) });
+            model.Axes.Add(new OxyPlot.Axes.LinearColorAxis {
+                Position = AxisPosition.Right,
+                Palette = OxyPalettes.Rainbow(200),
+            });
 
             m_Canvas.Model = model;
             m_Canvas.InvalidatePlot(true);

@@ -14,6 +14,8 @@ namespace Interface
     {
         private Plot m_Canvas;
 
+        public Plot Canvas { get { return m_Canvas; } }
+
         public ConfigPlotter(Plot canvas)
         {
             m_Canvas = canvas;
@@ -22,6 +24,7 @@ namespace Interface
         delegate double[] DrawCircle(double a, double b);
 
         delegate double[] DrawLine(double a, double[] b, double[] c);
+
         private void PlotCircle(DrawCircle func, Vector<double> x, double R, string color, int linewidth)
         {
             LineSeries ls = new LineSeries()
@@ -37,6 +40,7 @@ namespace Interface
             }
             ls.ItemsSource = p;
             m_Canvas.Series.Add(ls);
+
             m_Canvas.InvalidatePlot(true);
         }
 
@@ -174,6 +178,8 @@ namespace Interface
             // plot normal to crystal and start of the system;
 
             PlotPoints(new double[] { 0.0, 0.0 }, new double[] { self.crystalR, -self.crystalR }, "#000000", 2, LineStyle.Dash);
+
+            m_Canvas.ResetAllAxes();
         }
     }
 }

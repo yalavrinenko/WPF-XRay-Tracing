@@ -685,6 +685,11 @@ namespace Interface
 
             SysConf_onChange(this, null);
         }
+
+        private void ConfigurationPlot_Loaded(object sender, RoutedEventArgs e)
+        {
+            m_ConfPlot.DrawConfiguration(m_SysConf);
+        }
     }
 
 }

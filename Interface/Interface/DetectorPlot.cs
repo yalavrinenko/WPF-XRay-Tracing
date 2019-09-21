@@ -26,6 +26,7 @@ namespace Interface
         public void PlotDetector(Detector detector)
         {
             var model = new PlotModel();
+            model.PlotType = PlotType.Cartesian;
 
             var sser = new OxyPlot.Series.HeatMapSeries()
             {
@@ -69,45 +70,28 @@ namespace Interface
             {
                 LineStyle = LineStyle.Solid,
                 Color = OxyColors.RoyalBlue.ToColor(),
-                BrokenLineColor = OxyColors.RoyalBlue.ToColor()
+                BrokenLineColor = OxyColors.RoyalBlue.ToColor(),
+                DataFieldX = "X",
+                DataFieldY = "Y",
+                TrackerFormatString = "Point position: {X:0.######}" + Environment.NewLine + 
+                                      "Wavelenght: {W:0.######}" + Environment.NewLine +
+                                      "Counts: {Y}"
             };
             lineSeries.YAxisKey = "Counts";
             lineSeries.XAxisKey = "XPosition";
 
             var step = (Math.Abs(detector.MeredionalMax - detector.MeredionalMin) / bins.Length);
 
-            List<DataPoint> pointList = new List<DataPoint>();
+            List<WavelenghtDataPoint> pointList = new List<WavelenghtDataPoint>();
+
             for (int i = 0; i < bins.Length; ++i)
             {
                 double x = detector.MeredionalMin + i * step - detector.XShift;
-                pointList.Add(new DataPoint(x, bins[i]));
+                pointList.Add(new WavelenghtDataPoint(x, bins[i], (detector.ZeroCurve != null) ? detector.ZeroCurve.Evaluate(x) * OrderScale : 0.0));
             }
             lineSeries.ItemsSource = pointList;
             lineSeries.Items.Refresh();
 
-
-            var waveSeries = new OxyPlot.Wpf.LineSeries()
-            {
-                LineStyle = LineStyle.None,
-                Color = OxyColors.RoyalBlue.ToColor(),
-                BrokenLineColor = OxyColors.RoyalBlue.ToColor()
-            };
-            waveSeries.YAxisKey = "Counts";
-            waveSeries.XAxisKey = "WaveLength";
-
-            List<DataPoint> waveList = new List<DataPoint>();
-            if (detector.ZeroCurve != null)
-            {
-                for (int i = 0; i < bins.Length; ++i)
-                {
-                    double x = detector.MeredionalMin + i * step - detector.XShift;
-                    waveList.Add(new DataPoint(detector.ZeroCurve.Evaluate(x) * OrderScale, 1));
-                }
-            }
-            waveSeries.ItemsSource = waveList;
-            waveSeries.Items.Refresh();
-
-            m_Spectrum.Series.Add(waveSeries);
             m_Spectrum.Series.Add(lineSeries);
             m_Spectrum.InvalidatePlot(true);
 

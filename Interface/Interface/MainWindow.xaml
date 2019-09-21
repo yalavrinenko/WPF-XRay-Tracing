@@ -449,7 +449,7 @@
                             <oxy:Plot.Axes >
                                 <oxy:LinearAxis Position="Bottom" Key="XPosition" Title="x, [mm]"></oxy:LinearAxis>
                                 <oxy:LinearAxis Position="Left" Key="Counts" Title="Intensity"></oxy:LinearAxis>
-                                <oxy:LinearAxis Position="Top" Key="WaveLength" Title="Wavelength, [Å]"></oxy:LinearAxis>
+                                <!--<oxy:LinearAxis Position="Top" Key="WaveLength" Title="Wavelength, [Å]"></oxy:LinearAxis> -->
                             </oxy:Plot.Axes>
                         </oxy:Plot>
                     </TabItem>
@@ -462,8 +462,8 @@
 
                     <TabItem Height="25" VerticalAlignment="Bottom">
                         <TabItem.Header>Configuration</TabItem.Header>
-                        <oxy:Plot Name="ConfigurationPlot">
-                            <oxy:Plot.Axes >
+                        <oxy:Plot Name="ConfigurationPlot" PlotType="Cartesian" Loaded="ConfigurationPlot_Loaded">
+                            <oxy:Plot.Axes>
                                 <oxy:LinearAxis Position="Bottom" Title="x, [mm]"></oxy:LinearAxis>
                                 <oxy:LinearAxis Position="Left" Title="y, [mm]"></oxy:LinearAxis>
                             </oxy:Plot.Axes>

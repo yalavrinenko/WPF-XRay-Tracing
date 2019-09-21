@@ -294,26 +294,46 @@ namespace Interface
             FilmAngle = (Gamma - Gamma2) * 180.0 / Math.PI;
             GetRotationAngle(phi);
 
-            var theta = BraggA * Math.PI / 180.0;
-
-            var H = crystalR - Math.Sqrt(crystalR * crystalR - crystalW * crystalW / 4.0);
-            var dh = H * Math.Tan(Math.PI / 2.0 - theta);
-            var l = crystalW / 2.0 + dh;
-            L = SrcDist - Math.Sqrt(dh * dh + H * H);
-
-            var d = L * L + l * l - 2 * L * l * Math.Sin(Math.PI - theta);
-            d = Math.Sqrt(d);
-
-            var max_edge_dist = Math.Max(crystalH, crystalW);
-            var cone_Cos = SrcDist / (Math.Sqrt(SrcDist * SrcDist + max_edge_dist * max_edge_dist));
-            SrcCone = Math.Acos(cone_Cos);
-            SrcCone *= 1.05;
-            SolidCone = 2.0 * Math.PI * (1.0 - cone_Cos);
-            SrcCone *= 180.0 / Math.PI;
+            SrcCone = 0.0;
+            SolidCone = SolidAngle(); 
 
             GetLimitWaves();
 
             onChange?.Invoke(this, new EventArgs());
+        }
+
+        private double SolidAngle()
+        {
+            Func<Vector_3d, Vector_3d, Vector_3d, double> solid_angle_estimator = (Vector_3d r1, Vector_3d r2, Vector_3d r3) =>
+            {
+                double numerator = Math.Abs(Vector_3d.Scalar(r1, Vector_3d.Vector(r2, r3)));
+                double denumerator = r1.Lenght * r2.Lenght * r3.Lenght +
+                                     Vector_3d.Scalar(r1, r2) * r3.Lenght +
+                                     Vector_3d.Scalar(r2, r3) * r1.Lenght +
+                                     Vector_3d.Scalar(r3, r1) * r2.Lenght;
+                return 2.0 * Math.Atan2(numerator, denumerator);
+            };
+
+            Vector_3d mirror_center = new Vector_3d(this.SrcDist * Math.Cos(Rad(this.ScatterAngle)), this.SrcDist * Math.Sin(Rad(this.ScatterAngle)), 0.0);
+            Vector_3d upper_left = new Vector_3d(mirror_center.x - this.crystalW / 2, mirror_center.y, this.crystalH / 2.0),
+                      down_left = new Vector_3d(mirror_center.x - this.crystalW / 2, mirror_center.y, -this.crystalH / 2.0),
+                      upper_right = new Vector_3d(mirror_center.x + this.crystalW / 2, mirror_center.y, this.crystalH / 2.0),
+                      down_right = new Vector_3d(mirror_center.x + this.crystalW / 2, mirror_center.y, -this.crystalH / 2.0);
+
+
+            double left_triangle = solid_angle_estimator(down_left, upper_left, upper_right);
+            double right_triangle = solid_angle_estimator(upper_right, down_right, down_left);
+            return left_triangle + right_triangle;
+        }
+
+        static public double Rad(double dec)
+        {
+            return dec * Math.PI / 180.0;
+        }
+
+        static public double Dec(double rad)
+        {
+            return rad * 180.0 / Math.PI;
         }
 
         public void UpdateConfiguration()

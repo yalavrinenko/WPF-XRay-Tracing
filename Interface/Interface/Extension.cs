@@ -26,7 +26,7 @@ namespace Interface
             ui.dgrid.ItemsSource = waves.Wave;
             ui.dgrid.Items.Refresh();
 
-            ui.wavePlot.PlotLines(waves.Wave);  
+            ui.wavePlot.PlotLines(waves.Wave);
         }
 
         public static void SaveTiff(string path, Int16[] pixels, int w, int h)
@@ -70,7 +70,7 @@ namespace Interface
             {
                 hist = new double[M, N];
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 System.Windows.MessageBox.Show("Detector cell size to small! Changed to default size 0.025.", "Detector cell size error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
                 return Histogram2D(xvalue, yvalue, xrange, yrange, 0.025);
@@ -78,7 +78,7 @@ namespace Interface
 
             var InRegion = Enumerable.Zip(xvalue, yvalue, (x, y) => new { x, y })
                 .Where(v => (xrange.VMin <= v.x && v.x <= xrange.VMax) && (yrange.VMin <= v.y && v.y <= yrange.VMax))
-                .Select( v => new { x = v.x - xrange.VMin, y = v.y - yrange.VMin });
+                .Select(v => new { x = v.x - xrange.VMin, y = v.y - yrange.VMin });
 
             foreach (var p in InRegion)
             {
@@ -93,7 +93,7 @@ namespace Interface
         public static long[] Histogram(IEnumerable<double> xvalue, Range xrange, double step)
         {
             if (xvalue.Count() == 0)
-                return new long[1]{0};
+                return new long[1] { 0 };
 
             ulong N = (ulong)Math.Ceiling(Math.Abs(xrange.VMax - xrange.VMin) / step);
             long[] hist = new long[N];
@@ -101,7 +101,7 @@ namespace Interface
             var InRegion = xvalue.Where(x => xrange.VMin <= x && x <= xrange.VMax).Select(x => x - xrange.VMin);
             foreach (var x in InRegion)
             {
-                long index = (long) (x / step);
+                long index = (long)(x / step);
                 ++hist[index];
             }
 
@@ -140,4 +140,30 @@ namespace Interface
             return Mul(a, b).Sum();
         }
     }
+
+    public class Vector_3d
+    {
+        public double x, y, z;
+
+        public Vector_3d(double x_, double y_, double z_)
+        {
+            x = x_; y = y_; z = z_;
+        }
+
+        public double Lenght { get { return Math.Sqrt(x * x + y * y + z * z); } }
+
+        static public double Scalar(Vector_3d v1, Vector_3d v2)
+        {
+            return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+        }
+
+        static public Vector_3d Vector(Vector_3d a, Vector_3d b)
+        {
+            return new Vector_3d(a.y * b.z - a.z * b.y,
+                                 a.z * b.x - a.x * b.z,
+                                 a.x * b.y - a.y * b.x);
+
+        }
+    }
+
 }
