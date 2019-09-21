@@ -8,7 +8,7 @@
 100% захват лучей кристаллом и позволяет достигать статистически значимых значений при меньшем количестве лучей.
 Телесный угол, в который генерируются лучи, вычисляется путем триангуляции плоскости кристалла и рассчета телесного угла
 по формуле (1) для каждого из треугольников**
-- <img src="https://latex.codecogs.com/gif.latex?\tan \left({\frac {1}{2}}\Omega \right)={\frac {\left|{\vec {a}}\ {\vec {b}}\ {\vec {c}}\right|}{abc+\left({\vec {a}}\cdot {\vec {b}}\right)c+\left({\vec {a}}\cdot {\vec {c}}\right)b+\left({\vec {b}}\cdot {\vec {c}}\right)a}}" />
+- <img src="https://wikimedia.org/api/rest_v1/media/math/render/svg/c5199af9bb1b0f79d8ed0244127d581d3c0d4dbf" />
 
 3. Разный масштаб по осям во вкладке «Detector plane». Необходимо сделать один и тот же. 
 По-видимому, часть окна при этом окажется пустой, но это не проблема. 
