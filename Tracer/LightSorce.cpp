@@ -35,9 +35,9 @@ public:
 		random_generator{ central_line, fwhm / (2.0 * sqrt(2.0 * log(2.0))) } {}
 };
 
-class lourentz_lineshape : public random_generator<std::cauchy_distribution<double>> {
+class lorentz_lineshape : public random_generator<std::cauchy_distribution<double>> {
 public:
-	lourentz_lineshape(double central_line, double fwhm) :
+	lorentz_lineshape(double central_line, double fwhm) :
 		random_generator{ central_line, fwhm / 2.0 } {}
 };
 
