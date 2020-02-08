@@ -31,7 +31,7 @@ __lib_spec void xrt_terminate() {
 }
 
 template<class mirrorClass>
-std::shared_ptr<XRTMirror> initMirror(tParameters *p) {
+std::shared_ptr<XRTMirror> initMirror(std::shared_ptr<tParameters> const &p) {
     double mirrorYpos = p->sourceDistance * cos(p->programAngle) - p->mirrorR;
     Vec3d mpos(0, mirrorYpos, 0);
     Vec3d mprop(p->mirrorR, p->mirrorTheta, p->mirrorPsi);
@@ -44,7 +44,7 @@ std::shared_ptr<XRTMirror> initMirror(tParameters *p) {
     return mirror;
 }
 
-std::shared_ptr<XRTRaySource> initRaySource(tParameters *p, std::shared_ptr<XRTRaySource::XRTTargetSurface> &&target){
+std::shared_ptr<XRTRaySource> initRaySource(std::shared_ptr<tParameters> const &p, std::shared_ptr<XRTRaySource::XRTTargetSurface> &&target){
     double srcXpos = p->sourceDistance * sin(p->programAngle);
     Vec3d spos(-srcXpos, 0, 0);
     return std::make_shared<SphereLight>(spos, p->sourceSize_W, p->sourceSize_H,
@@ -53,7 +53,7 @@ std::shared_ptr<XRTRaySource> initRaySource(tParameters *p, std::shared_ptr<XRTR
 
 void addDumpPlanesSrcLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
                            Vec3d srcDir, int count, double step, double sizeW, double sizeH, double angl,
-                           tDetectorPlane::IntersectionFilter crossPattern, tParameters *p) {
+                           tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
     double h = startPoint;
     for (int i = 0; i < count; i++) {
         double sx = h * sin(angl);
@@ -84,7 +84,7 @@ void addDumpPlanesSrcLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
 
 void addDumpPlanes(XRTObjectVector &obj, double startPoint, Vec3d dir,
                    int count, double step, double sizeW, double sizeH, double angl,
-                   tDetectorPlane::IntersectionFilter crossPattern, tParameters *p) {
+                   tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
     double h = startPoint;
     for (int i = 0; i < count; i++) {
         double sx = h * sin(angl);
@@ -114,7 +114,7 @@ void addDumpPlanes(XRTObjectVector &obj, double startPoint, Vec3d dir,
 }
 
 void addManualObject(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
-                     double size, double angl, tParameters *p) {
+                     double size, double angl, std::shared_ptr<tParameters> const &p) {
     double x, y;
 
     x = -gridPosition * sin(angl);
@@ -146,7 +146,7 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
     isTerminated = false;
 
     XRTObjectVector obj;
-    tParameters *p = nullptr;
+    std::shared_ptr<tParameters> p = nullptr;
 
     double startTime = omp_get_wtime();
 
@@ -154,7 +154,7 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
         printf("No input file!\n");
         return 1;
     } else
-        p = new tParameters(argv);
+        p = std::make_unique<tParameters>(argv);
 
     std::shared_ptr<XRTMirror> mirror = nullptr;
     if (p->mirrorType == MIRROR_SPHERE)

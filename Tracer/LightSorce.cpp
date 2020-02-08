@@ -7,8 +7,43 @@
 
 #include "LightSorce.hpp"
 
+template<typename __tdistribution>
+class random_generator {
+public:
+	random_generator(double central_line, double sigma):
+		central_{ central_line }, sigma_{ sigma }, 
+		is_constant_{ std::abs(sigma) < std::numeric_limits<double>::epsilon() }, distribution_{ central_, (!is_constant_) ? sigma_ : 0.1 } {
+	}
+
+	double operator() (std::mt19937_64 &engine) {
+		if (!is_constant_)
+			return distribution_(engine);
+		else
+			return central_;
+	}
+
+public:
+	double central_;
+	double sigma_;
+	bool is_constant_;
+	__tdistribution distribution_;
+};
+
+class gauss_lineshape : public random_generator<std::normal_distribution<double>> {
+public:
+	gauss_lineshape(double central_line, double fwhm) :
+		random_generator{ central_line, fwhm / (2.0 * sqrt(2.0 * log(2.0))) } {}
+};
+
+class lourentz_lineshape : public random_generator<std::cauchy_distribution<double>> {
+public:
+	lourentz_lineshape(double central_line, double fwhm) :
+		random_generator{ central_line, fwhm / 2.0 } {}
+};
+
 std::vector<tRay> SphereLight::GenerateRays(double lambda, double dlambda, int count) {
-    std::normal_distribution<double> distr_wavelenght(lambda, dlambda / (sqrt(2.0 * log(2.0))));
+	gauss_lineshape distr_wavelenght(lambda, dlambda);
+	//lourentz_lineshape distr_wavelenght(lambda, dlambda);
 
     auto single_ray = [&distr_wavelenght, this](){
         auto trg_point = target->surface_point();

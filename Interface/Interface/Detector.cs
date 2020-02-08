@@ -73,6 +73,7 @@ namespace Interface
         public double WaveOrderScale = 1;
 
         private long[] m_Histogram;
+        private double m_current_histogram_step;
         private double[,] m_HeatMap;
 
         public List<DetectorPoint> Points { get { return m_Points; } }
@@ -93,7 +94,8 @@ namespace Interface
 
             double step = (Math.Abs(range.VMax - range.VMin) / NBINS);
 
-            m_Histogram = Extension.Histogram(this.Points.Select(p => p.x), range, step);
+            m_Histogram = Extension.Histogram(this.Points.Select(p => p.x), range, this.PixelSize);
+            m_current_histogram_step = this.PixelSize;
         }
 
         public void BuildHeatMap()
@@ -120,6 +122,8 @@ namespace Interface
 
         public long[] GetHistogram()
         {
+            if (m_current_histogram_step != this.PixelSize)
+                BuildHistogram();
             return m_Histogram;
         }
 

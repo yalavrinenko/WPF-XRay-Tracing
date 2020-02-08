@@ -5,11 +5,11 @@
 class tObjectPlane:public tPlane{
 
 public:
-    tObjectPlane(Vec3d const &_N, Vec3d const &_r0, tParameters *parameters) :
+    tObjectPlane(Vec3d const &_N, Vec3d const &_r0, std::shared_ptr<tParameters> parameters) :
             tPlane(_N, _r0, parameters->transitivity_map().size().first / 2.0,
                    parameters->transitivity_map().size().second / 2.0),
             r_engine(XRTRaySource::r_engine_seed()) {
-        this->xrt_parameters(parameters);
+        this->xrt_parameters(std::move(parameters));
     }
 
     IntersectionResult transition_decision(Vec3d const &intersection_point) override;

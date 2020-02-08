@@ -527,6 +527,7 @@ namespace Interface
         {
             m_Detector.BuildHeatMap();
             m_DetectorPlot.PlotDetector(m_Detector);
+            m_DetectorPlot.PlotSpectrum(m_Detector);
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)

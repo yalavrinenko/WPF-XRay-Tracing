@@ -30,8 +30,8 @@ public:
         return r0;
     }
 
-    void xrt_parameters(tParameters *parameters_ptr){
-        parameters = parameters_ptr;
+    void xrt_parameters(std::shared_ptr<tParameters> parameters_ptr){
+        parameters = std::move(parameters_ptr);
     }
 
     int type = -1;
@@ -61,7 +61,7 @@ protected:
     Vec3d r0{};
 
     XRTFLogging<xrt_intersection> logger;
-    tParameters *parameters = nullptr;
+    std::shared_ptr<tParameters> parameters = nullptr;
     std::mutex critical_section_mut;
 };
 
