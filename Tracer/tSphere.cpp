@@ -48,8 +48,8 @@ tRay tSphere::crossAndGen(const tRay &ray, double &t) {
 
     double cosA = dot2(N, direction) / (sqrt(dot(N)) * sqrt(dot(direction)));
 
-    if (cosA > 1)
-        cosA = 1;
+    if (cosA > 1.0)
+        cosA = 1.0;
 
     double angle = acos(cosA);
 
@@ -80,8 +80,9 @@ bool tSphere::checkPosition(Vec3d point) {
     Vec3d R = point - this->r0;
     double r = sqrt(dot(R));
     double eps = 1e-10;
-    if (r - eps >= this->RadThetaPhi.x && this->RadThetaPhi.x >= r + eps)
-        return false;
+    //if (r - eps >= this->RadThetaPhi.x && this->RadThetaPhi.x >= r + eps) //WTF???
+    //    return false;
+
     double Theta = acos(R.z / r);
     double Phi = acos(R.x / (r * sin(Theta)));
 

@@ -42,6 +42,8 @@ namespace Interface
         private DetectorPlot m_DetectorPlot;
 
         private UIList m_UIS;
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -162,6 +164,8 @@ namespace Interface
             {
                 if ((sender as TextBox) == CentralWaveLenght)
                     m_SysConf.UpdateConfigurationWithNewCentralWave();
+                if ((sender as TextBox) == Dst2Src)
+                    m_SysConf.UpdateConfigurationWithNewDetectorDistance();
                 else
                     m_SysConf.UpdateConfiguration();
 
@@ -695,6 +699,26 @@ namespace Interface
         private void ConfigurationPlot_Loaded(object sender, RoutedEventArgs e)
         {
             m_ConfPlot.DrawConfiguration(m_SysConf);
+        }
+
+        private void HelpAbout_Click(object sender, RoutedEventArgs e)
+        {
+            string build_date = "Apr 1 2020";
+            String info = "WPF XRay-tracing build info\n" +
+                          "Ray-tracing core: " + Computation.CoreBuildDate() + "\n" +
+                          "WPF Interface: " + build_date;
+            MessageBox.Show(info, "About", MessageBoxButton.OK);
+        }
+
+        private void DataGridContextCreateline_Click(object sender, RoutedEventArgs e)
+        {
+            m_SelectedWaves.Add(new DataBaseWavelength()
+            {
+                name = "New wave",
+                lambda = 0.0,
+                dlambda = 0.0,
+                intensity = 1.0,
+            }, 1);
         }
     }
 

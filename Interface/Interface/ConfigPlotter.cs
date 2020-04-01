@@ -107,7 +107,8 @@ namespace Interface
 
             var detector_center = new double[] { self.DstDist * Math.Cos(b_phi), -self.DstDist * Math.Sin(b_phi) + self.crystalR };
 
-            var detector_norm_line = Extension.Sub(detector_center, source_pos);
+            double[] R_position = { 0, 0, 0 };
+            var detector_norm_line = Extension.Sub(detector_center, R_position);
             var norm = Extension.vectorLenght(detector_norm_line);
             detector_norm_line = detector_norm_line.Select(x => x / norm).ToArray();
 

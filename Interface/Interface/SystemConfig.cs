@@ -10,6 +10,7 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace Interface
 {
+
     public class SystemConfig
     {
         public class ObjectInfo
@@ -56,6 +57,15 @@ namespace Interface
         public CrystalInfo CrystalProps;
 
         #region public vars
+
+        public enum SpectrometerType
+        {
+            ONE_ARM,
+            TWO_ARM
+        };
+
+        public SpectrometerType spectrometer_type { get; set; } = SpectrometerType.TWO_ARM;
+
         public string Crystal2d { get
             {
                 var s = "";
@@ -209,6 +219,7 @@ namespace Interface
         {
             var data = "";
             data += "[INPUT]\n";
+            data += "Spectometer type = " + spectrometer_type.ToString() + "\n";
             data += "Crystal type = " + CrystType + "\n";
             try
             {
@@ -230,10 +241,13 @@ namespace Interface
             data += "\n\n[OUTPUT]\n";
             data += "Bragg Angle = " + Extension.mstr(BraggA) + " [deg]\n";
             data += "Incident Angle = " + Extension.mstr(90.0 - BraggA) + " [deg]\n";
-            data += "FRO angle = " + Extension.mstr(180.0 - ToFilmDirection) + " [deg]\n";
+            if (spectrometer_type == SpectrometerType.TWO_ARM)
+            {
+                data += "FRO angle = " + Extension.mstr(180.0 - ToFilmDirection) + " [deg]\n";
+                data += "Detector to center = " + Extension.mstr(FilmDistFromCenter) + " [mm]\n";
+            }
             data += "Detector angle = " + Extension.mstr(FilmRotationAngle) + " [deg]\n";
             data += "Detector to crystal = " + Extension.mstr(DstDist) + " [mm]\n";
-            data += "Detector to center = " + Extension.mstr(FilmDistFromCenter) + " [mm]\n";
 
             if (ObjectExist)
             {
@@ -347,6 +361,15 @@ namespace Interface
             MainGeometry(phi);
         }
 
+        public void UpdateConfigurationWithNewDetectorDistance()
+        {
+            if (CrystalProps == null)
+                throw new Exception("No crystal file");
+
+            var phi = (90.0 - BraggA) * Math.PI / 180.0;
+            MainGeometry(phi);
+        }
+
         public void UpdateConfigurationWithNewCentralWave()
         {
             if (CrystalProps == null)
@@ -443,14 +466,43 @@ namespace Interface
             onWaveLimitChange?.Invoke(this, waveLimits);
         }
 
-        private void GetRotationAngle(double phi)
+        private void GetRotationAngle2Arm(double phi)
         {
             double[] Cp = { 0.0, -crystalR / 2.0 };
-            double[] Sp = { -SrcDist * Math.Sin(phi), -SrcDist * Math.Cos(phi) };
+            double[] Sp = { 0.0, -crystalR };
             double[] Dp = { DstDist * Math.Sin(phi), -DstDist * Math.Cos(phi) };
 
             double[] Dn = { Dp[0] - Sp[0], Dp[1] - Sp[1] };
             Dn = new double[]{ -Dn[1], Dn[0]};
+            double[] CDp = { Cp[0] - Dp[0], Cp[1] - Dp[1] };
+
+            var Dnl = Extension.vectorLenght(Dn);
+            var CDpl = Extension.vectorLenght(CDp);
+
+            Dn = Dn.Select(d => d / Dnl).ToArray();
+            CDp = CDp.Select(d => d / CDpl).ToArray();
+
+            var RotAngleCos = (Dn[0] * CDp[0] + Dn[1] * CDp[1]);
+
+            FilmRotationAngle = Math.Acos(RotAngleCos) * 180.0 / Math.PI;
+        }
+
+        private void GetRotationAngle(double phi)
+        {
+            if (spectrometer_type == SpectrometerType.ONE_ARM)
+                GetRotationAngle1Arm(phi);
+            else if (spectrometer_type == SpectrometerType.TWO_ARM)
+                GetRotationAngle2Arm(phi);
+        }
+
+        private void GetRotationAngle1Arm(double phi)
+        {
+            double[] Cp = { 0.0, 0.0 };
+            double[] Sp = { 0.0, -this.crystalR };
+            double[] Dp = { DstDist * Math.Sin(phi), -DstDist * Math.Cos(phi) };
+
+            double[] Dn = { Dp[0] - Sp[0], Dp[1] - Sp[1] };
+            Dn = new double[] { -Dn[1], Dn[0] };
             double[] CDp = { Cp[0] - Dp[0], Cp[1] - Dp[1] };
 
             var Dnl = Extension.vectorLenght(Dn);

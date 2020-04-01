@@ -69,16 +69,16 @@ namespace Interface
             var lineSeries = new OxyPlot.Wpf.LineSeries()
             {
                 LineStyle = LineStyle.Solid,
-                Color = OxyColors.RoyalBlue.ToColor(),
+                Color = OxyColors.OrangeRed.ToColor(),
                 BrokenLineColor = OxyColors.RoyalBlue.ToColor(),
                 DataFieldX = "X",
                 DataFieldY = "Y",
-                TrackerFormatString = "Point position: {X:0.######}" + Environment.NewLine + 
-                                      "Wavelenght: {W:0.######}" + Environment.NewLine +
+                TrackerFormatString = "Point position: {W:0.######}" + Environment.NewLine + 
+                                      "Wavelenght: {X:0.######}" + Environment.NewLine +
                                       "Counts: {Y}"
             };
             lineSeries.YAxisKey = "Counts";
-            lineSeries.XAxisKey = "XPosition";
+            lineSeries.XAxisKey = "WaveLength";
 
             var step = (Math.Abs(detector.MeredionalMax - detector.MeredionalMin) / bins.Length);
 
@@ -87,7 +87,10 @@ namespace Interface
             for (int i = 0; i < bins.Length; ++i)
             {
                 double x = detector.MeredionalMin + i * step - detector.XShift;
-                pointList.Add(new WavelenghtDataPoint(x, bins[i], (detector.ZeroCurve != null) ? detector.ZeroCurve.Evaluate(x) * OrderScale : 0.0));
+                if (detector.ZeroCurve != null)
+                {
+                    pointList.Add(new WavelenghtDataPoint(detector.ZeroCurve.Evaluate(x) * OrderScale, bins[i], x));
+                }
             }
             lineSeries.ItemsSource = pointList;
             lineSeries.Items.Refresh();

@@ -144,7 +144,7 @@ double tParameters::reflection(double phi, double lambda) {
 #ifdef DEBUG_MODE
     return 2;
 #else
-    if (randomNumber <= currentRefValue)
+    if (randomNumber < currentRefValue)
         return 2;
     else
         return 0;

@@ -26,6 +26,11 @@ const char *plinkedLibraryOutput;
 
 bool isTerminated;
 
+
+__lib_spec char* build_date() {
+	return __DATE__;
+}
+
 __lib_spec void xrt_terminate() {
     isTerminated = true;
 }
@@ -51,8 +56,70 @@ std::shared_ptr<XRTRaySource> initRaySource(std::shared_ptr<tParameters> const &
                                          std::forward<std::shared_ptr<XRTRaySource::XRTTargetSurface>>(target));
 }
 
+void addDumpPlanesObjectLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
+	Vec3d object_r, int count, double step, double sizeW, double sizeH, double angl,
+	tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
+	double h = startPoint;
+	for (int i = 0; i < count; i++) {
+		double sx = h * sin(angl);
+		double sy = h * cos(angl);
+		sy = dir.y - sy;
+
+		Vec3d r0(sx, sy, 0);
+		Vec3d N = object_r - r0;
+		N = N / sqrt(dot(N));
+
+		double nx = N.x * cos(-M_PI / 2) - N.y * sin(-M_PI / 2);
+		double ny = N.x * sin(-M_PI / 2) + N.y * cos(-M_PI / 2);
+		N.x = nx;
+		N.y = ny;
+
+		//string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
+		string name = p->dumpPlaneName + "Detector.dmp";
+
+		auto dp = std::make_shared<tDetectorPlane>(N, r0, sizeW, sizeH, name);
+		dp->setCrossPattern(crossPattern);
+		dp->type = DUMP_PLANE;
+		dp->xrt_parameters(p);
+
+		obj.push_back(dp);
+		h += step;
+	}
+}
+
 void addDumpPlanesSrcLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
-                           Vec3d srcDir, int count, double step, double sizeW, double sizeH, double angl,
+	Vec3d srcDir, int count, double step, double sizeW, double sizeH, double angl,
+	tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
+	double h = startPoint;
+	for (int i = 0; i < count; i++) {
+		double sx = h * sin(angl);
+		double sy = h * cos(angl);
+		sy = dir.y - sy;
+
+		Vec3d r0(sx, sy, 0);
+		Vec3d N = srcDir - r0;
+		N = N / sqrt(dot(N));
+
+		double nx = N.x * cos(-M_PI / 2) - N.y * sin(-M_PI / 2);
+		double ny = N.x * sin(-M_PI / 2) + N.y * cos(-M_PI / 2);
+		N.x = nx;
+		N.y = ny;
+
+		//string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
+		string name = p->dumpPlaneName + "Detector.dmp";
+
+		auto dp = std::make_shared<tDetectorPlane>(N, r0, sizeW, sizeH, name);
+		dp->setCrossPattern(crossPattern);
+		dp->type = DUMP_PLANE;
+		dp->xrt_parameters(p);
+
+		obj.push_back(dp);
+		h += step;
+	}
+}
+
+void addDumpPlanesR2Lined(XRTObjectVector &obj, double startPoint, Vec3d dir,
+                           Vec3d mirror_r, int count, double step, double sizeW, double sizeH, double angl,
                            tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
     double h = startPoint;
     for (int i = 0; i < count; i++) {
@@ -61,7 +128,8 @@ void addDumpPlanesSrcLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
         sy = dir.y - sy;
 
         Vec3d r0(sx, sy, 0);
-        Vec3d N = srcDir - r0;
+
+        Vec3d N = mirror_r - r0;
         N = N / sqrt(dot(N));
 
         double nx = N.x * cos(-M_PI / 2) - N.y * sin(-M_PI / 2);
@@ -175,10 +243,14 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
             addDumpPlanes(obj, p->startPoint, dumpPlaneStart, p->planeCount,
                           p->planeStep, p->planeSizeW, p->planeSizeH, p->programAngle,
                           tDetectorPlane::IntersectionFilter::IMAGE, p);
-        else
-            addDumpPlanesSrcLined(obj, p->startPoint, dumpPlaneStart,
-                                  light->GetR0(), p->planeCount, p->planeStep, p->planeSizeW, p->planeSizeH,
-                                  p->programAngle, tDetectorPlane::IntersectionFilter::IMAGE, p);
+		else {
+			//addDumpPlanesR2Lined(obj, p->startPoint, dumpPlaneStart,
+				//mirror->GetR0(), p->planeCount, p->planeStep, p->planeSizeW, p->planeSizeH,
+				//p->programAngle, tDetectorPlane::IntersectionFilter::IMAGE, p);
+			addDumpPlanesObjectLined(obj, p->startPoint, dumpPlaneStart,
+				mirror->GetR0(), p->planeCount, p->planeStep, p->planeSizeW, p->planeSizeH,
+				p->programAngle, tDetectorPlane::IntersectionFilter::IMAGE, p);
+		}
     }
 
     if (p->objPlaneCount > 0)

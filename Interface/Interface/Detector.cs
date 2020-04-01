@@ -112,7 +112,7 @@ namespace Interface
                 VMin = this.MinDetectorPositionSag
             };
 
-            m_HeatMap = Extension.Histogram2D(this.Points.Select(p => p.x), Points.Select(p => p.y), xrange, yrange, PixelSize);
+            m_HeatMap = Extension.Histogram2D(this.Points.Select(p => p.x), Points.Select(p => p.z), xrange, yrange, PixelSize);
         }
 
         public double[,] GetHeatMap()
@@ -142,7 +142,7 @@ namespace Interface
                 double cy = Double.Parse(CoordLine[1]);
                 double cz = Double.Parse(CoordLine[2]);
 
-                var NormalLine = lines.ElementAt(2).Replace(";", "").Replace("\t", "").Replace(" ", "").Replace("]", "").Replace("[", "").Split('=')[1].Split(',');
+                var NormalLine = lines.ElementAt(3).Replace(";", "").Replace("\t", "").Replace(" ", "").Replace("]", "").Replace("[", "").Split('=')[1].Split(',');
                 double ncx = Double.Parse(NormalLine[0]);
                 double ncy = Double.Parse(NormalLine[1]);
                 double ncz = Double.Parse(NormalLine[2]);

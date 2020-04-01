@@ -65,7 +65,16 @@ namespace Interface
 
         [DllImport(@"./sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void xrt_terminate();
+
+        [DllImport(@"./sys/xray-tracing.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr build_date();
         #endregion
+
+        public static String CoreBuildDate()
+        {
+            IntPtr pdate = build_date();
+            return Marshal.PtrToStringAnsi(pdate);
+        }
 
         private String parFileName = System.IO.Directory.GetCurrentDirectory() + "/par/Order_0.par";
 
