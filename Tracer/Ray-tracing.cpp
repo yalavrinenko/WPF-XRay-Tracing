@@ -327,8 +327,8 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
             if (rayByIter > (p->rayCount * currentWaveLenght.intensity - generatedRay))
                 rayByIter = p->rayCount * currentWaveLenght.intensity - generatedRay;
 
-            auto ray = std::move(light->GenerateRays(currentWaveLenght.waveLenght,
-                                            currentWaveLenght.dwaveLenght, rayByIter));
+            auto ray = light->GenerateRays(currentWaveLenght.waveLenght,
+                                            currentWaveLenght.dwaveLenght, rayByIter);
 
             if (isTerminated) {
                 break;

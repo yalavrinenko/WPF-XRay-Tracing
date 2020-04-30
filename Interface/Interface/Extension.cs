@@ -148,6 +148,16 @@ namespace Interface
             return (value).ToString("0.#####");
         }
 
+        public static string сstr(object value)
+        {
+            return (value)?.ToString();
+        }
+
+        public static string сstr(double value)
+        {
+            return (value).ToString();
+        }
+
         public static double vectorLenght(double[] v)
         {
             return Math.Sqrt(v[0] * v[0] + v[1] * v[1]);

@@ -141,18 +141,11 @@ public:
         if (m_reflection_curves.empty())
             throw std::logic_error("The curve set is empty.");
 
-        double min_div = std::numeric_limits<double>::epsilon();
-        size_t index = 0;
-
-        for (auto i = 0u; i < m_reflection_curves.size(); ++i){
-            auto dw = std::abs(m_reflection_curves[i].first - wave);
-            if (dw < min_div){
-                min_div = dw;
-                index = i;
-            }
-        }
-
-        m_working_curve = index;
+		auto nearest = std::min_element(m_reflection_curves.begin(), m_reflection_curves.end(), [wave](auto const &curve_a, auto const &curve_b) {
+			return std::abs(curve_a.first - wave) < std::abs(curve_b.first - wave);
+		});
+		
+		m_working_curve = std::distance(m_reflection_curves.begin(), nearest);
     }
 
     TransitivityMap const& transitivity_map() const {

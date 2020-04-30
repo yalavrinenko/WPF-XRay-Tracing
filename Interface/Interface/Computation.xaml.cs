@@ -117,36 +117,36 @@ namespace Interface
             try
             {
                 outFile.Write("$GenName = " + "Order_0\n");
-                outFile.Write("$rayCnt = " + Extension.mstr(m_self.RayCount) + "\n");
-                outFile.Write("$rayByIt = " + Extension.mstr(m_self.RayByIter) + "\n");
-                outFile.Write("$cR = " + Extension.mstr(m_self.crystalR) + "\n");
-                outFile.Write("$wA = " + Extension.mstr(m_self.crystalW) + "\n");
-                outFile.Write("$hA = " + Extension.mstr(m_self.crystalH) + "\n");
-                outFile.Write("$ScattAngle = " + Extension.mstr(m_self.BraggA) + "\n");
-                outFile.Write("$Cr2D = " + Extension.mstr(m_self.CrystalProps.crystal2d[idx] / m_self.mainOrder) + "\n");
-                outFile.Write("$DistrWidth = " + Extension.mstr(m_self.CrystalProps.DistrHW[idx]) + "\n");
+                outFile.Write("$rayCnt = " + Extension.сstr(m_self.RayCount) + "\n");
+                outFile.Write("$rayByIt = " + Extension.сstr(m_self.RayByIter) + "\n");
+                outFile.Write("$cR = " + Extension.сstr(m_self.crystalR) + "\n");
+                outFile.Write("$wA = " + Extension.сstr(m_self.crystalW) + "\n");
+                outFile.Write("$hA = " + Extension.сstr(m_self.crystalH) + "\n");
+                outFile.Write("$ScattAngle = " + Extension.сstr(m_self.BraggA) + "\n");
+                outFile.Write("$Cr2D = " + Extension.сstr(m_self.CrystalProps.crystal2d[idx] / m_self.mainOrder) + "\n");
+                outFile.Write("$DistrWidth = " + Extension.сstr(m_self.CrystalProps.DistrHW[idx]) + "\n");
                 outFile.Write("$RFile = " + m_self.CrystalProps.DistrFileName[idx] + "\n");
-                outFile.Write("$RSize = " + Extension.mstr(m_self.CrystalProps.DistrSize[idx]) + "\n");
-                outFile.Write("$RStep = " + Extension.mstr(m_self.CrystalProps.DistrStep[idx]) + "\n");
-                outFile.Write("$SrcDist = " + Extension.mstr(m_self.SrcDist) + "\n");
-                outFile.Write("$SrcCone = " + Extension.mstr(m_self.SrcCone) + "\n");
-                outFile.Write("$DDist  = " + Extension.mstr(m_self.DstDist) + "\n");
-                outFile.Write("$FilmA  = " + Extension.mstr(m_self.FilmAngle) + "\n");
-                outFile.Write("$FildDir = " + Extension.mstr(m_self.ToFilmDirection) + "\n");
+                outFile.Write("$RSize = " + Extension.сstr(m_self.CrystalProps.DistrSize[idx]) + "\n");
+                outFile.Write("$RStep = " + Extension.сstr(m_self.CrystalProps.DistrStep[idx]) + "\n");
+                outFile.Write("$SrcDist = " + Extension.сstr(m_self.SrcDist) + "\n");
+                outFile.Write("$SrcCone = " + Extension.сstr(m_self.SrcCone) + "\n");
+                outFile.Write("$DDist  = " + Extension.сstr(m_self.DstDist) + "\n");
+                outFile.Write("$FilmA  = " + Extension.сstr(m_self.FilmAngle) + "\n");
+                outFile.Write("$FildDir = " + Extension.сstr(m_self.ToFilmDirection) + "\n");
 
-                outFile.Write("$SrcSizeW = " + Extension.mstr(m_self.SrcSizeW / 2.0) + "\n");
-                outFile.Write("$SrcSizeH = " + Extension.mstr(m_self.SrcSizeH / 2.0) + "\n");
-                outFile.Write("$FilmH = " + Extension.mstr(m_self.FilmSizeH) + "\n");
-                outFile.Write("$FilmW = " + Extension.mstr(m_self.FilmSizeW) + "\n");
+                outFile.Write("$SrcSizeW = " + Extension.сstr(m_self.SrcSizeW / 2.0) + "\n");
+                outFile.Write("$SrcSizeH = " + Extension.сstr(m_self.SrcSizeH / 2.0) + "\n");
+                outFile.Write("$FilmH = " + Extension.сstr(m_self.FilmSizeH) + "\n");
+                outFile.Write("$FilmW = " + Extension.сstr(m_self.FilmSizeW) + "\n");
 
                 foreach (var object_props in m_self.Object.GetType().GetProperties())
                 {
-                    outFile.Write(String.Format("${0} = {1}\n", object_props.Name, Extension.mstr(object_props.GetValue(this.m_self.Object))));
+                    outFile.Write(String.Format("${0} = {1}\n", object_props.Name, Extension.сstr(object_props.GetValue(this.m_self.Object))));
                 }
 
                 outFile.Write("$MrType = " + m_self.CrystType + "\n");
 
-                outFile.Write("$WLCount  = " + Extension.mstr(m_wave.Length) + "\n");
+                outFile.Write("$WLCount  = " + Extension.сstr(m_wave.Length) + "\n");
 
                 outFile.Write("\n\n\n");
 
@@ -161,9 +161,9 @@ namespace Interface
                 var waveIndex = 1;
                 foreach (var wave in m_wave)
                 {
-                    outFile.Write("wave" + Extension.mstr(waveIndex) + " = " + Extension.mstr(wave.lambda) + "\n");
-                    outFile.Write("dwave" + Extension.mstr(waveIndex) + " = " + Extension.mstr(wave.dlambda * 1e-3) + "\n");
-                    outFile.Write("iwave" + Extension.mstr(waveIndex) + " = " + Extension.mstr(wave.intensity) + "\n");
+                    outFile.Write("wave" + Extension.сstr(waveIndex) + " = " + Extension.сstr(wave.lambda) + "\n");
+                    outFile.Write("dwave" + Extension.сstr(waveIndex) + " = " + Extension.сstr(wave.dlambda * 1e-3) + "\n");
+                    outFile.Write("iwave" + Extension.сstr(waveIndex) + " = " + Extension.сstr(wave.intensity) + "\n");
                     waveIndex += 1;
                 }
                 return true;

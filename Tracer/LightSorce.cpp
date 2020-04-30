@@ -6,6 +6,7 @@
  */
 
 #include "LightSorce.hpp"
+#include <algorithm>
 
 template<typename __tdistribution>
 class random_generator {
@@ -15,7 +16,8 @@ public:
 		is_constant_{ std::abs(sigma) < std::numeric_limits<double>::epsilon() }, distribution_{ central_, (!is_constant_) ? sigma_ : 0.1 } {
 	}
 
-	double operator() (std::mt19937_64 &engine) {
+	template <typename engine_type>
+	double operator() (engine_type &engine) {
 		if (!is_constant_)
 			return distribution_(engine);
 		else
@@ -57,10 +59,9 @@ std::vector<tRay> SphereLight::GenerateRays(double lambda, double dlambda, int c
     };
 
     std::vector<tRay> rays(static_cast<unsigned long>(count));
-    for (auto &ray: rays)
-        ray = single_ray();
+	std::generate(rays.begin(), rays.end(), single_ray);
 
-    return std::move(rays);
+    return rays;
 }
 
 Vec3d SphereLight::source_point() {
