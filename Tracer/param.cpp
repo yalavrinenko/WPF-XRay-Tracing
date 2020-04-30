@@ -1,5 +1,5 @@
 // ***********************************************************************
-// Parameters management library implementation
+// Parameters management library implementation; WARNING: CODE IS UNSAFE!!!!!!!!!!!!!!!!
 // ***********************************************************************
 
 #include <string.h>
@@ -14,7 +14,7 @@
 const char delimiters[] = " \t;#=[]\"";
 const char blanks[] = " \t#";
 int CList::prefixlen = 0;
-char* CList::prefixstr = "";
+std::string CList::prefixstr = "";
 bool CParameter::m_expandmacros = true;
 
 //------------------------------------------------------------------------
@@ -114,12 +114,16 @@ CList* CList::Insert(CList* pnew)
 CParameter* CParameter::Insert(CParameter* pnew)
 {
   CParameter *par = pnew;
-  if( FindPlace((CList*&)par) )
+  auto* lpar = reinterpret_cast<CList*>(par); //Тому кто это читает: Не я это писал и я сам не рад этому!
+  if( FindPlace(lpar ))
   {
+    par = reinterpret_cast<CParameter*>(lpar);
+
     if( pnew->m_value ) par->Set(pnew->m_value);
     delete pnew;
     return par;
   }
+  par = reinterpret_cast<CParameter*>(lpar);
   return (CParameter*) par->CList::Insert(pnew);
 }
 
@@ -127,11 +131,14 @@ CParameter* CParameter::Insert(CParameter* pnew)
 CSection* CSection::Insert(CSection* snew)
 {
   CSection *sec = snew;
-  if( FindPlace((CList*&)sec) )
+  auto* lpar = reinterpret_cast<CList*>(sec); //Тому кто это читает: Не я это писал и я сам не рад этому!
+  if( FindPlace(lpar) )
   {
+    sec = reinterpret_cast<CSection*>(lpar);
     delete snew;
     return sec;
   }
+  sec = reinterpret_cast<CSection*>(lpar);
   return (CSection*) sec->CList::Insert(snew);
 }
 
@@ -211,7 +218,7 @@ void CParameter::Set(char* value)
 
 // Locate parameters using "section.parameter" name
 // (to be called from par_root)
-CParameter* CSection::LocatePar(char* name)
+CParameter* CSection::LocatePar(const char *name)
 {
   if( !name ) return NULL;
 
@@ -246,7 +253,7 @@ CParameter* CSection::CreatePar(char* name)
 
 // Split "section.parameter" name
 // (static function)
-void CSection::SplitName(char* name, char* secname, char* parname)
+void CSection::SplitName(const char *name, char* secname, char* parname)
 {
   parname[0] = secname[0] = 0;
   if( !name || !*name ) return;
@@ -290,7 +297,7 @@ int CParameter::Save(char*& buf)
   if(buf)
   {
     sprintf( buf, quotation ? "%s%s = \"%s\"\n" : "%s%s = %s\n",
-             prefixstr, m_name, m_value );
+             prefixstr.c_str(), m_name, m_value );
     buf += size;
   }
 
@@ -304,7 +311,7 @@ int CSection::SaveTitle(char*& buf)
 
   if(buf)
   {
-    sprintf(buf, "%s[%s]\n", prefixstr, m_name );
+    sprintf(buf, "%s[%s]\n", prefixstr.c_str(), m_name );
     buf += size;
   }
 
@@ -575,7 +582,7 @@ void MovePar(char* dstname, char* srcname)
 //
 // Check whether section or parameter exists
 //
-bool ExistsPar(char* name)
+bool ExistsPar(const char *name)
 {
   char secname[MAXPARNAMELEN], parname[MAXPARNAMELEN];
   par_root.SplitName(name, secname, parname);
@@ -590,7 +597,7 @@ bool ExistsPar(char* name)
 //
 // Get parameter value as integer
 //
-int GetIntPar(char* name)
+int GetIntPar(char const* name)
 {
   CParameter* par = par_root.LocatePar( name );
   if( par ) return atoi(par->m_value);
@@ -600,7 +607,7 @@ int GetIntPar(char* name)
 //
 // Get parameter value as double
 //
-double GetDblPar(char* name)
+double GetDblPar(const char *name)
 {
   CParameter* par = par_root.LocatePar( name );
   if( par ) return atof(par->m_value);
@@ -610,7 +617,7 @@ double GetDblPar(char* name)
 //
 // Get parameter value as string
 //
-void GetStrPar(char* name, char* value)
+void GetStrPar(const char *name, char* value)
 {
   CParameter* par = par_root.LocatePar( name );
   if( par ) strcpy(value, par->m_value);

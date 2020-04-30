@@ -1,5 +1,5 @@
 //**************************************************************
-//     Interface module to interlanguage communication
+//     Interface module to interlanguage communication. WARNING: CODE IS UNSAFE!!!!!!!!!!!!!!!!
 //**************************************************************
 
 #include <istream>
@@ -30,10 +30,10 @@ extern "C"
   void RemovePar(char*);
   void CopyPar(char*, char*);
   void MovePar(char*, char*);
-  bool ExistsPar(char*);
-  int GetIntPar(char*);
-  double GetDblPar(char*);
-  void GetStrPar(char*, char*);
+  bool ExistsPar(const char *name);
+  int GetIntPar(char const*);
+  double GetDblPar(const char *name);
+  void GetStrPar(const char *name, char *value);
   void SetIntPar(char*, int);
   void SetDblPar(char*, double);
   void SetStrPar(char*, char*);
@@ -51,15 +51,15 @@ public:
   CList *m_next, *m_last;
   char m_name[MAXPARNAMELEN];
 
-  CList(char* name = NULL);
-  ~CList();
+  explicit CList(char* name = nullptr);
+  virtual ~CList();
   
   CList* Find(char*);
   bool FindPlace(CList*&);
   CList* Insert(CList*);
   void virtual Remove();
 
-  static char* prefixstr;
+  static std::string prefixstr;
   static int prefixlen;
 };
 
@@ -73,8 +73,8 @@ public:
   char *m_value;
   static bool m_expandmacros;
 
-  CParameter(char* name = NULL, char* value = NULL);
-  ~CParameter();
+  explicit CParameter(char* name = nullptr, char* value = nullptr);
+  ~CParameter() override;
   
   void Set(char*);
   CParameter* next() { return (CParameter*)m_next; }
@@ -93,16 +93,16 @@ class CSection : public CList
 public:
   CParameter m_plist;
 
-  CSection(char* name = NULL);
+  explicit CSection(char* name = nullptr);
   ~CSection();
   
   CSection* next() { return (CSection*)m_next; }
   CSection* Find(char* parname) { return (CSection*) CList::Find(parname); }
   CSection* Insert(CSection*);
-  CParameter* LocatePar(char*);
+  CParameter* LocatePar(const char *name);
   CParameter* CreatePar(char*);
-  void Clear(void);
-  static void SplitName(char*, char*, char*);
+  void Clear();
+  static void SplitName(const char *name, char *secname, char *parname);
   bool isEmpty() { return !m_plist.m_next; }
   int SaveTitle(char*&);
   int Save(char*&);

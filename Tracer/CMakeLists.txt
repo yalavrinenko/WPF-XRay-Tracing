@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 2.8)
-
+cmake_minimum_required(VERSION 3.10)
 
 project(xray-tracing-lib)
 
 set(CMAKE_CXX_STANDARD 17)
-
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wall -Werror")
 set (SOURCES general.cpp
         gridFunction.cpp
         InputOutput.cpp
@@ -33,7 +32,7 @@ set (HEADERS general.hpp
         tRay.hpp
         tSphere.hpp
         Object.hpp
-        TransitivityMap.cpp TransitivityMap.hpp xrt_rocking_curve.cpp xrt_rocking_curve.h Object.cpp Utils.cpp Utils.hpp DetectorPlane.cpp DetectorPlane.hpp)
+        TransitivityMap.cpp TransitivityMap.hpp xrt_rocking_curve.cpp xrt_rocking_curve.h Object.cpp Utils.cpp Utils.hpp DetectorPlane.cpp DetectorPlane.hpp line_profile.hpp)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -50,10 +49,6 @@ if (TEST_MODE)
 endif()
 
 
-
 add_library(xray-tracing SHARED ${SOURCES} ${HEADERS})
-
-add_subdirectory(Logger)
-target_link_libraries(xray-tracing Logger)
 
 add_subdirectory(test)

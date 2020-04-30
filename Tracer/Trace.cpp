@@ -17,7 +17,7 @@ void trace_single_ray(tRay &current_ray, XRTObjectVector const &object){
         double close_intersection_time = VERY_BIG_NUM;
         int intersection_object_id = -1;
 
-        for (int j = 0; j < object.size(); j++) {
+        for (auto j = 0ull; j < object.size(); j++) {
             auto intersection_time = object[j]->cross(current_ray);
 
             if (intersection_time > 0 && intersection_time < close_intersection_time && fabs(intersection_time) >= c_eps) {
@@ -31,10 +31,7 @@ void trace_single_ray(tRay &current_ray, XRTObjectVector const &object){
 
             auto intersection_time = 0.0;
 
-            auto tmp = current_ray;
-
             current_ray = object[intersection_object_id]->crossAndGen(current_ray, intersection_time);
-
         } else {
             current_ray = tRay();
         }
@@ -83,7 +80,7 @@ void XRTEnvironment::trace(std::vector<tRay> &ray_ptr, const XRTObjectVector &xr
     std::vector<std::future<unsigned>> task_futures;
 
     task_futures.reserve(this->threads_count);
-    for (auto i = 0; i < this->threads_count; ++i) {
+    for (auto i = 0ul; i < this->threads_count; ++i) {
         task_futures.emplace_back(std::async(std::launch::async, pool_function));
     }
 
@@ -91,3 +88,5 @@ void XRTEnvironment::trace(std::vector<tRay> &ray_ptr, const XRTObjectVector &xr
         future.get();
     });
 }
+
+

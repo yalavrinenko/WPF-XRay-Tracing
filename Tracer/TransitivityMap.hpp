@@ -12,17 +12,10 @@ class TransitivityMap{
 public:
     TransitivityMap() = default;
 
-    TransitivityMap(double __psize_x, double __psize_y): pixel_size({__psize_x, __psize_y}){
+    TransitivityMap(double psize_x, double psize_y): pixel_size({psize_x, psize_y}){
     }
 
-    TransitivityMap(TransitivityMap &&m) noexcept :
-            pixel_size(m.pixel_size),
-            width(m.width),
-            height(m.height){
-        m_map = std::move(m.m_map);
-    }
-
-    TransitivityMap(double __psize_x, double __psize_y, std::string const &path);
+    TransitivityMap(double psize_x, double psize_y, std::string const &path);
 
     TransitivityMap& operator= (TransitivityMap const &m) = default;
 
@@ -34,21 +27,21 @@ public:
      * @param y [-height/2..height/2]
      * @return
      */
-    double transitivity (double x, double y) const;
+    [[nodiscard]] double transitivity (double x, double y) const;
 
-    std::pair<double, double> size() const {
+    [[nodiscard]] std::pair<double, double> size() const {
         return {width, height};
     }
 
 private:
     std::vector<std::vector<double>> m_map;
-    double width = 0;
-    double height = 0;
+    double width{0.0};
+    double height{0.0};
 
     struct {
-        double x;
-        double y;
-    } pixel_size = {0.0, 0.0};
+        double x{};
+        double y{};
+    } pixel_size;
 };
 
 

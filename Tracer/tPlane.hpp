@@ -14,40 +14,40 @@
 #include <vector>
 #include "Object.hpp"
 
-class tPlane: public XRTObject{
+class tPlane : public XRTObject {
 
 public:
-	Vec3d N;
+  Vec3d N;
 
-	double limit_area_w{};
-	double limit_area_h{};
+  double limit_area_w{};
+  double limit_area_h{};
 
 public:
-	tPlane() = default;
+  tPlane() = default;
 
-	tPlane(Vec3d _N, Vec3d _r0, std::string const &logpath = {});
+  tPlane(Vec3d N, Vec3d _r0, std::string const &logpath = {});
 
-	tPlane(Vec3d _N, Vec3d _r0, double _lim_area, std::string const &logpath = {});
+  tPlane(Vec3d N, Vec3d _r0, double _lim_area, std::string const &logpath = {});
 
-	tPlane(Vec3d _N,Vec3d _r0,double _lim_area_w,double _lim_area_h,std::string const &dumpName = {});
+  tPlane(Vec3d N, Vec3d _r0, double _lim_area_w, double _lim_area_h, std::string const &dumpName = {});
 
-	virtual double cross(const tRay &ray) override;
+  virtual double cross(const tRay &ray) override;
 
-	virtual tRay crossAndGen(const tRay &ray, double &t) override;
+  virtual tRay crossAndGen(const tRay &ray, double &t) override;
 
 protected:
 
-    enum class IntersectionResult{
-        REFLECTION,
-		TRANSMISSION,
-        ABSORPTION
-    };
+  enum class IntersectionResult {
+    REFLECTION,
+    TRANSMISSION,
+    ABSORPTION
+  };
 
-	virtual IntersectionResult transition_decision(Vec3d const &intersection_point) {
-		return IntersectionResult ::REFLECTION;
-	}
+  virtual IntersectionResult transition_decision(Vec3d const &intersection_point) {
+    return IntersectionResult::REFLECTION;
+  }
 
-	virtual bool intersection_check(Vec3d const &intercetion_point);
+  virtual bool intersection_check(Vec3d const &intercetion_point);
 
 };
 

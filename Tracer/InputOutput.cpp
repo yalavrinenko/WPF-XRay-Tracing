@@ -62,7 +62,7 @@ void dumpPlane(char* name, vector<Vec3d> odata) {
         out << i.x << "\t" << i.y << "\t" << i.z << endl;
 }
 
-void dumpRoad(char* name, char* name_func, vector<vector<Vec3d> > road) {
+void dumpRoad(char* name, char* name_func, vector<vector<Vec3d> > const &road) {
 	ofstream out(name);
 	out << "function [] = " << name_func << "()" << endl;
 	out << "\tfigure" << endl;
@@ -75,10 +75,10 @@ void dumpRoad(char* name, char* name_func, vector<vector<Vec3d> > road) {
 		string x = "[";
 		string y = "[";
 		string z = "[";
-		for (int j = 0; j < i.size(); j++) {
-			x += doubleToStr(i[j].x) + ";";
-			y += doubleToStr(i[j].y) + ";";
-			z += doubleToStr(i[j].z) + ";";
+		for (const auto & j : i) {
+			x += doubleToStr(j.x) + ";";
+			y += doubleToStr(j.y) + ";";
+			z += doubleToStr(j.z) + ";";
 		}
 		x += "]";
 		y += "]";
@@ -89,7 +89,7 @@ void dumpRoad(char* name, char* name_func, vector<vector<Vec3d> > road) {
 	out << "end" << endl;
 }
 
-void dumpRoadNOSPH(char const* name, char const* name_func, vector<vector<Vec3d> > road) {
+void dumpRoadNOSPH(char const* name, char const* name_func, vector<vector<Vec3d> > const &road) {
 	ofstream out(name);
 	out << "function [] = " << name_func << "()" << endl;
 	out << "\tfigure" << endl;
@@ -99,10 +99,10 @@ void dumpRoadNOSPH(char const* name, char const* name_func, vector<vector<Vec3d>
 		string x = "[";
 		string y = "[";
 		string z = "[";
-		for (int j = 0; j < i.size(); j++) {
-			x += doubleToStr(i[j].x) + ";";
-			y += doubleToStr(i[j].y) + ";";
-			z += doubleToStr(i[j].z) + ";";
+		for (auto & j : i) {
+			x += doubleToStr(j.x) + ";";
+			y += doubleToStr(j.y) + ";";
+			z += doubleToStr(j.z) + ";";
 		}
 		x += "]";
 		y += "]";

@@ -10,7 +10,7 @@
 double whiteConst=1;
 double blackConst=1;
 
-double defaultFunction(Vec3d p, tPlane pl) {
+double defaultFunction(Vec3d const &p, tPlane const& pl) {
 	Vec3d zDirection(0, 0, 1);
 	Vec3d N = pl.N;
 	double phi = acos(
@@ -23,13 +23,12 @@ double defaultFunction(Vec3d p, tPlane pl) {
 	double z = p.z;
 
 	double ys = y * cos(phi) - z * sin(phi);
-	double zs = y * sin(phi) + z * cos(phi);
 
 	double yd = fabs(ys - pl.GetR0().y) - constB / 2.0;
 	double xd = fabs(p.x - pl.GetR0().x) - constB / 2.0;
 
-	int ny = yd / (constB + constW);
-	int nx = xd / (constB + constW);
+	int ny = static_cast<int>(yd / (constB + constW));
+	int nx = static_cast<int>(xd / (constB + constW));
 
 	double bx = nx * (constB + constW) + constW;
 

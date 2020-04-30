@@ -8,68 +8,27 @@
 #include "LightSorce.hpp"
 #include <algorithm>
 
-template<typename __tdistribution>
-class random_generator {
-public:
-	random_generator(double central_line, double sigma):
-		central_{ central_line }, sigma_{ sigma }, 
-		is_constant_{ std::abs(sigma) < std::numeric_limits<double>::epsilon() }, distribution_{ central_, (!is_constant_) ? sigma_ : 0.1 } {
-	}
-
-	template <typename engine_type>
-	double operator() (engine_type &engine) {
-		if (!is_constant_)
-			return distribution_(engine);
-		else
-			return central_;
-	}
-
-public:
-	double central_;
-	double sigma_;
-	bool is_constant_;
-	__tdistribution distribution_;
-};
-
-class gauss_lineshape : public random_generator<std::normal_distribution<double>> {
-public:
-	gauss_lineshape(double central_line, double fwhm) :
-		random_generator{ central_line, fwhm / (2.0 * sqrt(2.0 * log(2.0))) } {}
-};
-
-class lorentz_lineshape : public random_generator<std::cauchy_distribution<double>> {
-public:
-	lorentz_lineshape(double central_line, double fwhm) :
-		random_generator{ central_line, fwhm / 2.0 } {}
-};
-
-std::vector<tRay> SphereLight::GenerateRays(double lambda, double dlambda, int count) {
-	gauss_lineshape distr_wavelenght(lambda, dlambda);
-	//lourentz_lineshape distr_wavelenght(lambda, dlambda);
-
-    auto single_ray = [&distr_wavelenght, this](){
-        auto trg_point = target->surface_point();
-        auto src_point = this->source_point();
-
-        auto direction = trg_point - src_point;
-        direction = direction / std::sqrt(dot(direction));
-        tRay ray(src_point, direction, distr_wavelenght(engine()));
-        ray.reflection_stage = 1;
-        return ray;
-    };
-
-    std::vector<tRay> rays(static_cast<unsigned long>(count));
-	std::generate(rays.begin(), rays.end(), single_ray);
-
-    return rays;
+Vec3d SphereLight::random_surface_point() {
+  return random_surface_point(engine());
 }
 
-Vec3d SphereLight::source_point() {
-    auto point_theta = distr_theta(engine());
-    auto point_phi = distr_phi(engine());
-    auto x = std::sin(point_theta) * std::cos(point_phi) * width;
-    auto y = std::sin(point_theta) * std::sin(point_phi) * height;
-    auto z = std::cos(point_theta) * height;
+Vec3d SphereLight::random_surface_point(std::mt19937_64 &random_engine) {
+  auto point_theta = distr_theta(random_engine);
+  auto point_phi = distr_phi(random_engine);
+  auto x = std::sin(point_theta) * std::cos(point_phi) * width;
+  auto y = std::sin(point_theta) * std::sin(point_phi) * height;
+  auto z = std::cos(point_theta) * height;
 
-    return Vec3d(x + r0.x, y + r0.y, z + r0.z);
+  return Vec3d(x + r0.x, y + r0.y, z + r0.z);
+}
+
+tRay SphereLight::generate_single(double lambda, mt19937_64 &local_engine) {
+  auto trg_point = target_surface_->random_surface_point(local_engine);
+  auto src_point = this->random_surface_point(local_engine);
+
+  auto direction = trg_point - src_point;
+  direction = direction / std::sqrt(dot(direction));
+  tRay ray(src_point, direction, lambda);
+  ray.reflection_stage = 1;
+  return ray;
 }

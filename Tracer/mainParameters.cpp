@@ -156,8 +156,6 @@ void tParameters::readWaveLenghts() {
 	string dwavePattern;
 	string iwavePattern;
 
-	int waveId = 1;
-
 	double dwave = -1;
 
 	waveLenghts.resize(waveLenghtCount);
@@ -192,7 +190,7 @@ void tParameters::readWaveLenghts() {
 void tParameters::init(char const* initFileName) {
 	ParseFile(const_cast<char*>(initFileName));
 
-	auto tmp = new char[1024];
+	char tmp[1024];
 
 	//GENERAL
 	rayCount = (ExistsPar(".rayCount")) ? GetIntPar(".rayCount") : 1000;

@@ -19,18 +19,21 @@ class SphereLight: public XRTRaySource{
 public:
 	SphereLight() = default;
 
-	SphereLight(Vec3d _position, double _Rw,double _Rh, std::shared_ptr<XRTTargetSurface> &&ray_target):
-		XRTRaySource(_position, std::forward<std::shared_ptr<XRTTargetSurface>>(ray_target)),
-		width(_Rw), height(_Rh),
+	SphereLight(Vec3d position, double Rw, double Rh, size_t seed, std::shared_ptr<XRTTargetSurface<>> target_surface):
+		XRTRaySource(position, seed, std::move(target_surface)),
+		width(Rw), height(Rh),
 		distr_theta(0, 180),
 		distr_phi(0, 360){
 	}
 
-	std::vector<tRay> GenerateRays(double lambda, double dlambda, int count) override;
+protected:
+  Vec3d random_surface_point() override;
+
+  Vec3d random_surface_point(mt19937_64 &random_engine) override;
+
+  tRay generate_single(double lambda, mt19937_64 &local_engine) override;
 
 private:
-	Vec3d source_point();
-
 	double width = 0;
 	double height = 0;
 

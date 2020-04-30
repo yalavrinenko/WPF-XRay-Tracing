@@ -22,9 +22,11 @@ public:
 	tRay crossAndGen(const tRay &ray, double &t) override ;
 
 	//From raytarget
-	Vec3d surface_point() override;
+	Vec3d random_surface_point() override;
 
-	~tCylinder() override = default;
+  Vec3d random_surface_point(mt19937_64 &random_engine) override;
+
+  ~tCylinder() override = default;
 
 protected:
 	std::string log_header() const;
