@@ -349,8 +349,8 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
     }
 
     double rCast = generatedRay;
-    double rCatch = mirror->getCatchRayCount();
-    double rRefl = mirror->getReflRayCount();
+    auto rCatch = static_cast<double>(mirror->getCatchRayCount());
+    auto rRefl = static_cast<double>(mirror->getReflRayCount());
     double rI = rRefl / rCatch;
 
     XRayWaveResult xwave{};
