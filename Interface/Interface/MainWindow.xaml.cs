@@ -703,7 +703,7 @@ namespace Interface
 
         private void HelpAbout_Click(object sender, RoutedEventArgs e)
         {
-            string build_date = "Apr 1 2020";
+            string build_date = "May 1 2020";
             String info = "WPF XRay-tracing build info\n" +
                           "Ray-tracing core: " + Computation.CoreBuildDate() + "\n" +
                           "WPF Interface: " + build_date;

@@ -65,9 +65,9 @@ void XRTEnvironment::generate_rays(ForwardIterator begin, ForwardIterator end, p
 
   auto start = begin;
   auto next_range = [this, &start, end, batch_size](){
-    std::lock_guard lock(this->access_mutex);
+    std::lock_guard<std::mutex> lock(this->access_mutex);
     auto start_range = start;
-    std::advance(start, std::min(static_cast<long>(batch_size), std::distance(start, end)));
+    std::advance(start, std::min(static_cast<decltype(std::distance(start, end))>(batch_size), std::distance(start, end)));
     auto end_range = start;
     return std::make_pair(start_range, end_range);
   };
