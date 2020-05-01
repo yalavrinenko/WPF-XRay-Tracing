@@ -3,6 +3,10 @@
 //
 
 #include "env_builder.hpp"
+#include "LightSorce.hpp"
+#include "tCylinder.hpp"
+#include "tObject.hpp"
+#include "tSphere.hpp"
 
 struct XRTSystem::XRTSystemImpl {
   std::shared_ptr<XRTMirror> mirror_;
@@ -32,7 +36,6 @@ void XRTSystem::XRTSystemImpl::create_ray_source(const XRTSystem::ptParameters &
   Vec3d spos(-srcXpos, 0, 0);
   source_ = std::make_unique<ray_source>(spos, parameters->sourceSize_W, parameters->sourceSize_H,
                                          std::random_device{}(), mirror_);
-
 }
 
 void XRTSystem::create_mirror() {
@@ -44,7 +47,7 @@ void XRTSystem::create_light_source() {
   system_->create_ray_source<SphereLight>(parameters_);
 }
 void XRTSystem::create_plane(double distance, double angle, Size size,
-                             tDetectorPlane::IntersectionFilter crossPattern,
+                             IntersectionFilter crossPattern,
                              XRTSystem::PlaneAlignment alignment, Vec3d align_base,
                              std::string const &dump_name) {
   auto sx = distance * sin(angle);
@@ -74,7 +77,7 @@ void XRTSystem::create_plane(double distance, double angle, Size size,
 void XRTSystem::create_detector() {
   create_plane(parameters_->startPoint, parameters_->programAngle,
                  {parameters_->objPlaneSizeW, parameters_->objPlaneSizeH, 0.0},
-                 tDetectorPlane::IntersectionFilter::IMAGE,
+                 IntersectionFilter::IMAGE,
                  PlaneAlignment::RolandCircleCenter, system_->mirror_->GetR0(), parameters_->dumpPlaneName + "Detector.dmp");
 }
 

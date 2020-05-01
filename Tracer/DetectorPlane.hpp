@@ -9,11 +9,6 @@
 
 class tDetectorPlane: public tPlane{
 public:
-    enum class IntersectionFilter {
-        OBJECT = 1,
-        IMAGE = 2
-    };
-
     tDetectorPlane() = default;
 
     tDetectorPlane(Vec3d _N,Vec3d _r0):
@@ -35,7 +30,7 @@ public:
 
     double cross(const tRay &ray) override;
 
-    virtual IntersectionResult transition_decision(Vec3d const &intersection_point) {
+    IntersectionResult transition_decision(Vec3d const &intersection_point) override{
         return IntersectionResult ::ABSORPTION;
     }
 

@@ -5,10 +5,10 @@
 #ifndef XRAY_TRACING_LIB_ENV_BUILDER_HPP
 #define XRAY_TRACING_LIB_ENV_BUILDER_HPP
 
-#include "LightSorce.hpp"
-#include "tCylinder.hpp"
-#include "tObject.hpp"
-#include "tSphere.hpp"
+#include "Object.hpp"
+#include <memory>
+
+class tParameters;
 
 class XRTSystem{
 public:
@@ -25,8 +25,7 @@ public:
     create_detector();
   }
 
-  void create_plane(double distance, double angle, Size size,
-                    tDetectorPlane::IntersectionFilter crossPattern,
+  void create_plane(double distance, double angle, Size size, IntersectionFilter crossPattern,
                     XRTSystem::PlaneAlignment alignment, Vec3d align_base,
                     std::string const &dump_name);
 

@@ -13,6 +13,11 @@
 #include <atomic>
 #include "line_profile.hpp"
 
+enum class IntersectionFilter {
+  OBJECT = 1,
+  IMAGE = 2
+};
+
 class XRTObject {
 public:
   XRTObject() = default;
@@ -27,7 +32,7 @@ public:
   //Function to make intersection at time t. Call to make intersection and get reflected ray.
   virtual tRay crossAndGen(const tRay &ray, double &t) = 0;
 
-  virtual Vec3d const &GetR0() const {
+  [[nodiscard]] virtual Vec3d const &GetR0() const {
     return r0;
   }
 
@@ -39,7 +44,7 @@ public:
     Vec3d point;
     double I{}, l{};
 
-    std::string to_string() const {
+    [[nodiscard]] std::string to_string() const {
       auto estimate_size = std::snprintf(nullptr, 0, "%0.10f\t%0.10f\t%0.10f\t%0.10f\t%0.10f",
                                          point.x, point.y, point.z, l, I);
 #ifdef WIN32
