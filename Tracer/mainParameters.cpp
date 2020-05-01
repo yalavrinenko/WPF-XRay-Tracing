@@ -111,7 +111,7 @@ void tParameters::readReflectionFunction() {
             reflStream >> point.angle >> point.reflectivity;
         }
 
-		point.angle = GradToRad(point.angle);
+		point.angle = MathExtension::GradToRad(point.angle);
         if (!reflStream.eof()) {
             if (!reflection_surface.count(wave))
                 reflection_surface[wave] = std::vector<XRTCurvePoint>();
@@ -160,9 +160,9 @@ void tParameters::readWaveLenghts() {
 
 	waveLenghts.resize(waveLenghtCount);
 	for (int i = 0; i < waveLenghtCount; i++) {
-		wavePattern = "SRC.wave" + intToStr(i + 1);
-		dwavePattern = "SRC.dwave" + intToStr(i + 1);
-		iwavePattern = "SRC.iwave" + intToStr(i + 1);
+		wavePattern = "SRC.wave" + std::to_string(i + 1);
+		dwavePattern = "SRC.dwave" + std::to_string(i + 1);
+		iwavePattern = "SRC.iwave" + std::to_string(i + 1);
 
 		waveLenghts[i].waveLenght = GetDblPar((char*) wavePattern.c_str());
 		waveLenghts[i].intensity = (ExistsPar((char*) iwavePattern.c_str())) ?
@@ -252,10 +252,10 @@ void tParameters::init(char const* initFileName) {
 
 
 	if (mirrorType == MIRROR_SPHERE){
-		dmPsi = RadToGrad(asin(wA/(2.0*mirrorR)));
-		dmTh = RadToGrad(asin(hA/(2.0*mirrorR)));
+		dmPsi = MathExtension::RadToGrad(asin(wA/(2.0*mirrorR)));
+		dmTh = MathExtension::RadToGrad(asin(hA/(2.0*mirrorR)));
 	} else if (mirrorType == MIRROR_CYLINDER){
-		dmPsi = RadToGrad(asin(hA/(2.0*mirrorR)));
+		dmPsi = MathExtension::RadToGrad(asin(hA/(2.0*mirrorR)));
 		dmTh = wA/2.0;
 	}
 

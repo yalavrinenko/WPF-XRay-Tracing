@@ -89,8 +89,8 @@ bool tSphere::checkPosition(Vec3d point) {
   if (R.y < 0)
     Phi = M_PI + Phi;
 
-  Theta = RadToGrad(Theta);
-  Phi = RadToGrad(Phi);
+  Theta = MathExtension::RadToGrad(Theta);
+  Phi = MathExtension::RadToGrad(Phi);
 
   return fabs(RadThetaPhi.y - Theta) <= deltaRadThetaPhi.y
          && fabs(RadThetaPhi.z - Phi) <= deltaRadThetaPhi.z;
@@ -136,12 +136,12 @@ Vec3d tSphere::random_surface_point() {
 }
 
 Vec3d tSphere::random_surface_point(mt19937_64 &random_engine) {
-  auto point_theta = GradToRad(distr_theta(random_engine));
-  auto point_phi = GradToRad(distr_phi(random_engine));
+  auto point_theta = MathExtension::GradToRad(distr_theta(random_engine));
+  auto point_phi = MathExtension::GradToRad(distr_phi(random_engine));
   auto &r = this->RadThetaPhi.x;
   auto x = r * std::sin(point_theta) * std::cos(point_phi);
   auto y = r * std::sin(point_theta) * std::sin(point_phi);
   auto z = r * std::cos(point_theta);
 
-  return {x + r0.x, y + r0.y, z + r0.z};
+  return Vec3d{x + r0.x, y + r0.y, z + r0.z};
 }

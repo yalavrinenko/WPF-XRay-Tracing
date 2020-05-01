@@ -20,7 +20,8 @@ infoOut::infoOut(char const* name, std::function<void(char const*, size_t)> stdo
     out.open(name);
 }
 
-void infoOut::logScene(std::shared_ptr<XRTMirror> const &mirror, std::shared_ptr<XRTRaySource> const &light) {
+void infoOut::logScene(std::shared_ptr<XRTMirror> const &mirror,
+                       const unique_ptr<XRTRaySource> &light) {
 	auto r0 = mirror->GetR0();
 	out << "[MIRROR]" << endl;
 	out << "[X,Y,Z]" << "[" << r0.x << ", " << r0.y << ", "

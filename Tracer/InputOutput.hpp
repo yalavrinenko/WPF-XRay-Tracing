@@ -22,20 +22,6 @@
 #include <memory>
 
 using namespace std;
-
-void dump(char* name,char* name_func,tRay *arr,int count,double *t);
-void dumpRef(char* name,char* name_func,tRay* arr,int count,double *t);
-void dumpRoad(char* name,char* name_func,vector<vector<Vec3d> > road);
-void dumpRoadNOSPH(char const* name, char const* name_func, vector<vector<Vec3d> > road);
-string doubleToStr(double a);
-string intToStr(int a);
-void dumpPlane(char* name,vector<Vec3d> odata);
-
-void dumpRays(tRay* d,char* fileName,int count, Vec3d dir);
-
-void appPoint(Vec3d point);
-void dumpPoint(char* name);
-
 class infoOut{
 private:
 	ofstream out;
@@ -46,8 +32,22 @@ public:
 	explicit infoOut(char const* name);
     infoOut(char const* name, std::function<void(char const*, size_t)> stdout_callback);
 
-	void logScene(std::shared_ptr<XRTMirror> const &mirror, std::shared_ptr<XRTRaySource> const &light);
+	void logScene(std::shared_ptr<XRTMirror> const &mirror, const unique_ptr<XRTRaySource> &light);
 	void logText(string const &text);
+
+  template<typename ... T>
+  void logText(T ... args){
+    std::stringstream ss;
+    auto log = [&ss](auto &object) {
+      ss << object << "\t";
+    };
+
+    (log(args), ...);
+    logText(ss.str());
+  }
+
+  template<typename T>
+  infoOut& operator << (T const &object) { logText(object); return *this; }
 };
 
 #endif /* INPUTOUTPUT_HPP_ */

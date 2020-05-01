@@ -10,11 +10,12 @@
 
 using namespace std;
 bool writeRoad = false;
+static const double c_eps = 1e-6;
 
 void trace_single_ray(tRay &current_ray, XRTObjectVector const &object){
 
     while (current_ray.lambda > 0 && current_ray.reflection_stage >= c_eps){
-        double close_intersection_time = VERY_BIG_NUM;
+        double close_intersection_time = std::numeric_limits<double>::max();
         int intersection_object_id = -1;
 
         for (auto j = 0ull; j < object.size(); j++) {

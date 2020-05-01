@@ -34,7 +34,7 @@ public:
   template<typename ForwardIterator, typename process_function>
   void generate_rays(ForwardIterator begin, ForwardIterator end, process_function ray_generator, std::size_t batch_size = 0);
 
-  size_t threads() const { return threads_count; }
+  [[nodiscard]] size_t threads() const { return threads_count; }
 
 protected:
 

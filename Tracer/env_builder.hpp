@@ -19,18 +19,24 @@ public:
     CrystalNormal
   };
 
-  explicit XRTSystem(ptParameters parameters) : parameters_{std::move(parameters)}{
-    create_mirror();
-    create_light_source();
-    create_detector();
-  }
+  explicit XRTSystem(ptParameters parameters);
 
   void create_plane(double distance, double angle, Size size, IntersectionFilter crossPattern,
                     XRTSystem::PlaneAlignment alignment, Vec3d align_base,
                     std::string const &dump_name);
 
+  shared_ptr<XRTMirror>& crystal();
+  std::unique_ptr<XRTRaySource>& source();
+  XRTObjectVector & objects() { return objects_; }
+
+  [[nodiscard]] shared_ptr<XRTMirror> const & crystal() const;
+  [[nodiscard]] std::unique_ptr<XRTRaySource> const & source() const;
+  XRTObjectVector const& objects() const  { return objects_; }
+
   ~XRTSystem();
 private:
+  void create_object(double distance, double angle, Size size);
+
   void create_mirror();
 
   void create_light_source();

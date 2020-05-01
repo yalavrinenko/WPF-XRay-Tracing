@@ -66,7 +66,7 @@ bool tCylinder::checkPoint(double t, tRay r) {
   if (hpoint.y < 0)
     return false;
 
-  return RadToGrad(fabs(phi)) <= dPhi;
+  return MathExtension::RadToGrad(fabs(phi)) <= dPhi;
 }
 
 tRay tCylinder::crossAndGen(const tRay &ray, double &t) {
@@ -151,7 +151,7 @@ Vec3d tCylinder::random_surface_point() {
 
 Vec3d tCylinder::random_surface_point(mt19937_64 &random_engine) {
   auto x = this->distr_z(random_engine);
-  auto phi = GradToRad(this->distr_phi(random_engine));
+  auto phi = MathExtension::GradToRad(this->distr_phi(random_engine));
 
   auto z = R * sin(phi);
   auto y = R * cos(phi);

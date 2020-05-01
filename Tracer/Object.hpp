@@ -158,8 +158,8 @@ public:
       throw std::logic_error("Error in parameters structure at" + std::string(__FUNCTION__));
   }
 
-  void setWorkingWave(double lambda) {
-    parameters->set_working_wave(lambda);
+  double setWorkingWave(double lambda) {
+    return parameters->set_working_wave(lambda);
   }
 
   virtual ~XRTMirror() = default;

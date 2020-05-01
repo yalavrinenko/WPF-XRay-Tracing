@@ -38,6 +38,12 @@ void XRTSystem::XRTSystemImpl::create_ray_source(const XRTSystem::ptParameters &
                                          std::random_device{}(), mirror_);
 }
 
+XRTSystem::XRTSystem(XRTSystem::ptParameters parameters)
+    : system_{std::make_unique<XRTSystemImpl>()}, parameters_{std::move(parameters)} {
+  create_mirror();
+  create_light_source();
+  create_detector();
+}
 void XRTSystem::create_mirror() {
   if (parameters_->mirrorType == MIRROR_SPHERE) system_->create_mirror<tSphere>(parameters_);
   if (parameters_->mirrorType == MIRROR_CYLINDER) system_->create_mirror<tCylinder>(parameters_);
@@ -80,5 +86,31 @@ void XRTSystem::create_detector() {
                  IntersectionFilter::IMAGE,
                  PlaneAlignment::RolandCircleCenter, system_->mirror_->GetR0(), parameters_->dumpPlaneName + "Detector.dmp");
 }
+void XRTSystem::create_object(double distance, double angle, Size size) {
+  double x, y;
+
+  x = -distance * sin(angle);
+  if (parameters_->gridLocation == tParameters::GridLocation::AFTER)
+    x = -x;
+
+  y = (system_->mirror_->GetR0().y + parameters_->mirrorR) - distance * cos(angle);
+
+  Vec3d posGrid(x, y, 0);
+  auto crystal_position = system_->mirror_->GetR0();
+  crystal_position.y += parameters_->mirrorR;
+  Vec3d direction = crystal_position - posGrid;
+
+  direction = direction / sqrt(dot(direction));
+
+  auto g = std::make_shared<tObjectPlane>(direction, posGrid, parameters_);
+  g->xrt_parameters(parameters_);
+
+  objects_.push_back(g);
+}
+
+std::shared_ptr<XRTMirror> &XRTSystem::crystal() { return system_->mirror_; }
+std::unique_ptr<XRTRaySource> &XRTSystem::source() { return system_->source_; }
+shared_ptr<XRTMirror> const &XRTSystem::crystal() const { return system_->mirror_; }
+std::unique_ptr<XRTRaySource> const &XRTSystem::source() const { return system_->source_; }
 
 XRTSystem::~XRTSystem() = default;

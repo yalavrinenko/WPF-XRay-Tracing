@@ -5,17 +5,15 @@
  *      Author: cheshire
  */
 
-#include "Trace.hpp"
-#include "InputOutput.hpp"
 #include "Ray-tracing.hpp"
-#include <clocale>
+#include "InputOutput.hpp"
+#include "Trace.hpp"
 #include "env_builder.hpp"
+#include <clocale>
 
 #ifdef NO_OMP_SUPP
 #include <time.h>
-double omp_get_wtime() {
-    return time(0);
-}
+double omp_get_wtime() { return time(0); }
 #endif
 
 std::string linkedLibraryOutput;
@@ -24,91 +22,60 @@ const char *plinkedLibraryOutput;
 bool isTerminated;
 
 
-__lib_spec char const *build_date() {
-  return __DATE__;
-}
+__lib_spec char const *build_date() { return __DATE__; }
 
-__lib_spec void xrt_terminate() {
-  isTerminated = true;
-}
+__lib_spec void xrt_terminate() { isTerminated = true; }
 
-void addManualObject(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
-                     double size, double angl, std::shared_ptr<tParameters> const &p) {
-  double x, y;
-
-  x = -gridPosition * sin(angl);
-  if (p->gridLocation == tParameters::GridLocation::AFTER)
-    x = -x;
-
-  y = (mirrorPos.y + p->mirrorR) - gridPosition * cos(angl);
-
-  Vec3d posGrid(x, y, 0);
-  mirrorPos.y += p->mirrorR;
-  Vec3d direction = mirrorPos - posGrid;
-
-  direction = direction / sqrt(dot(direction));
-
-  auto g = std::make_shared<tObjectPlane>(direction, posGrid, p);
-  g->type = GRID;
-  g->xrt_parameters(p);
-
-  obj.push_back(g);
-}
-
-__lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGenerated, WaveCallback waveTraced,
-                          StdOutCallback stdoutCallback) {
-
-#ifdef _WIN32
-  std::setlocale(LC_ALL, "C");
-#endif
-
-  isTerminated = false;
-
-  std::shared_ptr<tParameters> p = nullptr;
-
-  double startTime = omp_get_wtime();
-
-  if (argc < 1) {
-    printf("No input file!\n");
-    return 1;
-  } else
-    p = std::make_shared<tParameters>(argv);
-
-  XRTSystem object_system(p);
-
-
-  if (p->objPlaneCount > 0)
-    addDumpPlanes(obj, p->objStartPoint, dumpPlaneStart, p->objPlaneCount,
-                  p->objPlaneStep, p->objPlaneSizeW, p->objPlaneSizeH, -p->programAngle,
-                  tDetectorPlane::IntersectionFilter::OBJECT, p);
-
-  if (p->gridPos > 0 && p->gridType != "none") {
-    if (p->gridType == "manual")
-      addManualObject(obj, mirror->GetR0(), p->gridPos, p->gridSize, p->programAngle, p);
-  }
-
-  infoOut log(p->logFileName.c_str(), stdoutCallback);
-  log.logText("XRT Version: DATE [" + std::string(__DATE__) + "], TIME [" + std::string(__TIME__) + "]");
-  log.logText("Input File Name = " + string(argv) + "\n");
+void log_start_info(infoOut &log, char const *argv, std::shared_ptr<tParameters> const &p,
+                    XRTSystem const &object_system) {
+  log.logText("XRT Version: DATE [", __DATE__, "], TIME [", __TIME__, "]");
+  log.logText("Input File Name = ", argv, "\n");
   p->logVariable(log);
-  log.logText("Rmirror\t=\t" + doubleToStr(p->mirrorR));
+  log.logText("Rmirror\t=", std::to_string(p->mirrorR));
 
-  log.logScene(mirror, light);
+  log.logScene(object_system.crystal(), object_system.source());
 
-  log.logText("Size\t=\t" + doubleToStr(p->sourceSize));
-  log.logText("Dist\t=\t" + doubleToStr(p->sourceDistance));
+  log.logText("Size\t=", p->sourceSize);
+  log.logText("Dist\t=", p->sourceDistance);
+}
 
-  if (p->waveLenghtCount <= 0) {
-    log.logText("No wave!!!!");
-    cout << "No wave!!!" << endl;
-    return 1;
+int trace_single_wavelenght(waveInput current_wave, int rayByIter, int totalRays,
+                             XRTSystem &object_system, XRTEnvironment &xrt_env,
+                             XRayTracingLog &xlog, ProgressCallback const &raysGenerated) {
+  object_system.crystal()->initRayCounter();
+
+  xlog.linkedLibraryMinorOutput = 0;
+  xlog.linkedLibraryTotalOutput = totalRays;
+
+  std::vector<tRay> rays;
+
+  auto generatedRay = 0;
+  while (generatedRay < totalRays && rayByIter > 0 && !isTerminated) {
+    rayByIter = std::min(rayByIter, totalRays - generatedRay);
+
+    rays.resize(rayByIter);
+    auto ray_generator = [&object_system, current_wave](auto begin, auto end) {
+      object_system.source()->generate_rays(begin, end, current_wave.waveLenght,
+                                            current_wave.dwaveLenght);
+    };
+
+    xrt_env.generate_rays(rays.begin(), rays.end(), ray_generator);
+
+    if (isTerminated) { break; }
+
+    xrt_env.trace(rays, object_system.objects());
+
+    generatedRay += rays.size();
+    xlog.linkedLibraryMinorOutput = generatedRay;
+
+    raysGenerated(xlog);
   }
+  return generatedRay;
+}
 
-  //
-
+void main_loop(std::shared_ptr<tParameters> const &p, XRTSystem &object_system, infoOut &log,
+               ProgressCallback const &raysGenerated, WaveCallback const &waveTraced) {
   XRayTracingLog xlog{};
-
-  linkedLibraryOutput = std::string("[" + to_string(0) + "/" + to_string(p->waveLenghtCount) + "]:\t");
 
   xlog.totalWaves = p->waveLenghtCount;
   xlog.currentWaves = 0;
@@ -117,98 +84,64 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
 
   for (int w = 0; w < p->waveLenghtCount && !isTerminated; w++) {
 
-    waveInput const &currentWaveLenght = p->waveLenghts[w];
-    if (currentWaveLenght.waveLenght <= 0)
-      continue;
+    waveInput const &current_wave = p->waveLenghts[w];
+    if (current_wave.waveLenght <= 0) continue;
 
-    log.logText(
-        "Set wave lenght\t=\t"
-        + doubleToStr(currentWaveLenght.waveLenght));
-    log.logText(
-        "Set wave dlenght\t=\t"
-        + doubleToStr(currentWaveLenght.dwaveLenght));
-    log.logText(
-        "Set wave intensity\t=\t"
-        + doubleToStr(currentWaveLenght.intensity));
+    log.logText("Set wave lenght\t=", current_wave.waveLenght);
+    log.logText("Set wave dlenght\t=", current_wave.dwaveLenght);
+    log.logText("Set wave intensity\t=", current_wave.intensity);
 
-    cout << "Wave [lenght/width/intensity]\t=\t[" << currentWaveLenght.waveLenght << "/";
-    cout << currentWaveLenght.dwaveLenght << "/";
-    cout << currentWaveLenght.intensity << "]" << endl;
+    auto working_wave = object_system.crystal()->setWorkingWave(current_wave.waveLenght);
+    log.logText("Switch working wavelenght to ", working_wave);
 
-    mirror->initRayCounter();
-    mirror->setWorkingWave(currentWaveLenght.waveLenght);
-    log.logText("Switch working wavelenght to " + std::to_string(currentWaveLenght.waveLenght));
+    auto total_rays = static_cast<std::size_t>(p->rayCount * current_wave.intensity);
+    auto rCast = trace_single_wavelenght(current_wave, p->rayByIter, total_rays, object_system,
+                                         xrt_env, xlog, raysGenerated);
 
-    int rayByIter = p->rayByIter;
-    auto totalRays =static_cast<int>(p->rayCount * currentWaveLenght.intensity);
-    xlog.linkedLibraryMinorOutput = 0;
-    xlog.linkedLibraryTotalOutput = totalRays;
-
-    std::vector<tRay> rays;
-
-    int generatedRay = 0;
-    while (generatedRay < totalRays && rayByIter > 0 && !isTerminated) {
-
-      if (rayByIter > (totalRays - generatedRay))
-        rayByIter = totalRays - generatedRay;
-
-      rays.resize(rayByIter);
-      auto ray_generator = [&light, currentWaveLenght](auto begin, auto end){
-        light->generate_rays(begin, end, currentWaveLenght.waveLenght, currentWaveLenght.dwaveLenght);
-      };
-
-      xrt_env.generate_rays(rays.begin(), rays.end(), ray_generator);
-
-      if (isTerminated) {
-        break;
-      }
-
-      xrt_env.trace(rays, obj);
-
-      generatedRay += rays.size();
-      xlog.linkedLibraryMinorOutput = generatedRay;
-
-      raysGenerated(xlog);
-    }
-
-    double rCast = generatedRay;
-    auto rCatch = static_cast<double>(mirror->getCatchRayCount());
-    auto rRefl = static_cast<double>(mirror->getReflRayCount());
+    auto rCatch = static_cast<double>(object_system.crystal()->getCatchRayCount());
+    auto rRefl = static_cast<double>(object_system.crystal()->getReflRayCount());
     double rI = rRefl / rCatch;
 
-    XRayWaveResult xwave{};
-    xwave.captured = rCatch;
-    xwave.generate = rCast;
-    xwave.dlambda = currentWaveLenght.dwaveLenght;
-    xwave.lambda = currentWaveLenght.waveLenght;
-    xwave.reflected = rRefl;
-    xwave.relfectivity = rRefl;
-    xwave.intensity = currentWaveLenght.intensity;
+    XRayWaveResult xwave{current_wave.waveLenght, current_wave.dwaveLenght, current_wave.intensity,
+                         static_cast<double>(rCast), rCatch, rRefl, rI};
 
     waveTraced(xwave);
 
-    linkedLibraryOutput = "[lambda gen catch relf reflection_stage] =\t"
-                          + doubleToStr(currentWaveLenght.waveLenght) + "\t"
-                          + doubleToStr(rCast) + "\t" + doubleToStr(rCatch) + "\t"
-                          + doubleToStr(rRefl) + "\t" + doubleToStr(rI);
-
-    log.logText(linkedLibraryOutput);
-
-    linkedLibraryOutput =
-        std::string("[").append(to_string(w + 1)).append("/").append(to_string(p->waveLenghtCount)).append(
-            "]:\t").append(linkedLibraryOutput);
-
-    plinkedLibraryOutput = linkedLibraryOutput.c_str();
+    log.logText("[lambda gen catch relf reflection_stage] =", current_wave.waveLenght,
+                rCast, rCatch, rRefl, rI);
 
     xlog.currentWaves++;
 
     cout << endl;
   }
-  //
+}
 
-  double finishTime = omp_get_wtime();
-  cout << "Done!" << endl;
-  cout << "Working time:" << "\t" << finishTime - startTime << " sec.";
-  log.logText("Working time:\t" + doubleToStr(finishTime - startTime) + " sec.");
+__lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGenerated,
+                          WaveCallback waveTraced, StdOutCallback stdoutCallback) {
+
+#ifdef _WIN32
+  std::setlocale(LC_ALL, "C");
+#endif
+
+  isTerminated = false;
+
+  std::shared_ptr<tParameters> p = nullptr;
+  auto startTime = std::chrono::high_resolution_clock::now();
+
+  if (argc < 1)
+    return 1;
+
+  p = std::make_shared<tParameters>(argv);
+
+  XRTSystem object_system(p);
+
+  infoOut log(p->logFileName.c_str(), stdoutCallback);
+  log_start_info(log, argv, p, object_system);
+
+  main_loop(p, object_system, log, raysGenerated, waveTraced);
+
+  auto finishTime = std::chrono::high_resolution_clock::now();
+  auto wtime = std::chrono::duration_cast<std::chrono::duration<double>>(finishTime - startTime).count();
+  log.logText("Working time:", wtime, " sec.");
   return 0;
 }
