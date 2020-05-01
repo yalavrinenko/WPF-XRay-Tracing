@@ -8,32 +8,22 @@
 #ifndef GENERAL_HPP_
 #define GENERAL_HPP_
 
-#define PLANE 0
-#define SPHERE 1
-#define CYLINDER 2
-#define GRID 3
-#define DUMP_PLANE 4
-
 #include <cmath>
 #include <limits>
 #include <vector>
 #include <string>
 #include "TransitivityMap.hpp"
 
-#ifdef __USE_OWN_PI__
-constexpr double M_PI = 3.14159265358979323846264338327950288;
-#endif
-
-constexpr double VERY_BIG_NUM = std::numeric_limits<double>::max();
-constexpr int VERY_BIG_NUM_INT = std::numeric_limits<int>::max();
-#define RadToGrad(A) (A*180.0/M_PI)
-#define GradToRad(A) (A*M_PI/180)
-const double c_eps = 1E-6;
-
 struct waveInput{
 	double waveLenght;
 	double dwaveLenght;
 	double intensity;
+};
+
+struct Size{
+  double width;
+  double height;
+  double depth;
 };
 
 struct Vec3d {
@@ -49,19 +39,6 @@ struct Vec3d {
 	}
 };
 
-struct Vec2d {
-	double x;
-	double y;
-	Vec2d(double _x, double _y) :
-			x(_x), y(_y) {
-	}
-	Vec2d() :
-			x(0), y(0) {
-	}
-};
-
-void readReflectionFunction();
-
 Vec3d operator-(const Vec3d &a, const Vec3d &b);
 
 Vec3d operator+(const Vec3d &a, const Vec3d &b);
@@ -70,14 +47,17 @@ Vec3d operator*(const Vec3d &a, double t);
 
 Vec3d operator/(const Vec3d &a, double t);
 
+struct MathExtension{
+  inline static double pi() { static double pi_ = std::atan(1.0) * 4.0; return pi_; }
+  static inline double RadToGrad(double angle) { return angle * 180.0 / MathExtension::pi(); }
+  static inline double GradToRad(double angle) { return angle * MathExtension::pi() / 180.0; }
+};
+
+
 double dot(const Vec3d &a);
 
 double dot2(const Vec3d &a, const Vec3d &b);
 
-double normal(double mean,double stddev);
-
 double ngrand(int a);
-
-double rdrand(int a);
 
 #endif /* GENERAL_HPP_ */

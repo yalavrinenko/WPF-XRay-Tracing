@@ -32,7 +32,7 @@ set (HEADERS general.hpp
         tRay.hpp
         tSphere.hpp
         Object.hpp
-        TransitivityMap.cpp TransitivityMap.hpp xrt_rocking_curve.cpp xrt_rocking_curve.h Object.cpp Utils.cpp Utils.hpp DetectorPlane.cpp DetectorPlane.hpp line_profile.hpp)
+        TransitivityMap.cpp TransitivityMap.hpp xrt_rocking_curve.cpp xrt_rocking_curve.h Object.cpp Utils.cpp Utils.hpp DetectorPlane.cpp DetectorPlane.hpp line_profile.hpp env_builder.cpp env_builder.hpp)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)

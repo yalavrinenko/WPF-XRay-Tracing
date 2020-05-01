@@ -35,8 +35,6 @@ public:
     parameters = std::move(parameters_ptr);
   }
 
-  int type = -1;
-
   struct xrt_intersection {
     Vec3d point;
     double I{}, l{};

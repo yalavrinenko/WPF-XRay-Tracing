@@ -5,14 +5,11 @@
  *      Author: cheshire
  */
 
-#include "tSphere.hpp"
-#include "tCylinder.hpp"
-#include "LightSorce.hpp"
 #include "Trace.hpp"
 #include "InputOutput.hpp"
 #include "Ray-tracing.hpp"
-#include "tObject.hpp"
 #include <clocale>
+#include "env_builder.hpp"
 
 #ifdef NO_OMP_SUPP
 #include <time.h>
@@ -33,153 +30,6 @@ __lib_spec char const *build_date() {
 
 __lib_spec void xrt_terminate() {
   isTerminated = true;
-}
-
-template<class mirrorClass>
-std::shared_ptr<XRTMirror> initMirror(std::shared_ptr<tParameters> const &p) {
-  double mirrorYpos = p->sourceDistance * cos(p->programAngle) - p->mirrorR;
-  Vec3d mpos(0, mirrorYpos, 0);
-  Vec3d mprop(p->mirrorR, p->mirrorTheta, p->mirrorPsi);
-  Vec3d mdprop(0, p->dmTh, p->dmPsi);
-
-  auto mirror = std::make_shared<mirrorClass>(mpos, mprop, mdprop, p->mirrorDumpFileName);
-  mirror->type = p->mirrorType + 1;
-  mirror->xrt_parameters(p);
-
-  return mirror;
-}
-
-std::shared_ptr<XRTRaySource>
-initRaySource(std::shared_ptr<tParameters> const &p, std::shared_ptr<XRTTargetSurface<>> &&target) {
-  double srcXpos = p->sourceDistance * sin(p->programAngle);
-  Vec3d spos(-srcXpos, 0, 0);
-  return std::make_shared<SphereLight>(spos, p->sourceSize_W, p->sourceSize_H, std::random_device{}(),
-                                       std::forward<std::shared_ptr<XRTTargetSurface<>>>(target));
-}
-
-void addDumpPlanesObjectLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
-                              Vec3d object_r, int count, double step, double sizeW, double sizeH, double angl,
-                              tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
-  double h = startPoint;
-  for (int i = 0; i < count; i++) {
-    double sx = h * sin(angl);
-    double sy = h * cos(angl);
-    sy = dir.y - sy;
-
-    Vec3d r0(sx, sy, 0);
-    Vec3d N = object_r - r0;
-    N = N / sqrt(dot(N));
-
-    double nx = N.x * cos(-M_PI / 2) - N.y * sin(-M_PI / 2);
-    double ny = N.x * sin(-M_PI / 2) + N.y * cos(-M_PI / 2);
-    N.x = nx;
-    N.y = ny;
-
-    //string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
-    string name = p->dumpPlaneName + "Detector.dmp";
-
-    auto dp = std::make_shared<tDetectorPlane>(N, r0, sizeW, sizeH, name);
-    dp->setCrossPattern(crossPattern);
-    dp->type = DUMP_PLANE;
-    dp->xrt_parameters(p);
-
-    obj.push_back(dp);
-    h += step;
-  }
-}
-
-void addDumpPlanesSrcLined(XRTObjectVector &obj, double startPoint, Vec3d dir,
-                           Vec3d srcDir, int count, double step, double sizeW, double sizeH, double angl,
-                           tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
-  double h = startPoint;
-  for (int i = 0; i < count; i++) {
-    double sx = h * sin(angl);
-    double sy = h * cos(angl);
-    sy = dir.y - sy;
-
-    Vec3d r0(sx, sy, 0);
-    Vec3d N = srcDir - r0;
-    N = N / sqrt(dot(N));
-
-    double nx = N.x * cos(-M_PI / 2) - N.y * sin(-M_PI / 2);
-    double ny = N.x * sin(-M_PI / 2) + N.y * cos(-M_PI / 2);
-    N.x = nx;
-    N.y = ny;
-
-    //string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
-    string name = p->dumpPlaneName + "Detector.dmp";
-
-    auto dp = std::make_shared<tDetectorPlane>(N, r0, sizeW, sizeH, name);
-    dp->setCrossPattern(crossPattern);
-    dp->type = DUMP_PLANE;
-    dp->xrt_parameters(p);
-
-    obj.push_back(dp);
-    h += step;
-  }
-}
-
-void addDumpPlanesR2Lined(XRTObjectVector &obj, double startPoint, Vec3d dir,
-                          Vec3d mirror_r, int count, double step, double sizeW, double sizeH, double angl,
-                          tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
-  double h = startPoint;
-  for (int i = 0; i < count; i++) {
-    double sx = h * sin(angl);
-    double sy = h * cos(angl);
-    sy = dir.y - sy;
-
-    Vec3d r0(sx, sy, 0);
-
-    Vec3d N = mirror_r - r0;
-    N = N / sqrt(dot(N));
-
-    double nx = N.x * cos(-M_PI / 2) - N.y * sin(-M_PI / 2);
-    double ny = N.x * sin(-M_PI / 2) + N.y * cos(-M_PI / 2);
-    N.x = nx;
-    N.y = ny;
-
-    //string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
-    string name = p->dumpPlaneName + "Detector.dmp";
-
-    auto dp = std::make_shared<tDetectorPlane>(N, r0, sizeW, sizeH, name);
-    dp->setCrossPattern(crossPattern);
-    dp->type = DUMP_PLANE;
-    dp->xrt_parameters(p);
-
-    obj.push_back(dp);
-    h += step;
-  }
-}
-
-void addDumpPlanes(XRTObjectVector &obj, double startPoint, Vec3d dir,
-                   int count, double step, double sizeW, double sizeH, double angl,
-                   tDetectorPlane::IntersectionFilter crossPattern, std::shared_ptr<tParameters> const &p) {
-  double h = startPoint;
-  for (int i = 0; i < count; i++) {
-    double sx = h * sin(angl);
-    double sy = h * cos(angl);
-    sy = dir.y - sy;
-
-    Vec3d r0(sx, sy, 0);
-    Vec3d N(sx, sy, 0);
-    N = dir - N;
-    N = N / sqrt(dot(N));
-
-    //string name = p->dumpPlaneName + doubleToStr(h) + ".dmp";
-#ifdef DEUBG_MODE
-    string name = p->dumpPlaneName + std::to_string(h) + ".dmp";
-#else
-    string name = p->dumpPlaneName + "Detector.dmp";
-#endif
-
-    auto dp = std::make_shared<tDetectorPlane>(N, r0, sizeW, sizeH, name);
-    dp->setCrossPattern(crossPattern);
-    dp->type = DUMP_PLANE;
-    dp->xrt_parameters(p);
-
-    obj.push_back(dp);
-    h += step;
-  }
 }
 
 void addManualObject(XRTObjectVector &obj, Vec3d mirrorPos, double gridPosition,
@@ -214,7 +64,6 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
 
   isTerminated = false;
 
-  XRTObjectVector obj;
   std::shared_ptr<tParameters> p = nullptr;
 
   double startTime = omp_get_wtime();
@@ -225,34 +74,8 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
   } else
     p = std::make_shared<tParameters>(argv);
 
-  std::shared_ptr<XRTMirror> mirror = nullptr;
-  if (p->mirrorType == MIRROR_SPHERE)
-    mirror = initMirror<tSphere>(p);
-  if (p->mirrorType == MIRROR_CYLINDER)
-    mirror = initMirror<tCylinder>(p);
+  XRTSystem object_system(p);
 
-  obj.emplace_back(mirror);
-
-  auto light = initRaySource(p, mirror);
-
-  Vec3d dumpPlaneStart = mirror->GetR0();
-
-  dumpPlaneStart.y += p->mirrorR;
-
-  if (p->planeCount > 0) {
-    if (p->dumpDirection == "Mirror")
-      addDumpPlanes(obj, p->startPoint, dumpPlaneStart, p->planeCount,
-                    p->planeStep, p->planeSizeW, p->planeSizeH, p->programAngle,
-                    tDetectorPlane::IntersectionFilter::IMAGE, p);
-    else {
-      //addDumpPlanesR2Lined(obj, p->startPoint, dumpPlaneStart,
-      //mirror->GetR0(), p->planeCount, p->planeStep, p->planeSizeW, p->planeSizeH,
-      //p->programAngle, tDetectorPlane::IntersectionFilter::IMAGE, p);
-      addDumpPlanesObjectLined(obj, p->startPoint, dumpPlaneStart,
-                               mirror->GetR0(), p->planeCount, p->planeStep, p->planeSizeW, p->planeSizeH,
-                               p->programAngle, tDetectorPlane::IntersectionFilter::IMAGE, p);
-    }
-  }
 
   if (p->objPlaneCount > 0)
     addDumpPlanes(obj, p->objStartPoint, dumpPlaneStart, p->objPlaneCount,
@@ -383,22 +206,9 @@ __lib_spec int RayTracing(int argc, char const *argv, ProgressCallback raysGener
   }
   //
 
-  cout << "Done!\n\tCleaning memory..." << endl;
-  log.logText("Done!\n\tCleaning memory...");
-  try {
-    obj.clear();
-  }
-  catch (...) {
-    cout << "Catch something strange!" << endl;
-    log.logText("Catch something strange!");
-  }
-
-  cout << "\tClean!" << endl;
-  log.logText("\tClean!");
-
   double finishTime = omp_get_wtime();
+  cout << "Done!" << endl;
   cout << "Working time:" << "\t" << finishTime - startTime << " sec.";
   log.logText("Working time:\t" + doubleToStr(finishTime - startTime) + " sec.");
-  cout << endl << "End" << endl;
   return 0;
 }
